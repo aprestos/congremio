@@ -39,7 +39,7 @@ export const authService = {
       options: {
         // set this to false if you do not want the user to be automatically signed up
         shouldCreateUser: true,
-        emailRedirectTo: "http://localhost:5173/auth/confirm",
+        emailRedirectTo: `${window.location.origin}/auth/confirm`,
       },
     });
   },

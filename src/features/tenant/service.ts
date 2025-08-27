@@ -14,16 +14,35 @@ export const tenantService = {
   },
   async getByDomain(domain: string): Promise<Tenant> {
     try {
-      const { data, error } = await supabase
+      // First try to find by main domain
+      let { data, error } = await supabase
         .from("tenants")
         .select()
         .eq("domain", domain)
         .single();
 
-      if (error) {
-        const { data, error } = await supabase.from("tenants").select();
-        console.log(data);
-        console.error((error as Error).message);
+      // If not found in main domain, check other_domains array
+      if (error && error.code === "PGRST116") {
+        // No rows found
+        const { data: tenantsData, error: tenantsError } = await supabase
+          .from("tenants")
+          .select()
+          .contains("other_domains", [domain]);
+
+        if (tenantsError) {
+          console.error("Error searching other_domains:", tenantsError.message);
+          throw tenantsError;
+        }
+
+        if (tenantsData && tenantsData.length > 0) {
+          data = tenantsData[0];
+          error = null;
+        } else {
+          console.error(`No tenant found for domain: ${domain}`);
+          throw new Error(`No tenant found for domain: ${domain}`);
+        }
+      } else if (error) {
+        console.error("Error fetching tenant by domain:", error.message);
         throw error;
       }
 
@@ -52,12 +71,12 @@ export const tenantService = {
   },
   async updateTenant(
     tenantId: string,
-    updates: { email?: string; name?: string; logo?: string }
+    updates: { email?: string; name?: string; logo?: string },
   ): Promise<Tenant | null> {
     try {
       // Filter out undefined values to only update defined fields
       const filteredUpdates = Object.fromEntries(
-        Object.entries(updates).filter(([_, value]) => value !== undefined)
+        Object.entries(updates).filter(([_, value]) => value !== undefined),
       );
 
       // If no valid updates, return null
