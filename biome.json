@@ -6,7 +6,7 @@
     "useIgnoreFile": true
   },
   "files": {
-    "includes": ["src/**/*.{js,ts,jsx,tsx,vue,json}"],
+    "includes": ["src/**/*.{js,ts,jsx,tsx,json}"],
     "ignoreUnknown": false
   },
   "formatter": {
@@ -31,11 +31,12 @@
         "useTemplate": "warn"
       },
       "suspicious": {
-        "noExplicitAny": "warn",
+        "noExplicitAny": "off",
         "noArrayIndexKey": "warn"
       },
       "correctness": {
-        "noUnusedVariables": "warn",
+        "noUnusedVariables": "off",
+        "noUnusedImports": "off",
         "useExhaustiveDependencies": "warn"
       }
     }

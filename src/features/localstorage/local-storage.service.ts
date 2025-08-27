@@ -1,13 +1,17 @@
-class LocalStorageService {
-  private static TENANT_ID_KEY = "tenant_id";
+const TENANT_ID_KEY = "tenant_id";
 
-  static getTenantId(): string | null {
-    return localStorage.getItem(LocalStorageService.TENANT_ID_KEY);
-  }
+export const getTenantId = (): string | null => {
+  return localStorage.getItem(TENANT_ID_KEY);
+};
 
-  static setTenantId(id: string): void {
-    localStorage.setItem(LocalStorageService.TENANT_ID_KEY, id);
-  }
-}
+export const setTenantId = (id: string): void => {
+  localStorage.setItem(TENANT_ID_KEY, id);
+};
+
+// Default export for backward compatibility
+const LocalStorageService = {
+  getTenantId,
+  setTenantId,
+};
 
 export default LocalStorageService;
