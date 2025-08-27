@@ -65,6 +65,7 @@ const router = createRouter({
       component: () => import("../views/admin/HomeView.vue"),
       meta: {
         requiresAuth: true,
+        permission: "admin",
         guard: requiresStaff,
       },
       children: [

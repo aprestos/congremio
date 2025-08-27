@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabase";
-import type { Event } from "./event.model";
+import type { Event } from "./event.model.ts";
 
 const EditionService = {
   async getById(eventId: string): Promise<Event | null> {

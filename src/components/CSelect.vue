@@ -39,7 +39,7 @@
             'mt-1 border border-gray-200 dark:border-gray-600 rounded-md shadow-lg bg-white dark:bg-gray-700 z-[150]',
           menuOption:
             'px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 text-gray-900 dark:text-white',
-          menuOptionActive: 'bg-indigo-600 dark:bg-indigo-500 text-white',
+          menuOptionFocused: 'bg-indigo-600 dark:bg-indigo-500 text-white',
           noResults: 'text-gray-500 dark:text-gray-400 p-3',
           taggableNoOptions:
             'text-indigo-600 dark:text-indigo-400 p-3 hover:bg-indigo-50 dark:hover:bg-indigo-900',

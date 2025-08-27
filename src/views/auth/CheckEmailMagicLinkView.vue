@@ -104,9 +104,9 @@
 
 <script lang="ts" setup>
 import {
+  ArrowLeftIcon,
   EnvelopeIcon,
   InformationCircleIcon,
   LockClosedIcon,
-  ArrowLeftIcon,
 } from "@heroicons/vue/24/outline";
 </script>

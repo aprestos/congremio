@@ -1,4 +1,4 @@
-import type { User, UserResponse } from "@supabase/supabase-js";
+import type { UserResponse } from "@supabase/supabase-js";
 import type { Access, TenantAccess } from "@/features/auth/access.model.ts";
 import { supabase } from "@/lib/supabase.ts";
 import { tenantStore } from "@/stores/tenant.ts";
@@ -16,12 +16,16 @@ export const authService = {
       },
     });
 
-    await supabase.functions.invoke(`user-tenant`, {
-      body: {
-        user_id: data.user?.id,
-      },
-      method: "POST",
-    });
+    if (data.user) {
+      await supabase.functions.invoke(`user-tenant`, {
+        body: {
+          user_id: data.user.id,
+        },
+        method: "POST",
+      });
+    }
+
+    return { data, error };
   },
   async signIn(email: string, password: string) {
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -50,8 +54,9 @@ export const authService = {
     const access: Access = data?.claims?.access;
 
     console.log("access", access);
-    if (!tenant_id || !access || !access[tenant_id]) return {};
-    else return access[tenant_id];
+    if (!tenant_id || !access || !access[tenant_id]) {
+      return { role: "", permissions: [] };
+    } else return access[tenant_id];
   },
 
   async getRole(): Promise<string | undefined> {

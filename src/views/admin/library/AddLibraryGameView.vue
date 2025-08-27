@@ -71,7 +71,7 @@
 <script lang="ts" setup>
 import { useRegle } from "@regle/core";
 import { required } from "@regle/rules";
-import { onMounted, reactive, ref } from "vue";
+import { onMounted, ref } from "vue";
 import type { Option } from "vue3-select-component";
 import CButton from "@/components/CButton.vue";
 import CInput from "@/components/CInput.vue";
@@ -81,7 +81,6 @@ import type { Game } from "@/features/external-game/model.ts";
 import gameService from "@/features/external-game/service.ts";
 import { libraryService } from "@/features/library/service.ts";
 import { locationService } from "@/features/locations/service.ts";
-import router from "@/router";
 
 const formData = ref<{
   selectedGame: number | undefined;

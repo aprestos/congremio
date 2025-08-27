@@ -1,4 +1,3 @@
-import type { Game } from "@/features/external-game/model.ts";
 import { supabase } from "@/lib/supabase";
 
 export interface User {
@@ -11,14 +10,14 @@ export interface User {
 }
 
 export const userService = {
-  async search(query: string): Promise<Game> {
+  async search(query: string): Promise<User[]> {
     const result = await supabase.functions.invoke(`users`, {
       method: "POST",
       body: {
-        external_id: id,
+        query: query,
       },
     });
-    return result.data as Game;
+    return result.data as User[];
   },
 
   async getById(id: string): Promise<User | null> {

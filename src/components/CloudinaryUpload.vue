@@ -112,7 +112,7 @@ const openCloudinaryWidget = async () => {
 
     if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_UPLOAD_PRESET) {
       const error = new Error(
-        "Cloudinary configuration missing. Please set VITE_CLOUDINARY_CLOUD_NAME and VITE_CLOUDINARY_UPLOAD_PRESET in your .env file",
+        "Cloudinary configuration missing. Please set VITE_CLOUDINARY_CLOUD_NAME and VITE_CLOUDINARY_UPLOAD_PRESET in your .env file"
       );
       console.error(error.message);
       emit("upload-error", error);
@@ -122,7 +122,7 @@ const openCloudinaryWidget = async () => {
     const tenantId = tenantStore.value?.id;
     if (!tenantId) {
       const error = new Error(
-        "Tenant ID not found. Please ensure user is logged in and tenant is loaded.",
+        "Tenant ID not found. Please ensure user is logged in and tenant is loaded."
       );
       console.error(error.message);
       emit("upload-error", error);
@@ -205,7 +205,7 @@ const openCloudinaryWidget = async () => {
         if (result && result.event === "abort") {
           isUploading.value = false;
         }
-      },
+      }
     );
 
     widget.open();

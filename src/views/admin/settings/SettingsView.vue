@@ -97,7 +97,6 @@
         <div
           class="grid grid-cols-1 gap-x-6 gap-y-8 sm:max-w-xl sm:grid-cols-6"
         >
-          <DatePicker />
           <CInput
             id="current-password"
             label="Current password"
@@ -188,7 +187,6 @@ import CloudinaryUpload from "@/components/CloudinaryUpload.vue";
 import SettingsSection from "@/components/SettingsSection.vue";
 import tenantService from "@/features/tenant/service";
 import { tenantStore } from "@/stores/tenant";
-import DatePicker from "@/volt/DatePicker.vue";
 
 const secondaryNavigation = [
   { name: "General", href: "#", current: true },
@@ -231,7 +229,7 @@ const handleImageLoad = (event: Event) => {
 };
 
 // Handle upload events
-const handleLogoUploadSuccess = async (result: any) => {
+const handleLogoUploadSuccess = async (result: { secure_url: string }) => {
   try {
     const tenantId = tenantStore.value?.id;
     if (!tenantId) {
@@ -255,7 +253,7 @@ const handleLogoUploadSuccess = async (result: any) => {
   }
 };
 
-const handleLogoUploadError = (error: any) => {
+const handleLogoUploadError = (error: unknown) => {
   console.error("Logo upload failed:", error);
   // Handle error (show toast, etc.)
 };
@@ -376,14 +374,14 @@ const handleSubmit = async (event: Event) => {
   if (isSaving.value) return;
 
   // Validate form before submitting
-  const { valid, data } = await r$.$validate();
+  const { valid } = await r$.$validate();
 
   if (!valid) {
     console.log("Form has validation errors");
     return;
   }
 
-  saveTenant();
+  await saveTenant();
 };
 
 // Handle form submissions

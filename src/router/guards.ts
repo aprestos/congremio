@@ -57,7 +57,7 @@ export const requiresStaffOrAdmin = async (): Promise<boolean> => {
 export const navigationGuard = async (
   to: RouteLocationNormalized,
   from: RouteLocationNormalized,
-  next: NavigationGuardNext,
+  next: NavigationGuardNext
 ): Promise<void> => {
   try {
     // Check custom guard function

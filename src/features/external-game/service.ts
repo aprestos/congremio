@@ -17,7 +17,7 @@ export const gameService = {
       `boardgamegeek-api?query=${query}`,
       {
         method: "GET",
-      },
+      }
     );
     return result.data as Game[];
   },

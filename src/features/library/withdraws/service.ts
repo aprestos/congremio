@@ -61,7 +61,7 @@ export const libraryWithdrawService = {
   },
 
   async getByLibraryGameId(
-    libraryGameId: number,
+    libraryGameId: number
   ): Promise<Array<LibraryWithdraw>> {
     try {
       const result = await supabase
@@ -76,7 +76,7 @@ export const libraryWithdrawService = {
     } catch (error) {
       console.error(
         "Error fetching withdraws by library game:",
-        (error as Error).message,
+        (error as Error).message
       );
       return [];
     }
@@ -96,7 +96,7 @@ export const libraryWithdrawService = {
     } catch (error) {
       console.error(
         "Error fetching active withdraws:",
-        (error as Error).message,
+        (error as Error).message
       );
       return [];
     }

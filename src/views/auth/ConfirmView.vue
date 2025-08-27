@@ -35,7 +35,7 @@ onMounted(async () => {
       } else {
         console.log(
           "User already has role for this tenant:",
-          userRoles[tenantId],
+          userRoles[tenantId]
         );
       }
 

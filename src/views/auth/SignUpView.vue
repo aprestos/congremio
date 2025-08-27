@@ -92,7 +92,7 @@
 <script lang="ts" setup>
 import type { AuthError } from "@supabase/supabase-js";
 import { ref } from "vue";
-//import { toast } from "vue3-toastify";
+import { toast } from "vue-sonner";
 import { authService } from "@/features/auth/service.ts";
 
 const name = ref("");
@@ -104,7 +104,7 @@ const submit = async () => {
     const { data, error } = await authService.signUp(
       name.value,
       email.value,
-      password.value,
+      password.value
     );
     console.log(JSON.stringify(data));
     console.log(JSON.stringify(error));

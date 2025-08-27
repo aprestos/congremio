@@ -10,7 +10,7 @@ export const libraryService = {
       const result = await supabase
         .from("library_games")
         .select(
-          "id,owner,notes,game:games(id,name,image,year,min_playtime,max_playtime,min_players,max_players),event_id,status",
+          "id,owner,notes,game:games(id,name,image,year,min_playtime,max_playtime,min_players,max_players),event_id,status"
         )
         .eq("tenant_id", tenantStore.value?.id)
         .eq("event_id", tenantStore.value?.current_event);
@@ -25,7 +25,7 @@ export const libraryService = {
     gameId: number,
     locationId: number,
     owner: string,
-    notes?: string,
+    notes?: string
   ): Promise<void> {
     const { error } = await supabase.from("library_games").insert({
       tenant_id: tenantStore.value?.id,
@@ -71,7 +71,7 @@ export const libraryService = {
           schema: "public",
           table: "library_games",
         },
-        handleDatabaseChange,
+        handleDatabaseChange
       )
       .subscribe();
 
@@ -89,7 +89,7 @@ export const libraryService = {
         .eq("tenant_id", tenantStore.value?.id)
         .eq("event_id", tenantStore.value?.current_event)
         .or(
-          `game_name.ilike.%${query}%,owner.ilike.%${query}%,notes.ilike.%${query}%`,
+          `game_name.ilike.%${query}%,owner.ilike.%${query}%,notes.ilike.%${query}%`
         );
 
       console.log("Search results:", result.data);

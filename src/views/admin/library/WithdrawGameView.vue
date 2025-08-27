@@ -121,11 +121,7 @@
 
 <script setup lang="ts">
 import { useRegle } from "@regle/core";
-import { required } from "@regle/rules";
 import { ref } from "vue";
-import type { Option } from "vue3-select-component";
-//import { toast } from "vue3-toastify";
-
 import { toast } from "vue-sonner";
 import "vue-sonner/style.css";
 
@@ -151,18 +147,6 @@ const formData = ref({
 });
 
 const isSubmitting = ref(false);
-
-// Mock users data - replace with real user service later
-const users = ref<Option<number>[]>([
-  { label: "John Smith (john@example.com)", value: 1 },
-  { label: "Sarah Johnson (sarah@example.com)", value: 2 },
-  { label: "Mike Davis (mike@example.com)", value: 3 },
-  { label: "Emily Brown (emily@example.com)", value: 4 },
-  { label: "Alex Wilson (alex@example.com)", value: 5 },
-  { label: "Lisa Garcia (lisa@example.com)", value: 6 },
-  { label: "David Martinez (david@example.com)", value: 7 },
-  { label: "Jessica Taylor (jessica@example.com)", value: 8 },
-]);
 
 const { r$ } = useRegle(formData, {
   selectedUser: {},

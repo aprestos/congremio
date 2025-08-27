@@ -50,7 +50,7 @@ export default {
           games.push(...result);
         }
       },
-      { immediate: true },
+      { immediate: true }
     );
 
     return {

@@ -52,12 +52,12 @@ export const tenantService = {
   },
   async updateTenant(
     tenantId: string,
-    updates: { email?: string; name?: string; logo?: string },
+    updates: { email?: string; name?: string; logo?: string }
   ): Promise<Tenant | null> {
     try {
       // Filter out undefined values to only update defined fields
       const filteredUpdates = Object.fromEntries(
-        Object.entries(updates).filter(([_, value]) => value !== undefined),
+        Object.entries(updates).filter(([_, value]) => value !== undefined)
       );
 
       // If no valid updates, return null
