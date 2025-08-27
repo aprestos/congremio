@@ -1,9 +1,12 @@
-import type { ExternalGame } from '@/features/external-game/model.ts'
+import type { Game } from "@/features/external-game/model.ts";
+import type { GameLocation } from "@/features/locations/model.ts";
 
-export interface Game {
-  id: number
-  owner_id: string
-  notes: string
-  event_id: number
-  game: ExternalGame
+export interface LibraryGame {
+  id: number;
+  owner: string;
+  notes: string;
+  event_id: number;
+  location?: GameLocation;
+  game: Game;
+  status: "available" | "reserved" | "not-available" | "withdrawn";
 }

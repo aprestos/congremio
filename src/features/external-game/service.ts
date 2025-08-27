@@ -1,21 +1,26 @@
-import type { ExternalGame } from '@/features/external-game/model.ts'
-import { supabase } from '@/lib/supabase.ts'
+import type { Game } from "@/features/external-game/model.ts";
+import { supabase } from "@/lib/supabase.ts";
 
-export default class ExternalGameService {
-  static async get(id: string): Promise<ExternalGame[]> {
+export const gameService = {
+  async get(id: string): Promise<Game> {
     const result = await supabase.functions.invoke(`get-or-create-game`, {
-      method: 'POST',
+      method: "POST",
       body: {
         external_id: id,
       },
-    })
-    return result.data as ExternalGame[]
-  }
+    });
+    return result.data as Game;
+  },
 
-  static async search(query: string): Promise<ExternalGame[]> {
-    const result = await supabase.functions.invoke(`boardgamegeek-api?query=${query}`, {
-      method: 'GET',
-    })
-    return result.data as ExternalGame[]
-  }
-}
+  async search(query: string): Promise<Game[]> {
+    const result = await supabase.functions.invoke(
+      `boardgamegeek-api?query=${query}`,
+      {
+        method: "GET",
+      },
+    );
+    return result.data as Game[];
+  },
+} as const;
+
+export default gameService;

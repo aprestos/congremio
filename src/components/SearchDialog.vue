@@ -14,7 +14,9 @@
       </TransitionChild>
 
       <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
-        <div class="flex min-h-full items-end justify-center text-center sm:items-center sm:p-0">
+        <div
+          class="flex min-h-full items-end justify-center text-center sm:items-center sm:p-0"
+        >
           <TransitionChild
             as="template"
             enter="ease-out duration-300"
@@ -53,7 +55,9 @@
                         </a>
                       </p>
                       <p class="mt-1 flex text-xs/5 text-gray-500">
-                        <a class="relative truncate hover:underline">{{ game.yearPublished }}</a>
+                        <a class="relative truncate hover:underline">{{
+                          game.yearPublished
+                        }}</a>
                       </p>
                     </div>
                   </div>
@@ -68,34 +72,39 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from 'vue'
-import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
-import type { ExternalGame } from '@/features/external-game/model.ts'
-import ExternalGameService from '@/features/external-game/service.ts'
-import { useDebounceFn } from '@vueuse/core'
+import {
+  Dialog,
+  DialogPanel,
+  TransitionChild,
+  TransitionRoot,
+} from "@headlessui/vue";
+import { useDebounceFn } from "@vueuse/core";
+import { ref, watch } from "vue";
+import type { Game } from "@/features/external-game/model.ts";
+import gameService from "@/features/external-game/service.ts";
 
-const open = ref(true)
-const query = ref('')
-const results = ref<ExternalGame[]>([])
+const open = ref(true);
+const query = ref("");
+const results = ref<Game[]>([]);
 
-const emit = defineEmits(['selected-game'])
+const emit = defineEmits(["selected-game"]);
 
 const search = useDebounceFn(async (value) => {
   if (value?.length > 1) {
-    const response = await ExternalGameService.search(value)
-    console.log(response)
-    results.value = response
+    const response = await gameService.search(value);
+    console.log(response);
+    results.value = response;
   }
-}, 500)
+}, 500);
 
 const onSelectedGame = async (event: { id: string }) => {
-  const game = await ExternalGameService.get(event.id)
-  console.log(game)
-  emit('selected-game', game)
-}
+  const game = await gameService.get(event.id);
+  console.log(game);
+  emit("selected-game", game);
+};
 
 watch(query, async (newValue) => {
-  console.log(newValue)
-  await search(newValue)
-})
+  console.log(newValue);
+  await search(newValue);
+});
 </script>

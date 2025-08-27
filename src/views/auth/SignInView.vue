@@ -1,20 +1,16 @@
 <template>
-  <!--
-    This example requires updating your template:
-
-    ```
-    <html class="h-full bg-white">
-    <body class="h-full">
-    ```
-  -->
-  <div class="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
+  <div
+    class="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8"
+  >
     <div class="sm:mx-auto sm:w-full sm:max-w-sm">
       <img
         class="mx-auto h-10 w-auto"
         src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600"
         alt="Your Company"
       />
-      <h2 class="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">
+      <h2
+        class="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900"
+      >
         Sign in to your account
       </h2>
     </div>
@@ -22,7 +18,9 @@
     <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
       <form class="space-y-6" action="#" method="POST">
         <div>
-          <label for="email" class="block text-sm/6 font-medium text-gray-900">Email address</label>
+          <label for="email" class="block text-sm/6 font-medium text-gray-900"
+            >Email address</label
+          >
           <div class="mt-2">
             <input
               v-model="email"
@@ -38,9 +36,15 @@
 
         <div>
           <div class="flex items-center justify-between">
-            <label for="password" class="block text-sm/6 font-medium text-gray-900">Password</label>
+            <label
+              for="password"
+              class="block text-sm/6 font-medium text-gray-900"
+              >Password</label
+            >
             <div class="text-sm">
-              <a href="#" class="font-semibold text-indigo-600 hover:text-indigo-500"
+              <a
+                href="#"
+                class="font-semibold text-indigo-600 hover:text-indigo-500"
                 >Forgot password?</a
               >
             </div>
@@ -71,8 +75,10 @@
 
       <p class="mt-10 text-center text-sm/6 text-gray-500">
         Not a member?
-        {{ ' ' }}
-        <RouterLink to="/sign-up" class="font-semibold text-indigo-600 hover:text-indigo-500"
+        {{ " " }}
+        <RouterLink
+          to="/sign-up"
+          class="font-semibold text-indigo-600 hover:text-indigo-500"
           >Create your free account</RouterLink
         >
       </p>
@@ -81,15 +87,15 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
-import AuthService from '@/features/auth/service.ts'
-import router from '@/router'
+import { ref } from "vue";
+import { authService } from "@/features/auth/service.ts";
+import router from "@/router";
 
-const email = ref('')
-const password = ref('')
+const email = ref("");
+const password = ref("");
 
 const submit = async () => {
-  await AuthService.signIn(email.value, password.value)
-  await router.push({ name: 'home' })
-}
+  await authService.signIn(email.value, password.value);
+  await router.push({ name: "home" });
+};
 </script>
