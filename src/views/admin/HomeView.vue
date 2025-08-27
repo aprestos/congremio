@@ -107,30 +107,16 @@ const publicPages = [
     name: "Library",
     to: { name: RouteNames.public.library },
     initial: "L",
+    current: false,
   },
   {
     id: 2,
     name: "Flee Market",
     to: { name: RouteNames.public.fleeMarket },
     initial: "FM",
+    current: false,
   },
-];
-const userNavigation = [
-  { name: "Your profile", href: "#" },
-  { name: "Sign out", href: "#" },
 ];
 
 const sidebarOpen = ref(false);
-
-function handleSearchInput() {
-  // Optional: Handle real-time search as user types
-  if (searchInput.value.length > 2) {
-    executeSearch(searchInput.value);
-  }
-}
-
-function handleSearch() {
-  // Handle search form submission
-  executeSearch(searchInput.value);
-}
 </script>

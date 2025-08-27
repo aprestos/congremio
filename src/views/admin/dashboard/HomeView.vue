@@ -162,7 +162,9 @@
                               </div>
                               <div
                                 :class="[
-                                  statuses[transaction.status],
+                                  statuses[
+                                    transaction.status
+                                  ] as unknown as string,
                                   'rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset',
                                 ]"
                               >
@@ -348,31 +350,16 @@
 </template>
 
 <script lang="ts" setup>
-import {
-  Dialog,
-  DialogPanel,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuItems,
-} from "@headlessui/vue";
+import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import {
   ArrowDownCircleIcon,
   ArrowPathIcon,
   ArrowUpCircleIcon,
-  Bars3Icon,
   EllipsisHorizontalIcon,
   PlusSmallIcon,
 } from "@heroicons/vue/20/solid";
-import { BellIcon, XMarkIcon } from "@heroicons/vue/24/outline";
 import { ref } from "vue";
 
-const navigation = [
-  { name: "Home", href: "#" },
-  { name: "Invoices", href: "#" },
-  { name: "Clients", href: "#" },
-  { name: "Expenses", href: "#" },
-];
 const secondaryNavigation = [
   { name: "Last 24 hours", href: "#", current: true },
   { name: "All-time", href: "#", current: false },
@@ -403,7 +390,7 @@ const stats = [
     changeType: "negative",
   },
 ];
-const statuses = {
+const statuses: Record<string, string> = {
   Paid: "text-green-700 bg-green-50 ring-green-600/20 dark:bg-green-500/10 dark:text-green-500 dark:ring-green-500/10",
   Withdraw:
     "text-gray-600 bg-gray-50 ring-gray-500/10 dark:bg-white/5 dark:text-gray-400 dark:ring-white/10",
@@ -503,6 +490,4 @@ const clients = [
     },
   },
 ];
-
-const mobileMenuOpen = ref(false);
 </script>

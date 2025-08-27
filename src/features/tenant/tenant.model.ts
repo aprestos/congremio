@@ -4,4 +4,5 @@ export interface Tenant {
   domain: string;
   logo: string;
   current_event: string;
+  email: string;
 }

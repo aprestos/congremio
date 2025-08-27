@@ -74,10 +74,10 @@ const handleSearch = useDebounceFn(async (value) => {
       menuContainer:
         'mt-1 border border-gray-200 rounded-md shadow-lg bg-white z-50',
       menuOption: 'px-3 py-2 hover:bg-gray-100 text-gray-900',
-      menuOptionFocused: 'bg-indigo-600 text-white',
+      //menuOptionFocused: 'bg-indigo-600 text-white',
       noResults: 'text-gray-500 p-3',
       taggableNoOptions: 'text-indigo-600 p-3 hover:bg-indigo-50',
-      loadingSpinner: 'text-indigo-600',
+      //loadingSpinner: 'text-indigo-600',
     }"
   >
     <template #option="{ option }">

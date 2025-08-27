@@ -1,13 +1,4 @@
 <script setup lang="ts">
-import {
-  Dialog,
-  DialogPanel,
-  TransitionChild,
-  TransitionRoot,
-} from "@headlessui/vue";
-
-import { Cog6ToothIcon, XMarkIcon } from "@heroicons/vue/24/outline";
-
 interface NavigationItem {
   name: string;
   to: string | { name: string };
@@ -20,6 +11,7 @@ interface PublicPage {
   name: string;
   to: string | { name: string };
   initial: string;
+  current: boolean;
 }
 
 defineProps<{

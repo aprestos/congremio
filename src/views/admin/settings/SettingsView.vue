@@ -179,7 +179,7 @@
 
 <script setup lang="ts">
 import { useRegle } from "@regle/core";
-import { required, withMessage } from "@regle/rules";
+import { alpha, email, maxLength, minLength, required } from "@regle/rules";
 import { computed, ref, watchEffect } from "vue";
 import CButton from "@/components/CButton.vue";
 import CInput from "@/components/CInput.vue";
@@ -258,11 +258,6 @@ const handleLogoUploadError = (error: unknown) => {
   // Handle error (show toast, etc.)
 };
 
-// Custom regex validation rules
-const namePattern = (value: string) => /^[a-zA-Z0-9\s\-_&.]{2,50}$/.test(value);
-const emailPattern = (value: string) =>
-  /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value);
-
 // Form data
 const formData = ref({
   name: "",
@@ -284,18 +279,14 @@ const logoutPasswordData = ref({
 // Regle validation setup
 const { r$ } = useRegle(formData, {
   name: {
-    required: withMessage(required, "Event name is required"),
-    namePattern: withMessage(
-      namePattern,
-      "Name must be 2-50 characters and contain only letters, numbers, spaces, hyphens, underscores, ampersands, and periods",
-    ),
+    required,
+    alpha,
+    minLength: minLength(2),
+    maxLength: maxLength(50),
   },
   email: {
-    required: withMessage(required, "Contact email is required"),
-    emailPattern: withMessage(
-      emailPattern,
-      "Please enter a valid email address",
-    ),
+    required,
+    email,
   },
 });
 
