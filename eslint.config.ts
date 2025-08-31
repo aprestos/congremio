@@ -1,44 +1,46 @@
-import {
-  defineConfigWithVueTs,
-  vueTsConfigs,
-} from '@vue/eslint-config-typescript'
+import { defineConfigWithVueTs } from '@vue/eslint-config-typescript'
+import pluginVue from 'eslint-plugin-vue'
 import tseslint from '@typescript-eslint/eslint-plugin'
 import tsparser from '@typescript-eslint/parser'
-import pluginVue from 'eslint-plugin-vue'
-import pluginVitest from '@vitest/eslint-plugin'
+import pluginVitest from 'eslint-plugin-vitest'
 import pluginPlaywright from 'eslint-plugin-playwright'
-import skipFormatting from '@vue/eslint-config-prettier/skip-formatting'
+import prettierPlugin from 'eslint-plugin-prettier'
 
 export default defineConfigWithVueTs(
   {
     name: 'app/files-to-lint',
     files: ['**/*.{ts,mts,tsx,vue}'],
   },
-
   {
     name: 'app/files-to-ignore',
-    ignores: ['**/dist/**', '**/dist-ssr/**', '**/coverage/**'],
+    ignores: [
+      '**/dist/**',
+      '**/dist-ssr/**',
+      '**/coverage/**',
+      '**/eslint.config.ts',
+      '**/*.config.ts',
+    ],
   },
 
-  // ✅ Vue + TS recommended baseline
-  vueTsConfigs.recommended,
+  // Vue baseline
+  ...pluginVue.configs['flat/recommended'],
 
-  // ✅ Strict TypeScript rules
+  // Strict TypeScript rules
   {
     files: ['**/*.{ts,tsx,vue}'],
     languageOptions: {
       parser: tsparser,
       parserOptions: {
-        project: './tsconfig.json', // enable type-aware rules
+        project: './tsconfig.json',
         tsconfigRootDir: process.cwd(),
         extraFileExtensions: ['.vue'],
       },
     },
+    plugins: {
+      '@typescript-eslint': tseslint,
+    },
     rules: {
-      // Type-aware rules
       ...tseslint.configs['recommended-requiring-type-checking'].rules,
-
-      // Strictness
       '@typescript-eslint/explicit-function-return-type': 'error',
       '@typescript-eslint/explicit-module-boundary-types': 'error',
       '@typescript-eslint/no-explicit-any': 'error',
@@ -47,8 +49,6 @@ export default defineConfigWithVueTs(
       '@typescript-eslint/require-await': 'error',
       '@typescript-eslint/consistent-type-imports': 'error',
       '@typescript-eslint/no-unnecessary-type-assertion': 'error',
-
-      // Member ordering
       '@typescript-eslint/member-ordering': [
         'error',
         {
@@ -71,19 +71,17 @@ export default defineConfigWithVueTs(
     },
   },
 
-  // ✅ Strict Vue rules
+  // Strict Vue overrides
   {
     files: ['**/*.vue'],
+    plugins: {
+      vue: pluginVue,
+    },
     rules: {
-      ...pluginVue.configs['flat/recommended'].rules,
-
-      // Props & Emits strictness
       'vue/require-typed-ref': 'error',
       'vue/require-prop-types': 'error',
       'vue/require-default-prop': 'error',
       'vue/require-emit-validator': 'error',
-
-      // No unused Vue features
       'vue/no-unused-properties': [
         'error',
         {
@@ -93,8 +91,6 @@ export default defineConfigWithVueTs(
       ],
       'vue/no-unused-components': 'error',
       'vue/no-unused-vars': 'error',
-
-      // Enforce consistency
       'vue/require-explicit-emits': 'error',
       'vue/require-expose': 'error',
       'vue/require-valid-default-prop': 'error',
@@ -102,18 +98,31 @@ export default defineConfigWithVueTs(
     },
   },
 
-  // ✅ Vitest config
+  // Vitest config
   {
     ...pluginVitest.configs.recommended,
     files: ['**/*.{test,spec}.{js,ts,jsx,tsx}'],
+    plugins: {
+      vitest: pluginVitest,
+    },
   },
 
-  // ✅ Playwright config
+  // Playwright config
   {
     ...pluginPlaywright.configs['flat/recommended'],
     files: ['e2e/**/*.{test,spec}.{js,ts,jsx,tsx}'],
+    plugins: {
+      playwright: pluginPlaywright,
+    },
   },
 
-  // ✅ Prettier (disable formatting rules in ESLint)
-  skipFormatting,
+  // Prettier
+  {
+    plugins: {
+      prettier: prettierPlugin,
+    },
+    rules: {
+      'prettier/prettier': 'error',
+    },
+  },
 )
