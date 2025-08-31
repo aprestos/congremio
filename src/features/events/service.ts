@@ -11,6 +11,16 @@ const EditionService = {
     if (error) throw error;
     return data;
   },
+  async getCurrentEvent(tenantId: string): Promise<Event | null> {
+    const { data, error } = await supabase
+      .from("editions")
+      .select("*")
+      .eq("tenant_id", tenantId)
+      .eq("current", true)
+      .single();
+    if (error) throw error;
+    return data;
+  },
 };
 
 export default EditionService;

@@ -14,34 +14,13 @@ export const tenantService = {
   },
   async getByDomain(domain: string): Promise<Tenant> {
     try {
-      // First try to find by main domain
-      let { data, error } = await supabase
+      const { data, error } = await supabase
         .from("tenants")
         .select()
-        .eq("domain", domain)
+        .or(`domain.eq.${domain},other_domains.cs.{${domain}}`)
         .single();
 
-      // If not found in main domain, check other_domains array
-      if (error && error.code === "PGRST116") {
-        // No rows found
-        const { data: tenantsData, error: tenantsError } = await supabase
-          .from("tenants")
-          .select()
-          .contains("other_domains", [domain]);
-
-        if (tenantsError) {
-          console.error("Error searching other_domains:", tenantsError.message);
-          throw tenantsError;
-        }
-
-        if (tenantsData && tenantsData.length > 0) {
-          data = tenantsData[0];
-          error = null;
-        } else {
-          console.error(`No tenant found for domain: ${domain}`);
-          throw new Error(`No tenant found for domain: ${domain}`);
-        }
-      } else if (error) {
+      if (error) {
         console.error("Error fetching tenant by domain:", error.message);
         throw error;
       }
@@ -102,6 +81,31 @@ export const tenantService = {
     } catch (error) {
       console.error("Failed to update tenant:", (error as Error).message);
       return null;
+    }
+  },
+
+  async generateReservationId(
+    tenantId: string,
+    editionId: string,
+  ): Promise<number> {
+    try {
+      const { data, error } = await supabase.rpc("generate_reservation_id", {
+        p_tenant_id: tenantId,
+        p_edition_id: editionId,
+      });
+
+      if (error) {
+        console.error("Error generating reservation ID:", error.message);
+        throw error;
+      }
+
+      return data as number;
+    } catch (error) {
+      console.error(
+        "Failed to generate reservation ID:",
+        (error as Error).message,
+      );
+      throw error;
     }
   },
 };

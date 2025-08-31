@@ -192,7 +192,7 @@
           </div>
           <div class="ml-3">
             <p class="text-xs text-gray-600">
-              This link will expire in 1 hour for security purposes. If you
+              This link will expire in 20 minutes for security purposes. If you
               don't use it within that time, you'll need to request a new one.
             </p>
           </div>

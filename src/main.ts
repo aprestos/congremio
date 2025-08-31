@@ -29,9 +29,9 @@ async function loadTenant(): Promise<Tenant | null> {
   return tenant;
 }
 
-async function loadEvent(eventId: string) {
-  if (eventId) {
-    eventStore.value = await EditionService.getById(eventId);
+async function loadEvent(tenantId: string) {
+  if (tenantId) {
+    eventStore.value = await EditionService.getCurrentEvent(tenantId);
   }
 }
 
@@ -46,14 +46,8 @@ async function initializeApp() {
   // Load tenant first before setting up router
   const tenant = await loadTenant();
   if (tenant) {
-    await loadEvent(tenant.current_event);
+    await loadEvent(tenant.id);
   }
-
-  // app.use(Vue3Toastify, {
-  //   autoClose: 10_000,
-  //   theme: "colored",
-  //   position: "top-center",
-  // } as ToastContainerOptions);
 
   app.use(createPinia());
   app.use(router);

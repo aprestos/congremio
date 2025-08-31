@@ -28,7 +28,8 @@
       "style": {
         "noNonNullAssertion": "warn",
         "useConst": "error",
-        "useTemplate": "warn"
+        "useTemplate": "warn",
+        "useClassMemberOrder": "error"
       },
       "suspicious": {
         "noExplicitAny": "off",
@@ -53,5 +54,8 @@
     "formatter": {
       "enabled": true
     }
+  },
+  "organizeImports": {
+    "enabled": true
   }
 }
