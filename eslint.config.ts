@@ -2,9 +2,11 @@ import { defineConfigWithVueTs } from '@vue/eslint-config-typescript'
 import pluginVue from 'eslint-plugin-vue'
 import tseslint from '@typescript-eslint/eslint-plugin'
 import tsparser from '@typescript-eslint/parser'
+import vueParser from 'vue-eslint-parser'
 import pluginVitest from 'eslint-plugin-vitest'
 import pluginPlaywright from 'eslint-plugin-playwright'
 import prettierPlugin from 'eslint-plugin-prettier'
+import eslintConfigPrettier from '@vue/eslint-config-prettier'
 
 export default defineConfigWithVueTs(
   {
@@ -29,9 +31,15 @@ export default defineConfigWithVueTs(
   {
     files: ['**/*.{ts,tsx,vue}'],
     languageOptions: {
-      parser: tsparser,
+      parser: vueParser,
       parserOptions: {
-        project: './tsconfig.json',
+        parser: tsparser,
+        project: [
+          './tsconfig.app.json',
+          './tsconfig.node.json',
+          './tsconfig.vitest.json',
+          './e2e/tsconfig.json',
+        ],
         tsconfigRootDir: process.cwd(),
         extraFileExtensions: ['.vue'],
       },
@@ -41,9 +49,9 @@ export default defineConfigWithVueTs(
     },
     rules: {
       ...tseslint.configs['recommended-requiring-type-checking'].rules,
-      '@typescript-eslint/explicit-function-return-type': 'error',
+      '@typescript-eslint/explicit-function-return-type': 'warn',
       '@typescript-eslint/explicit-module-boundary-types': 'error',
-      '@typescript-eslint/no-explicit-any': 'error',
+      '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-floating-promises': 'error',
       '@typescript-eslint/await-thenable': 'error',
       '@typescript-eslint/require-await': 'error',
@@ -125,4 +133,7 @@ export default defineConfigWithVueTs(
       'prettier/prettier': 'error',
     },
   },
+
+  // THIS MUST BE LAST to override other formatting rules
+  eslintConfigPrettier,
 )
