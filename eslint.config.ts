@@ -1,67 +1,119 @@
-import pluginVue from "eslint-plugin-vue";
 import {
   defineConfigWithVueTs,
   vueTsConfigs,
-} from "@vue/eslint-config-typescript";
-import pluginVitest from "@vitest/eslint-plugin";
-import pluginPlaywright from "eslint-plugin-playwright";
-import oxlint from "eslint-plugin-oxlint";
-import skipFormatting from "@vue/eslint-config-prettier/skip-formatting";
-import pluginTs from "@typescript-eslint/eslint-plugin";
-
-// To allow more languages other than `ts` in `.vue` files, uncomment the following lines:
-// import { configureVueProject } from '@vue/eslint-config-typescript'
-// configureVueProject({ scriptLangs: ['ts', 'tsx'] })
-// More info at https://github.com/vuejs/eslint-config-typescript/#advanced-setup
+} from '@vue/eslint-config-typescript'
+import tseslint from '@typescript-eslint/eslint-plugin'
+import tsparser from '@typescript-eslint/parser'
+import pluginVue from 'eslint-plugin-vue'
+import pluginVitest from '@vitest/eslint-plugin'
+import pluginPlaywright from 'eslint-plugin-playwright'
+import skipFormatting from '@vue/eslint-config-prettier/skip-formatting'
 
 export default defineConfigWithVueTs(
   {
-    name: "app/files-to-lint",
-    files: ["**/*.{ts,mts,tsx,vue}"],
+    name: 'app/files-to-lint',
+    files: ['**/*.{ts,mts,tsx,vue}'],
   },
 
   {
-    name: "app/files-to-ignore",
-    ignores: ["**/dist/**", "**/dist-ssr/**", "**/coverage/**"],
+    name: 'app/files-to-ignore',
+    ignores: ['**/dist/**', '**/dist-ssr/**', '**/coverage/**'],
   },
 
-  pluginVue.configs["flat/essential"],
+  // ✅ Vue + TS recommended baseline
   vueTsConfigs.recommended,
+
+  // ✅ Strict TypeScript rules
   {
-    ...pluginTs.configs.recommended,
-    files: ["**/*.{ts,tsx}"],
+    files: ['**/*.{ts,tsx,vue}'],
+    languageOptions: {
+      parser: tsparser,
+      parserOptions: {
+        project: './tsconfig.json', // enable type-aware rules
+        tsconfigRootDir: process.cwd(),
+        extraFileExtensions: ['.vue'],
+      },
+    },
     rules: {
-      "@typescript-eslint/member-ordering": [
-        "error",
+      // Type-aware rules
+      ...tseslint.configs['recommended-requiring-type-checking'].rules,
+
+      // Strictness
+      '@typescript-eslint/explicit-function-return-type': 'error',
+      '@typescript-eslint/explicit-module-boundary-types': 'error',
+      '@typescript-eslint/no-explicit-any': 'error',
+      '@typescript-eslint/no-floating-promises': 'error',
+      '@typescript-eslint/await-thenable': 'error',
+      '@typescript-eslint/require-await': 'error',
+      '@typescript-eslint/consistent-type-imports': 'error',
+      '@typescript-eslint/no-unnecessary-type-assertion': 'error',
+
+      // Member ordering
+      '@typescript-eslint/member-ordering': [
+        'error',
         {
           default: [
-            "public-static-field",
-            "protected-static-field",
-            "private-static-field",
-            "public-instance-field",
-            "protected-instance-field",
-            "private-instance-field",
-            "public-constructor",
-            "protected-constructor",
-            "private-constructor",
-            "public-instance-method",
-            "protected-instance-method",
-            "private-instance-method",
+            'public-static-field',
+            'protected-static-field',
+            'private-static-field',
+            'public-instance-field',
+            'protected-instance-field',
+            'private-instance-field',
+            'public-constructor',
+            'protected-constructor',
+            'private-constructor',
+            'public-instance-method',
+            'protected-instance-method',
+            'private-instance-method',
           ],
-          order: "alphabetically",
         },
       ],
     },
   },
+
+  // ✅ Strict Vue rules
   {
-    ...pluginVitest.configs.recommended,
-    files: ["src/**/__tests__/*"],
+    files: ['**/*.vue'],
+    rules: {
+      ...pluginVue.configs['flat/recommended'].rules,
+
+      // Props & Emits strictness
+      'vue/require-typed-ref': 'error',
+      'vue/require-prop-types': 'error',
+      'vue/require-default-prop': 'error',
+      'vue/require-emit-validator': 'error',
+
+      // No unused Vue features
+      'vue/no-unused-properties': [
+        'error',
+        {
+          groups: ['props', 'data', 'computed', 'methods', 'setup'],
+          ignorePublicMembers: false,
+        },
+      ],
+      'vue/no-unused-components': 'error',
+      'vue/no-unused-vars': 'error',
+
+      // Enforce consistency
+      'vue/require-explicit-emits': 'error',
+      'vue/require-expose': 'error',
+      'vue/require-valid-default-prop': 'error',
+      'vue/no-deprecated-slot-attribute': 'error',
+    },
   },
 
+  // ✅ Vitest config
   {
-    ...pluginPlaywright.configs["flat/recommended"],
-    files: ["e2e/**/*.{test,spec}.{js,ts,jsx,tsx}"],
+    ...pluginVitest.configs.recommended,
+    files: ['**/*.{test,spec}.{js,ts,jsx,tsx}'],
   },
-  ...oxlint.configs["flat/recommended"],
+
+  // ✅ Playwright config
+  {
+    ...pluginPlaywright.configs['flat/recommended'],
+    files: ['e2e/**/*.{test,spec}.{js,ts,jsx,tsx}'],
+  },
+
+  // ✅ Prettier (disable formatting rules in ESLint)
   skipFormatting,
-);
+)
