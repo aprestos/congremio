@@ -5,7 +5,7 @@ import { createPinia } from "pinia";
 import PrimeVue from "primevue/config";
 import { createApp } from "vue";
 import { createI18n } from "vue-i18n";
-//import Vue3Toastify, { type ToastContainerOptions } from "vue3-toastify";
+
 import EditionService from "@/features/events/service.ts";
 import LocalStorageService from "@/features/localstorage/local-storage.service";
 import tenantService from "@/features/tenant/service";
