@@ -8,8 +8,8 @@
 
 <script setup lang="ts">
 interface Props {
-  errors?: string[] | undefined;
+  errors?: string[] | undefined
 }
 
-defineProps<Props>();
+defineProps<Props>()
 </script>

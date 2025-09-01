@@ -71,7 +71,7 @@
                 </div>
 
                 <div class="px-4 pt-5 pb-4 sm:p-6">
-                  <slot></slot>
+                  <slot />
                 </div>
               </DialogPanel>
             </TransitionChild>
@@ -88,31 +88,13 @@ import {
   DialogPanel,
   TransitionChild,
   TransitionRoot,
-} from "@headlessui/vue";
-import { BuildingLibraryIcon, XMarkIcon } from "@heroicons/vue/24/outline";
+} from '@headlessui/vue'
+import { BuildingLibraryIcon, XMarkIcon } from '@heroicons/vue/24/outline'
 
 interface Props {
-  open: boolean;
-  title?: string;
-  onSave?: () => Promise<void> | void;
-  saveLabel?: string;
-  cancelLabel?: string;
+  open: boolean
+  title?: string
 }
 
-const props = defineProps<Props>();
-
-const emit = defineEmits<{
-  "update:open": [value: boolean];
-}>();
-
-const closeDialog = () => {
-  emit("update:open", false);
-};
-
-const handleSave = async () => {
-  if (props.onSave) {
-    await props.onSave();
-  }
-  closeDialog();
-};
+const props = defineProps<Props>()
 </script>

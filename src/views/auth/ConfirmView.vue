@@ -5,75 +5,76 @@ import {
   CheckIcon,
   InformationCircleIcon,
   XMarkIcon,
-} from "@heroicons/vue/24/outline";
-import { onMounted, ref } from "vue";
-import { authService } from "@/features/auth/service.ts";
-import router from "@/router";
-import Router from "@/router";
-import { RouteNames } from "@/router/routeNames.ts";
-import { tenantStore } from "@/stores/tenant.ts";
+} from '@heroicons/vue/24/outline'
+import { onMounted, ref } from 'vue'
+import { authService } from '@/features/auth/service.ts'
+import router from '@/router'
+import { RouteNames } from '@/router/routeNames.ts'
+import { tenantStore } from '@/stores/tenant.ts'
 
-const isValidating = ref(true);
-const isSuccess = ref(false);
-const errorMessage = ref("");
-const countdown = ref(5);
+const isValidating = ref(true)
+const isSuccess = ref(false)
+const errorMessage = ref('')
+const countdown = ref(5)
 
 onMounted(async () => {
   try {
     // Check if user is authenticated
-    const { data } = await authService.getUser();
+    const { data } = await authService.getUser()
 
     if (data?.user) {
       // Check if user already has roles for this tenant
-      const tenantId = tenantStore.value?.id;
-      const userRoles = data.user.app_metadata?.roles;
-      const hasRoleForTenant = tenantId && userRoles && userRoles[tenantId];
+      const tenantId = tenantStore.value?.id
+      const userRoles = data.user.app_metadata?.roles as
+        | Record<string, any>
+        | undefined
+      const hasRoleForTenant = tenantId && userRoles && userRoles[tenantId]
 
       if (!hasRoleForTenant) {
         // User doesn't have roles for this tenant, set up the relationship
-        await authService.setTenant(data.user.id);
+        await authService.setTenant(data.user.id)
       } else {
         console.log(
-          "User already has role for this tenant:",
-          userRoles[tenantId]
-        );
+          'User already has role for this tenant:',
+          userRoles[tenantId],
+        )
       }
 
       // Show success state
-      isValidating.value = false;
-      isSuccess.value = true;
+      isValidating.value = false
+      isSuccess.value = true
 
       // Start countdown timer
-      startCountdown();
+      startCountdown()
     } else {
-      throw new Error("No authenticated user found");
+      throw new Error('No authenticated user found')
     }
   } catch (error) {
-    console.error("Authentication confirmation failed:", error);
-    isValidating.value = false;
-    isSuccess.value = false;
+    console.error('Authentication confirmation failed:', error)
+    isValidating.value = false
+    isSuccess.value = false
     errorMessage.value =
-      error instanceof Error ? error.message : "An unexpected error occurred";
+      error instanceof Error ? error.message : 'An unexpected error occurred'
   }
-});
+})
 
-const startCountdown = () => {
+const startCountdown = (): void => {
   const timer = setInterval(() => {
-    countdown.value--;
+    countdown.value--
     if (countdown.value <= 0) {
-      clearInterval(timer);
-      redirectToHome();
+      clearInterval(timer)
+      void redirectToHome()
     }
-  }, 1000);
-};
+  }, 1000)
+}
 
-const redirectToHome = async () => {
-  await router.push({ name: RouteNames.public.home });
-};
+const redirectToHome = async (): Promise<void> => {
+  await router.push({ name: RouteNames.public.home })
+}
 
-const backToSignIn = async () => {
-  await router.push({ name: RouteNames.auth.signIn });
-};
+const backToSignIn = async (): Promise<void> => {
+  await router.push({ name: RouteNames.auth.signIn })
+}
 </script>
 
 <template>
@@ -94,12 +95,12 @@ const backToSignIn = async () => {
           r="10"
           stroke="currentColor"
           stroke-width="4"
-        ></circle>
+        />
         <path
           class="opacity-75"
           fill="currentColor"
           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-        ></path>
+        />
       </svg>
     </div>
     <h2 class="mt-6 text-lg font-semibold text-gray-900">
@@ -143,8 +144,8 @@ const backToSignIn = async () => {
     <!-- Manual redirect button -->
     <div class="mt-6">
       <button
-        @click="redirectToHome"
         class="flex w-full justify-center items-center gap-2 rounded-md bg-indigo-600 px-3 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+        @click="redirectToHome"
       >
         <ArrowRightIcon class="h-4 w-4" aria-hidden="true" />
         Continue to Home
@@ -175,7 +176,9 @@ const backToSignIn = async () => {
           <XMarkIcon class="h-5 w-5 text-red-400" aria-hidden="true" />
         </div>
         <div class="ml-3">
-          <p class="text-sm text-red-800">{{ errorMessage }}</p>
+          <p class="text-sm text-red-800">
+            {{ errorMessage }}
+          </p>
         </div>
       </div>
     </div>
@@ -183,8 +186,8 @@ const backToSignIn = async () => {
     <!-- Back to sign in button -->
     <div class="mt-6">
       <button
-        @click="backToSignIn"
         class="flex w-full justify-center items-center gap-2 rounded-md bg-white px-3 py-2.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline-offset-0"
+        @click="backToSignIn"
       >
         <ArrowLeftIcon class="h-4 w-4" aria-hidden="true" />
         Back to Sign In

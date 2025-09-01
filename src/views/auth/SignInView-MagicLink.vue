@@ -38,10 +38,10 @@
           </label>
           <div class="relative mt-2">
             <input
+              id="email"
               v-model="email"
               type="email"
               name="email"
-              id="email"
               autocomplete="email"
               required
               placeholder="Enter your email address"
@@ -77,14 +77,14 @@
                 r="10"
                 stroke="currentColor"
                 stroke-width="4"
-              ></circle>
+              />
               <path
                 class="opacity-75"
                 fill="currentColor"
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              ></path>
+              />
             </svg>
-            {{ isLoading ? "Sending magic link..." : "Send magic link" }}
+            {{ isLoading ? 'Sending magic link...' : 'Send magic link' }}
           </button>
         </div>
       </form>
@@ -176,8 +176,8 @@
         <p class="text-xs text-gray-500">
           Didn't receive the email? Check your spam folder or
           <button
-            @click="goBack"
             class="font-medium text-indigo-600 hover:text-indigo-500"
+            @click="goBack"
           >
             try again
           </button>
@@ -202,8 +202,8 @@
       <!-- Back to form -->
       <div class="mt-8">
         <button
-          @click="goBack"
           class="flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline-offset-0"
+          @click="goBack"
         >
           <ArrowLeftIcon class="mr-2 h-4 w-4" aria-hidden="true" />
           Send to different email
@@ -221,30 +221,30 @@ import {
   InboxIcon,
   LockClosedIcon,
   PaperAirplaneIcon,
-} from "@heroicons/vue/24/outline";
-import { ref } from "vue";
-import { authService } from "@/features/auth/service.ts";
+} from '@heroicons/vue/24/outline'
+import { ref } from 'vue'
+import { authService } from '@/features/auth/service.ts'
 
-const email = ref("");
-const isLoading = ref(false);
-const linkSent = ref(false);
+const email = ref('')
+const isLoading = ref(false)
+const linkSent = ref(false)
 
-const submit = async () => {
-  if (!email.value || isLoading.value) return;
+const submit = async (): Promise<void> => {
+  if (!email.value || isLoading.value) return
 
   try {
-    isLoading.value = true;
-    await authService.signInWithOTP(email.value);
-    linkSent.value = true;
+    isLoading.value = true
+    await authService.signInWithOTP(email.value)
+    linkSent.value = true
   } catch (error) {
-    console.error("Error sending magic link:", error);
+    console.error('Error sending magic link:', error)
   } finally {
-    isLoading.value = false;
+    isLoading.value = false
   }
-};
+}
 
-const goBack = () => {
-  linkSent.value = false;
-  isLoading.value = false;
-};
+const goBack = (): void => {
+  linkSent.value = false
+  isLoading.value = false
+}
 </script>

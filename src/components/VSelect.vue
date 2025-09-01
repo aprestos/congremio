@@ -1,59 +1,60 @@
-<script setup lang="ts" generic="T = any">
-import { useDebounceFn } from "@vueuse/core";
-import { defineEmits, defineProps, ref } from "vue";
-import VueSelect, { type Option } from "vue3-select-component";
+<script setup lang="ts">
+import { useDebounceFn } from '@vueuse/core'
+import { defineEmits, defineProps, ref } from 'vue'
+import VueSelect, { type Option } from 'vue3-select-component'
 
 const props = defineProps<{
-  modelValue?: string | number | object | unknown[] | null;
-  placeholder?: string;
-  optionValue?: string;
-  optionLabel?: string;
-  optionSecondaryLabel?: string;
-  onSearch?: (query: string) => Promise<Array<T>>;
-}>();
+  modelValue?: string | number | object | unknown[] | null
+  placeholder?: string
+  optionValue?: string
+  optionLabel?: string
+  optionSecondaryLabel?: string
+  onSearch?: (query: string) => Promise<Array<T>>
+}>()
 
-const isLoading = ref<boolean>(false);
-const options = ref<Option<string>[]>([]);
+const isLoading = ref<boolean>(false)
+const options = ref<Option<string>[]>([])
 
 // Set defaults
-const { placeholder = "Select an option" } = props;
+const { placeholder = 'Select an option' } = props
 
-const emit = defineEmits(["update:modelValue"]);
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: unknown): void
+}>()
 
-function onUpdate(value: unknown) {
-  emit("update:modelValue", value);
+function onUpdate(value: unknown): void {
+  emit('update:modelValue', value)
 }
 
 const handleSearch = useDebounceFn(async (value) => {
-  console.log("calling onSearch with value:", value);
-  console.log("onSearch", props.onSearch);
-  if (!props.onSearch) return;
+  console.log('calling onSearch with value:', value)
+  console.log('onSearch', props.onSearch)
+  if (!props.onSearch) return
 
-  isLoading.value = true;
+  isLoading.value = true
   try {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     if (value?.length > 1) {
-      const result = await props.onSearch(value);
+      const result = await props.onSearch(value)
       options.value = result.map((item) => {
         // Type assertion to access properties safely
-        const typedItem = item as Record<string, any>;
+        const typedItem = item as Record<string, any>
         return {
-          value: typedItem[props.optionValue || "value"],
-          label: typedItem[props.optionLabel || "label"],
-          secondaryLabel: typedItem[props.optionSecondaryLabel || "label"],
-        } as unknown as Option<string>;
-      });
+          value: typedItem[props.optionValue || 'value'],
+          label: typedItem[props.optionLabel || 'label'],
+          secondaryLabel: typedItem[props.optionSecondaryLabel || 'label'],
+        } as unknown as Option<string>
+      })
     }
   } finally {
-    isLoading.value = false;
+    isLoading.value = false
   }
-}, 300);
+}, 300)
 </script>
 
 <template>
   <VueSelect
     :model-value="modelValue"
-    @update:modelValue="onUpdate"
-    @search="handleSearch"
     :is-searchable="true"
     :options="options"
     :placeholder="placeholder"
@@ -79,6 +80,8 @@ const handleSearch = useDebounceFn(async (value) => {
       taggableNoOptions: 'text-indigo-600 p-3 hover:bg-indigo-50',
       //loadingSpinner: 'text-indigo-600',
     }"
+    @update:model-value="onUpdate"
+    @search="handleSearch"
   >
     <template #option="{ option }">
       <div class="flex flex-col">

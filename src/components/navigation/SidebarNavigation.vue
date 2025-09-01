@@ -77,37 +77,27 @@
 </template>
 
 <script setup lang="ts">
-import {
-  Dialog,
-  DialogPanel,
-  TransitionChild,
-  TransitionRoot,
-} from "@headlessui/vue";
-
-import { Cog6ToothIcon, XMarkIcon } from "@heroicons/vue/24/outline";
-
 interface NavigationItem {
-  name: string;
-  to: string | { name: string };
-  icon: unknown;
-  current: boolean;
+  name: string
+  to: string | { name: string }
+  icon: unknown
+  current: boolean
 }
 
 interface PublicPage {
-  id: number;
-  name: string;
-  to: string | { name: string };
-  initial: string;
+  id: number
+  name: string
+  to: string | { name: string }
+  initial: string
 }
 
 defineProps<{
-  sidebarOpen: boolean;
-  navigation: NavigationItem[];
-  publicPages: PublicPage[];
-  userEmail: string | null;
-}>();
+  navigation: NavigationItem[]
+  publicPages: PublicPage[]
+  userEmail: string | null
+}>()
 
 defineEmits<{
-  close: [];
-}>();
+  close: []
+}>()
 </script>

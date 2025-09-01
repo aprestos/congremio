@@ -43,15 +43,33 @@
                 @load="handleImageLoad"
               />
               <div>
-                <CloudinaryUpload
-                  v-model="logoUrl"
-                  :folder="logoFolder"
-                  public-id-prefix="logo"
-                  button-text="Change logo"
-                  alt-text="Organization logo"
-                  crop-title="Crop your logo"
-                  :tags="['logo', 'organization']"
-                  :context="{ upload_type: 'logo' }"
+                <CButton variant="secondary" @click="showUploadDialog = true">
+                  Change logo
+                </CButton>
+                <p class="mt-2 text-sm text-gray-500">
+                  JPG, PNG, GIF or WebP. Max file size: 5MB.
+                </p>
+                <FilePondUploadDialog
+                  :open="showUploadDialog"
+                  title="Upload Logo"
+                  description="Select a logo image for your organization (max 5MB)"
+                  :allow-multiple="false"
+                  :accepted-file-types="[
+                    'image/jpeg',
+                    'image/png',
+                    'image/gif',
+                    'image/webp',
+                  ]"
+                  max-file-size="5MB"
+                  :max-files="1"
+                  supabase-bucket="images"
+                  :supabase-path="logoFolder"
+                  file-naming-strategy="uuid"
+                  :supabase-options="{
+                    cacheControl: '31536000',
+                    upsert: false,
+                  }"
+                  @close="showUploadDialog = false"
                   @upload-success="handleLogoUploadSuccess"
                   @upload-error="handleLogoUploadError"
                 />
@@ -61,19 +79,17 @@
 
           <CInput
             id="event-name"
-            label="Event Name"
             v-model="formData.name"
+            label="Event Name"
             name="event-name"
-            :errors="
-              r$.$errors.name.length > 0 ? [r$.$errors.name[0]] : undefined
-            "
+            :errors="r$.$errors.name"
           />
 
           <CInput
             id="email"
+            v-model="formData.email"
             label="Email address"
             type="email"
-            v-model="formData.email"
             name="email"
             :errors="
               r$.$errors.email.length > 0 ? [r$.$errors.email[0]] : undefined
@@ -93,31 +109,31 @@
       title="Change password"
       description="Update your password associated with your account."
     >
-      <form @submit="handlePasswordSubmit">
+      <form>
         <div
           class="grid grid-cols-1 gap-x-6 gap-y-8 sm:max-w-xl sm:grid-cols-6"
         >
           <CInput
             id="current-password"
+            v-model="passwordData.currentPassword"
             label="Current password"
             type="password"
-            v-model="passwordData.currentPassword"
             name="current_password"
           />
 
           <CInput
             id="new-password"
+            v-model="passwordData.newPassword"
             label="New password"
             type="password"
-            v-model="passwordData.newPassword"
             name="new_password"
           />
 
           <CInput
             id="confirm-password"
+            v-model="passwordData.confirmPassword"
             label="Confirm password"
             type="password"
-            v-model="passwordData.confirmPassword"
             name="confirm_password"
           />
         </div>
@@ -137,15 +153,15 @@
       title="Log out other sessions"
       description="Please enter your password to confirm you would like to log out of your other sessions across all of your devices."
     >
-      <form @submit="handleLogoutSubmit">
+      <form>
         <div
           class="grid grid-cols-1 gap-x-6 gap-y-8 sm:max-w-xl sm:grid-cols-6"
         >
           <CInput
             id="logout-password"
+            v-model="logoutPasswordData.password"
             label="Your password"
             type="password"
-            v-model="logoutPasswordData.password"
             name="password"
           />
         </div>
@@ -165,7 +181,7 @@
       title="Delete account"
       description="No longer want to use our service? You can delete your account here. This action is not reversible. All information related to this account will be deleted permanently."
     >
-      <form class="flex items-start" @submit="handleDeleteSubmit">
+      <form class="flex items-start">
         <button
           type="submit"
           class="rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-red-500 dark:bg-red-500 dark:shadow-none dark:hover:bg-red-400"
@@ -178,103 +194,84 @@
 </template>
 
 <script setup lang="ts">
-import { useRegle } from "@regle/core";
-import { alpha, email, maxLength, minLength, required } from "@regle/rules";
-import { computed, ref, watchEffect } from "vue";
-import CButton from "@/components/CButton.vue";
-import CInput from "@/components/CInput.vue";
-import CloudinaryUpload from "@/components/CloudinaryUpload.vue";
-import SettingsSection from "@/components/SettingsSection.vue";
-import tenantService from "@/features/tenant/service";
-import { tenantStore } from "@/stores/tenant";
+import { useRegle } from '@regle/core'
+import { alpha, email, maxLength, minLength, required } from '@regle/rules'
+import { computed, ref, watchEffect } from 'vue'
+import CButton from '@/components/CButton.vue'
+import CInput from '@/components/CInput.vue'
+
+import FilePondUploadDialog from '@/components/FilePondUploadDialog.vue'
+import SettingsSection from '@/components/SettingsSection.vue'
+import tenantService from '@/features/tenant/service'
+import { tenantStore } from '@/stores/tenant'
 
 const secondaryNavigation = [
-  { name: "General", href: "#", current: true },
-  { name: "Editions", href: "#", current: false },
-  { name: "Library", href: "#", current: false },
-];
+  { name: 'General', href: '#', current: true },
+  { name: 'Editions', href: '#', current: false },
+  { name: 'Library', href: '#', current: false },
+]
 
 // Logo state
-const logoUrl = ref(tenantStore.value?.logo);
+const logoUrl = ref(tenantStore.value?.logo)
+const showUploadDialog = ref(false)
 
 // Computed folder path with actual tenant ID
-const logoFolder = computed(() => {
-  const tenantId = tenantStore.value?.id;
-  console.log("Tenant ID:", tenantId); // Debug log
-  const folder = tenantId
-    ? `tenants/${tenantId}/logos`
-    : "tenants/default/logos";
-  console.log("Computed folder path:", folder); // Debug log
-  return folder;
-});
+const logoFolder = computed((): string => {
+  //const tenantId = tenantStore.value?.id
+  //return tenantId ? `tenants/${tenantId}/logos` : 'tenants/default/logos'
+  return ''
+})
 
 // Handle image load/error events for debugging
-const handleImageError = (event: Event) => {
-  const img = event.target as HTMLImageElement;
-  console.error("Image failed to load:", {
+const handleImageError = (event: Event): void => {
+  const img = event.target as HTMLImageElement
+  console.error('Image failed to load:', {
     src: img.src,
     logoUrl: logoUrl.value,
     tenantStoreLogo: tenantStore.value?.logo,
     error: event,
-  });
-};
+  })
+}
 
-const handleImageLoad = (event: Event) => {
-  const img = event.target as HTMLImageElement;
-  console.log("Image loaded successfully:", {
+const handleImageLoad = (event: Event): void => {
+  const img = event.target as HTMLImageElement
+  console.log('Image loaded successfully:', {
     src: img.src,
     logoUrl: logoUrl.value,
     tenantStoreLogo: tenantStore.value?.logo,
-  });
-};
+  })
+}
 
-// Handle upload events
-const handleLogoUploadSuccess = async (result: { secure_url: string }) => {
-  try {
-    const tenantId = tenantStore.value?.id;
-    if (!tenantId) {
-      console.error("No tenant ID found");
-      return;
-    }
+// Handle logo upload success
+const handleLogoUploadSuccess = (url: string): void => {
+  showUploadDialog.value = false
+  logoUrl.value = url
+  console.log('Logo uploaded successfully:', url)
+}
 
-    console.log("Cloudinary upload result:", result);
-    console.log("Setting logoUrl to:", result.secure_url);
-
-    logoUrl.value = result.secure_url;
-
-    // Verify the URL is accessible
-    const img = new Image();
-    img.onload = () => console.log("New logo URL is valid and accessible");
-    img.onerror = () =>
-      console.error("New logo URL is not accessible:", result.secure_url);
-    img.src = result.secure_url;
-  } catch (error) {
-    console.error("Error saving logo:", error);
-  }
-};
-
-const handleLogoUploadError = (error: unknown) => {
-  console.error("Logo upload failed:", error);
-  // Handle error (show toast, etc.)
-};
+// Handle logo upload error
+const handleLogoUploadError = (error: any): void => {
+  console.error('Logo upload failed:', error)
+  // Handle error (show toast notification, etc.)
+}
 
 // Form data
 const formData = ref({
-  name: "",
-  email: "",
-});
+  name: '',
+  email: '',
+})
 
 // Password form data
 const passwordData = ref({
-  currentPassword: "",
-  newPassword: "",
-  confirmPassword: "",
-});
+  currentPassword: '',
+  newPassword: '',
+  confirmPassword: '',
+})
 
 // Logout password data
 const logoutPasswordData = ref({
-  password: "",
-});
+  password: '',
+})
 
 // Regle validation setup
 const { r$ } = useRegle(formData, {
@@ -288,109 +285,90 @@ const { r$ } = useRegle(formData, {
     required,
     email,
   },
-});
+})
 
 // Loading state for save operation
-const isSaving = ref(false);
+const isSaving = ref(false)
 
 // Initialize form data with current tenant data
-const initializeFormData = () => {
+const initializeFormData = (): void => {
   if (tenantStore.value) {
-    formData.value.name = tenantStore.value.name || "";
-    formData.value.email = tenantStore.value.email || "";
-    logoUrl.value = tenantStore.value.logo || logoUrl.value;
+    formData.value.name = tenantStore.value.name || ''
+    formData.value.email = tenantStore.value.email || ''
+    logoUrl.value = tenantStore.value.logo || logoUrl.value
   }
-};
+}
 
 // Initialize form when component mounts or tenant changes
-watchEffect(() => {
+watchEffect((): void => {
   if (tenantStore.value) {
-    initializeFormData();
+    initializeFormData()
   }
-});
+})
 
 // Save tenant function
-const saveTenant = async () => {
+const saveTenant = async (): Promise<void> => {
   try {
-    const tenantId = tenantStore.value?.id;
+    const tenantId = tenantStore.value?.id
     if (!tenantId) {
-      console.error("No tenant ID found");
-      return;
+      console.error('No tenant ID found')
+      return
     }
 
-    isSaving.value = true;
+    isSaving.value = true
 
     // Prepare updates - only include defined values
-    const updates: { name?: string; email?: string; logo?: string } = {};
+    const updates: { name?: string; email?: string; logo?: string } = {}
 
     if (formData.value.name.trim()) {
-      updates.name = formData.value.name.trim();
+      updates.name = formData.value.name.trim()
     }
 
     if (formData.value.email.trim()) {
-      updates.email = formData.value.email.trim();
+      updates.email = formData.value.email.trim()
     }
 
     if (logoUrl.value && logoUrl.value !== tenantStore.value?.logo) {
-      updates.logo = logoUrl.value;
+      updates.logo = logoUrl.value
     }
 
     // Save to database
-    const updatedTenant = await tenantService.updateTenant(tenantId, updates);
+    const updatedTenant = await tenantService.updateTenant(tenantId, updates)
 
     if (updatedTenant) {
-      console.log("Tenant saved successfully:", updatedTenant);
+      console.log('Tenant saved successfully:', updatedTenant)
 
       // Update the tenant store with the new data
       if (tenantStore.value) {
-        tenantStore.value = { ...tenantStore.value, ...updatedTenant };
+        tenantStore.value = { ...tenantStore.value, ...updatedTenant }
       }
 
       // Show success message (you can add a toast notification here)
-      console.log("Settings saved successfully!");
+      console.log('Settings saved successfully!')
     } else {
-      console.error("Failed to save tenant settings");
+      console.error('Failed to save tenant settings')
     }
   } catch (error) {
-    console.error("Error saving tenant:", error);
+    console.error('Error saving tenant:', error)
   } finally {
-    isSaving.value = false;
+    isSaving.value = false
   }
-};
+}
 
 // Handle form submit
-const handleSubmit = async (event: Event) => {
-  event.preventDefault();
+const handleSubmit = async (event: Event): Promise<void> => {
+  event.preventDefault()
 
-  if (isSaving.value) return;
+  if (isSaving.value) return
 
   // Validate form before submitting
-  const { valid } = await r$.$validate();
+  const { valid } = await r$.$validate()
 
   if (!valid) {
-    console.log("Form has validation errors");
-    return;
+    console.log('Form has validation errors')
+    return
   }
 
-  await saveTenant();
-};
-
-// Handle form submissions
-const handlePasswordSubmit = (event: Event) => {
-  event.preventDefault();
-  // TODO: Implement password change logic
-  console.log("Password change submitted:", passwordData.value);
-};
-
-const handleLogoutSubmit = (event: Event) => {
-  event.preventDefault();
-  // TODO: Implement logout other sessions logic
-  console.log("Logout other sessions submitted:", logoutPasswordData.value);
-};
-
-const handleDeleteSubmit = (event: Event) => {
-  event.preventDefault();
-  // TODO: Implement account deletion logic
-  console.log("Account deletion submitted");
-};
+  await saveTenant()
+}
 </script>

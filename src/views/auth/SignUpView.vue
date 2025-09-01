@@ -17,10 +17,10 @@
       </label>
       <div class="mt-2">
         <input
+          id="name"
           v-model="name"
           type="text"
           name="name"
-          id="name"
           autocomplete="name"
           required
           class="block w-full rounded-md border-0 py-2.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
@@ -37,10 +37,10 @@
       </label>
       <div class="mt-2">
         <input
+          id="email"
           v-model="email"
           type="email"
           name="email"
-          id="email"
           autocomplete="email"
           required
           class="block w-full rounded-md border-0 py-2.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
@@ -57,10 +57,10 @@
       </label>
       <div class="mt-2">
         <input
+          id="password"
           v-model="password"
           type="password"
           name="password"
-          id="password"
           autocomplete="new-password"
           required
           class="block w-full rounded-md border-0 py-2.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
@@ -90,27 +90,21 @@
 </template>
 
 <script lang="ts" setup>
-import type { AuthError } from "@supabase/supabase-js";
-import { ref } from "vue";
-import { toast } from "vue-sonner";
-import { authService } from "@/features/auth/service.ts";
+import type { AuthError } from '@supabase/supabase-js'
+import { ref } from 'vue'
+import { toast } from 'vue-sonner'
+import { authService } from '@/features/auth/service.ts'
 
-const name = ref("");
-const email = ref("");
-const password = ref("");
+const name = ref('')
+const email = ref('')
+const password = ref('')
 
-const submit = async () => {
+const submit = async (): Promise<void> => {
   try {
-    const { data, error } = await authService.signUp(
-      name.value,
-      email.value,
-      password.value
-    );
-    console.log(JSON.stringify(data));
-    console.log(JSON.stringify(error));
+    await authService.signUp(name.value, email.value, password.value)
     //await router.push({ name: "home" });
   } catch (error) {
-    toast.error((error as AuthError).message);
+    toast.error((error as AuthError).message)
   }
-};
+}
 </script>

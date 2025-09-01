@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { defineProps } from "vue";
-import type { LibraryGame } from "@/features/library/game.model.ts";
+import { defineProps } from 'vue'
+import type { LibraryGame } from '@/features/library/game.model.ts'
 
-const props = defineProps<{ games: LibraryGame[] }>();
+const props = defineProps<{ games: LibraryGame[] }>()
 </script>
 
 <template>
@@ -23,7 +23,9 @@ const props = defineProps<{ games: LibraryGame[] }>();
             <h3 class="text-sm font-medium text-gray-900">
               {{ game.game.name }}
             </h3>
-            <p class="mt-1 text-sm text-gray-500">{{ game.game.year }}</p>
+            <p class="mt-1 text-sm text-gray-500">
+              {{ game.game.year }}
+            </p>
           </div>
           <div
             v-if="game.status && game.status !== 'available'"
@@ -44,7 +46,7 @@ const props = defineProps<{ games: LibraryGame[] }>();
               class="relative text-lg text-shadow-lg font-semibold text-gray-50"
             >
               {{
-                game.status === "not-available" ? "Not available" : "Withdrawn"
+                game.status === 'not-available' ? 'Not available' : 'Withdrawn'
               }}
             </p>
           </div>

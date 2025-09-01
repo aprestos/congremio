@@ -8,10 +8,10 @@
         @submit.prevent="handleSearchSubmit"
       >
         <input
+          v-model="searchInput"
           type="search"
           name="search"
           aria-label="Search"
-          v-model="searchInput"
           class="col-start-1 row-start-1 block size-full bg-white pl-8 text-base text-gray-900 outline-hidden placeholder:text-gray-400 sm:text-sm/6"
           placeholder="Search games..."
         />
@@ -79,7 +79,7 @@
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-200 dark:divide-white/10">
-          <tr v-for="game in games" :key="game.id"></tr>
+          <tr v-for="game in games" :key="game.id" />
           <tr v-for="game in games" :key="game.id">
             <td
               class="pl-4 sm:pl-6 lg:pl-8 py-5 pr-3 text-sm whitespace-nowrap"
@@ -96,7 +96,9 @@
                   <div class="font-medium text-gray-900 dark:text-white">
                     {{ game.game.name }}
                   </div>
-                  <div class="mt-1 text-gray-500">{{ game.game.year }}</div>
+                  <div class="mt-1 text-gray-500">
+                    {{ game.game.year }}
+                  </div>
                 </div>
               </div>
             </td>
@@ -120,7 +122,7 @@
               </div>
             </td>
             <td class="hidden px-3 py-4 text-sm text-gray-500 lg:table-cell">
-              {{ game.location?.name || "-" }}
+              {{ game.location?.name || '-' }}
             </td>
             <td class="hidden px-3 py-4 text-sm text-gray-500 lg:table-cell">
               {{ game.game.min_players }} - {{ game.game.max_players }}
@@ -134,16 +136,16 @@
               <button
                 v-show="game.status === 'available'"
                 class="ml-2 p-3 text-gray-400 bg-yellow-50 dark:hover:bg-yellow-500/20 dark:bg-yellow-200/20 hover:text-yellow-500 hover:bg-yellow-200 rounded transition-colors"
-                @click="openWithdrawDialog(game)"
                 :title="'Withdraw ' + game.game.name"
+                @click="openWithdrawDialog(game)"
               >
                 <ArrowRightStartOnRectangleIcon class="size-5" />
               </button>
               <button
                 v-show="game.status === 'withdrawn'"
                 class="ml-2 p-3 text-gray-400 bg-green-50 dark:hover:bg-green-500/20 dark:bg-green-200/20 hover:text-green-500 rounded transition-colors"
-                @click="returnGame(game)"
                 :title="'Withdraw ' + game.game.name"
+                @click="returnGame(game)"
               >
                 <ArrowRightEndOnRectangleIcon class="size-5" />
               </button>
@@ -158,10 +160,7 @@
   >
     <button
       class="z-50 rounded-4xl text-nowrap absolute shadow-xl mr-4 mb-4 py-4 px-6 font-semibold bg-slate-500 text-slate-50 hover:bg-slate-700 transition-colors"
-      @click="
-        open = true;
-        toast.success('test');
-      "
+      @click="open = true"
     >
       <PlusIcon class="size-6 inline-block" />
       Add
@@ -187,100 +186,100 @@
 </template>
 
 <script setup lang="ts">
-import { MagnifyingGlassIcon } from "@heroicons/vue/20/solid";
+import { MagnifyingGlassIcon } from '@heroicons/vue/20/solid'
 import {
   ArrowRightEndOnRectangleIcon,
   ArrowRightStartOnRectangleIcon,
   PlusIcon,
-} from "@heroicons/vue/24/outline";
-import { onMounted, onUnmounted, ref } from "vue";
+} from '@heroicons/vue/24/outline'
+import { onMounted, onUnmounted, ref } from 'vue'
 //import { toast } from "vue3-toastify";
-import { toast } from "vue-sonner";
+import { toast } from 'vue-sonner'
 
-import CBadge from "@/components/CBadge.vue";
-import DialogComponent from "@/components/DialogComponent.vue";
-import { useSearch } from "@/composables/useSearch.ts";
-import type { LibraryGame } from "@/features/library/game.model.ts";
-import Service from "@/features/library/service.ts";
-import libraryWithdrawService from "@/features/library/withdraws/service.ts";
-import AddLibraryGameView from "@/views/admin/library/AddLibraryGameView.vue";
-import WithdrawGameView from "@/views/admin/library/WithdrawGameView.vue";
+import CBadge from '@/components/CBadge.vue'
+import DialogComponent from '@/components/DialogComponent.vue'
+import { useSearch } from '@/composables/useSearch.ts'
+import type { LibraryGame } from '@/features/library/game.model.ts'
+import Service from '@/features/library/service.ts'
+import libraryWithdrawService from '@/features/library/withdraws/service.ts'
+import AddLibraryGameView from '@/views/admin/library/AddLibraryGameView.vue'
+import WithdrawGameView from '@/views/admin/library/WithdrawGameView.vue'
 
-const games = ref<LibraryGame[]>([]);
-const open = ref(false);
-const withdrawDialogOpen = ref(false);
-const selectedGameForWithdraw = ref<LibraryGame | null>(null);
-const isSearching = ref(false);
-const searchInput = ref("");
-let unsubscribe: (() => void) | null = null;
+const games = ref<LibraryGame[]>([])
+const open = ref(false)
+const withdrawDialogOpen = ref(false)
+const selectedGameForWithdraw = ref<LibraryGame | null>(null)
+const isSearching = ref(false)
+const searchInput = ref('')
+let unsubscribe: (() => void) | null = null
 
-const { setSearchHandler, clearSearchHandler } = useSearch();
+const { setSearchHandler, clearSearchHandler } = useSearch()
 
-const onGameAdded = () => {
+const onGameAdded = (): void => {
   // Close the dialog - realtime will handle the list update
-  open.value = false;
-};
+  open.value = false
+}
 
-const handleSearch = async (query: string) => {
+const handleSearch = async (query: string): Promise<void> => {
   if (!query.trim()) {
     // If empty search, reload all games
-    const allGames = await Service.get();
-    games.value = allGames;
-    isSearching.value = false;
-    return;
+    const allGames = await Service.get()
+    games.value = allGames
+    isSearching.value = false
+    return
   }
 
-  isSearching.value = true;
+  isSearching.value = true
   try {
-    const searchResults = await Service.search(query);
-    games.value = searchResults;
+    const searchResults = await Service.search(query)
+    games.value = searchResults
   } catch (error) {
-    console.error("Search failed:", error);
+    console.error('Search failed:', error)
   } finally {
-    isSearching.value = false;
+    isSearching.value = false
   }
-};
+}
 
-const handleSearchSubmit = (event: Event) => {
-  event.preventDefault();
-  handleSearch(searchInput.value);
-};
+const handleSearchSubmit = (event: Event): void => {
+  event.preventDefault()
+  void handleSearch(searchInput.value)
+}
 
 onMounted(() => {
   // Register search handler for this view
-  setSearchHandler(handleSearch);
-});
+  setSearchHandler(handleSearch)
+})
 
 // Set up subscription with automatic initial load and updates
 unsubscribe = Service.subscribeToUpdates((updatedGames) => {
   // Only update if not currently searching
   if (!isSearching.value) {
-    games.value = updatedGames;
+    games.value = updatedGames
   }
-});
+})
 
 onUnmounted(() => {
   // Clean up the subscription when component is unmounted
   if (unsubscribe) {
-    unsubscribe();
+    unsubscribe()
   }
   // Clear the search handler
-  clearSearchHandler();
-});
+  clearSearchHandler()
+})
 
-const openWithdrawDialog = (game: LibraryGame) => {
-  selectedGameForWithdraw.value = game;
-  withdrawDialogOpen.value = true;
-};
+const openWithdrawDialog = (game: LibraryGame): void => {
+  selectedGameForWithdraw.value = game
+  withdrawDialogOpen.value = true
+}
 
-const onGameWithdrawn = async () => {
+const onGameWithdrawn = (): void => {
   // Close the dialog - realtime will handle the list update
-  withdrawDialogOpen.value = false;
-  selectedGameForWithdraw.value = null;
-};
+  withdrawDialogOpen.value = false
+  selectedGameForWithdraw.value = null
+}
 
-const returnGame = async (game: LibraryGame) => {
-  await libraryWithdrawService.returnGame(game.id);
-  toast.success(`Game ${game.game.name} has been returned to the library.`);
-};
+const returnGame = async (game: LibraryGame): Promise<void> => {
+  await libraryWithdrawService.returnGame(game.id)
+  toast.success(`Game ${game.game.name} has been returned to the library.`)
+}
 </script>

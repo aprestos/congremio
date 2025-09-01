@@ -16,7 +16,7 @@
           <h3
             class="text-xl font-semibold text-gray-900 dark:text-white truncate"
           >
-            {{ game?.game.name || "Unknown Game" }}
+            {{ game?.game.name || 'Unknown Game' }}
           </h3>
           <div
             class="mt-1 flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400"
@@ -35,9 +35,9 @@
                   d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                 />
               </svg>
-              {{ game?.game.year || "Unknown" }}
+              {{ game?.game.year || 'Unknown' }}
             </span>
-            <span class="flex items-center" v-if="game?.location?.name">
+            <span v-if="game?.location?.name" class="flex items-center">
               <svg
                 class="size-4 mr-1"
                 fill="none"
@@ -65,15 +65,15 @@
     </div>
 
     <!-- Withdraw Form -->
-    <form @submit.prevent="submit" class="space-y-6">
+    <form class="space-y-6" @submit.prevent="submit">
       <div class="p-6">
         <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
           Select User
         </h4>
         <CSelect
           id="withdraw-to-user"
-          label="Withdraw to"
           v-model="formData.selectedUser"
+          label="Withdraw to"
           placeholder="Search and select a user..."
           :on-search="userService.search"
           :errors="r$.$errors.selectedUser"
@@ -109,8 +109,8 @@
         <CButton
           type="button"
           variant="secondary"
-          @click="emit('close')"
           class="mt-3 sm:col-start-1 sm:mt-0"
+          @click="emit('close')"
         >
           Cancel
         </CButton>
@@ -120,76 +120,76 @@
 </template>
 
 <script setup lang="ts">
-import { useRegle } from "@regle/core";
-import { ref } from "vue";
-import { toast } from "vue-sonner";
-import "vue-sonner/style.css";
+import { useRegle } from '@regle/core'
+import { ref } from 'vue'
+import { toast } from 'vue-sonner'
+import 'vue-sonner/style.css'
 
-import CButton from "@/components/CButton.vue";
-import CSelect from "@/components/CSelect.vue";
-import type { LibraryGame } from "@/features/library/game.model.ts";
-import libraryWithdrawService from "@/features/library/withdraws/service.ts";
-import { userService } from "@/features/users/service.ts";
+import CButton from '@/components/CButton.vue'
+import CSelect from '@/components/CSelect.vue'
+import type { LibraryGame } from '@/features/library/game.model.ts'
+import libraryWithdrawService from '@/features/library/withdraws/service.ts'
+import { userService } from '@/features/users/service.ts'
 
 interface Props {
-  game: LibraryGame | null;
+  game: LibraryGame | null
 }
 
-const props = defineProps<Props>();
+const props = defineProps<Props>()
 
 const emit = defineEmits<{
-  "game-withdrawn": [];
-  close: [];
-}>();
+  'game-withdrawn': []
+  close: []
+}>()
 
 const formData = ref({
   selectedUser: undefined as number | undefined,
-});
+})
 
-const isSubmitting = ref(false);
+const isSubmitting = ref(false)
 
 const { r$ } = useRegle(formData, {
   selectedUser: {},
-});
+})
 
-const submit = async () => {
-  if (isSubmitting.value) return;
+const submit = async (): Promise<void> => {
+  if (isSubmitting.value) return
 
   // Validate form before submitting
-  const { valid, data } = await r$.$validate();
+  const { valid, data } = await r$.$validate()
 
   if (!valid) {
-    console.log("Form has validation errors");
-    return;
+    console.log('Form has validation errors')
+    return
   }
 
-  isSubmitting.value = true;
+  isSubmitting.value = true
 
   try {
-    console.log("Withdrawing game:", {
+    console.log('Withdrawing game:', {
       gameId: props.game?.id,
       toUserId: data.selectedUser,
-    });
+    })
 
     // Call the withdraw service
     await libraryWithdrawService.post(
       props.game?.id as number,
-      "2753d47d-8f5c-4f56-b7f9-8e28e6e8bd23",
-    );
+      '2753d47d-8f5c-4f56-b7f9-8e28e6e8bd23',
+    )
 
-    toast.success(`${props.game?.game.name} withdrawn successfully.`);
+    toast.success(`${props.game?.game.name} withdrawn successfully.`)
 
     // Emit event to notify parent that game was withdrawn successfully
-    emit("game-withdrawn");
+    emit('game-withdrawn')
   } catch (error) {
-    console.error("Error withdrawing game:", error);
+    console.error('Error withdrawing game:', error)
   } finally {
-    isSubmitting.value = false;
+    isSubmitting.value = false
   }
-};
+}
 
 // Expose the submit function so parent components can call it
 defineExpose({
   submit,
-});
+})
 </script>

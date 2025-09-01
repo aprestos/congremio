@@ -23,10 +23,10 @@
           >
           <div class="mt-2">
             <input
+              id="email"
               v-model="email"
               type="email"
               name="email"
-              id="email"
               autocomplete="email"
               :required="true"
               class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
@@ -51,10 +51,10 @@
           </div>
           <div class="mt-2">
             <input
+              id="password"
               v-model="password"
               type="password"
               name="password"
-              id="password"
               autocomplete="current-password"
               :required="true"
               class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
@@ -64,9 +64,9 @@
 
         <div>
           <button
-            @click.prevent="submit"
             type="submit"
             class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            @click.prevent="submit"
           >
             Sign in
           </button>
@@ -75,27 +75,28 @@
 
       <p class="mt-10 text-center text-sm/6 text-gray-500">
         Not a member?
-        {{ " " }}
+        {{ ' ' }}
         <RouterLink
           to="/sign-up"
           class="font-semibold text-indigo-600 hover:text-indigo-500"
-          >Create your free account</RouterLink
         >
+          Create your free account
+        </RouterLink>
       </p>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
-import { authService } from "@/features/auth/service.ts";
-import router from "@/router";
+import { ref } from 'vue'
+import { authService } from '@/features/auth/service.ts'
+import router from '@/router'
 
-const email = ref("");
-const password = ref("");
+const email = ref('')
+const password = ref('')
 
-const submit = async () => {
-  await authService.signIn(email.value, password.value);
-  await router.push({ name: "home" });
-};
+const submit = async (): Promise<void> => {
+  await authService.signIn(email.value, password.value)
+  await router.push({ name: 'home' })
+}
 </script>

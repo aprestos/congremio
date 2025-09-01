@@ -1,14 +1,14 @@
 <script setup lang="ts">
 interface NavigationItem {
-  name: string;
-  to: string | { name: string };
-  icon: unknown;
-  current: boolean;
+  name: string
+  to: string | { name: string }
+  icon: unknown
+  current: boolean
 }
 
 defineProps<{
-  navigation: NavigationItem[];
-}>();
+  navigation: NavigationItem[]
+}>()
 </script>
 
 <template>
@@ -43,7 +43,7 @@ defineProps<{
                 }}</span>
                 <span
                   class="block w-5 mx-auto h-1 group-hover:bg-indigo-500 rounded-full"
-                ></span>
+                />
               </span>
             </RouterLink>
           </div>

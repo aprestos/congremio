@@ -1,29 +1,28 @@
 <script setup lang="ts">
 interface NavigationItem {
-  name: string;
-  to: string | { name: string };
-  icon: unknown;
-  current: boolean;
+  name: string
+  to: string | { name: string }
+  icon: unknown
+  current: boolean
 }
 
 interface PublicPage {
-  id: number;
-  name: string;
-  to: string | { name: string };
-  initial: string;
-  current: boolean;
+  id: number
+  name: string
+  to: string | { name: string }
+  initial: string
+  current: boolean
 }
 
 defineProps<{
-  sidebarOpen: boolean;
-  navigation: NavigationItem[];
-  publicPages: PublicPage[];
-  userEmail: string | null;
-}>();
+  navigation: NavigationItem[]
+  publicPages: PublicPage[]
+  userEmail: string | null
+}>()
 
 defineEmits<{
-  close: [];
-}>();
+  close: []
+}>()
 </script>
 
 <template>
@@ -114,11 +113,11 @@ defineEmits<{
               <div
                 class="size-8 rounded-full bg-indigo-600 flex items-center justify-center text-white text-sm font-medium uppercase dark:bg-indigo-500"
               >
-                {{ userEmail?.[0] || "U" }}
+                {{ userEmail?.[0] || 'U' }}
               </div>
               <div class="flex flex-col">
                 <span class="sr-only">Your profile</span>
-                <span aria-hidden="true">{{ userEmail?.split("@")[0] }}</span>
+                <span aria-hidden="true">{{ userEmail?.split('@')[0] }}</span>
                 <span class="text-xs text-gray-500 dark:text-gray-400"
                   >Admin</span
                 >

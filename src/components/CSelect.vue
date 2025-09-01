@@ -10,10 +10,8 @@
       <VueSelect
         :id="id"
         :model-value="modelValue"
-        @update:modelValue="onUpdate"
-        @search="handleSearch"
         :is-searchable="true"
-        :options="options"
+        :options="internalOptions"
         :placeholder="placeholder"
         :is-loading="isLoading"
         :classes="{
@@ -45,6 +43,8 @@
             'text-indigo-600 dark:text-indigo-400 p-3 hover:bg-indigo-50 dark:hover:bg-indigo-900',
           //loadingSpinner: 'text-indigo-600 dark:text-indigo-400',
         }"
+        @update:model-value="onUpdate"
+        @search="handleSearch"
       >
         <template #option="{ option }">
           <div class="flex flex-col">
@@ -61,63 +61,69 @@
 </template>
 
 <script setup lang="ts" generic="T = unknown">
-import { useDebounceFn } from "@vueuse/core";
-import { defineEmits, defineProps, ref } from "vue";
-import VueSelect, { type Option } from "vue3-select-component";
-import ValidationErrors from "@/components/ValidationErrors.vue";
+import { useDebounceFn } from '@vueuse/core'
+import { defineEmits, defineProps, ref } from 'vue'
+import VueSelect, { type Option } from 'vue3-select-component'
+import ValidationErrors from '@/components/ValidationErrors.vue'
 
 const props = defineProps<{
-  id: string;
-  label: string;
-  modelValue?: string | number | object | unknown[] | null;
-  placeholder?: string;
-  optionValue?: string;
-  optionLabel?: string;
-  optionSecondaryLabel?: string;
-  onSearch?: (query: string) => Promise<Array<T>>;
-  options?: Array<{ value: string | number; label: string }>;
-  errors?: string[];
-}>();
+  id: string
+  label: string
+  modelValue?: string | number | object | unknown[] | null
+  placeholder?: string
+  optionValue?: string
+  optionLabel?: string
+  optionSecondaryLabel?: string
+  onSearch?: (query: string) => Promise<Array<T>>
+  options?: Array<{ value: string | number; label: string }>
+  errors?: string[]
+}>()
 
-const isLoading = ref<boolean>(false);
-const options = ref<Option<string>[]>([]);
+const isLoading = ref<boolean>(false)
+const internalOptions = ref<Option<string>[]>([])
 
 // Set defaults
-const { placeholder = "Select an option" } = props;
+const { placeholder = 'Select an option' } = props
 
-const emit = defineEmits(["update:modelValue"]);
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: unknown): void
+}>()
 
-function onUpdate(value: unknown) {
-  emit("update:modelValue", value);
+function onUpdate(value: unknown): void {
+  emit('update:modelValue', value)
 }
 
 // Initialize options from props if provided
 if (props.options) {
-  options.value = props.options.map((item) => ({
+  internalOptions.value = props.options.map((item) => ({
     value: item.value,
     label: item.label,
-  })) as Option<string>[];
+  })) as Option<string>[]
 }
 
-const handleSearch = useDebounceFn(async (value) => {
-  if (!props.onSearch) return;
+const handleSearch = useDebounceFn(async (value: string) => {
+  if (!props.onSearch) return
 
-  isLoading.value = true;
+  isLoading.value = true
   try {
     if (value?.length > 1) {
-      const result = await props.onSearch(value);
-      options.value = result.map((item) => {
+      const result = await props.onSearch(value)
+      internalOptions.value = result.map((item) => {
         // Type assertion to access properties safely
-        const typedItem = item as Record<string, unknown>;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const typedItem = item as Record<string, any>
         return {
-          value: typedItem[props.optionValue || "value"],
-          label: typedItem[props.optionLabel || "label"],
-          secondaryLabel: typedItem[props.optionSecondaryLabel || "label"],
-        } as unknown as Option<string>;
-      });
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          value: typedItem[props.optionValue || 'value'],
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          label: typedItem[props.optionLabel || 'label'],
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          secondaryLabel: typedItem[props.optionSecondaryLabel || 'label'],
+        } as unknown as Option<string>
+      })
     }
   } finally {
-    isLoading.value = false;
+    isLoading.value = false
   }
-}, 300);
+}, 300)
 </script>

@@ -1,0 +1,357 @@
+<template>
+  <DialogComponent :open="open" :title="title" @close="handleClose">
+    <div class="space-y-4">
+      <p v-if="description" class="text-sm text-gray-500 dark:text-gray-400">
+        {{ description }}
+      </p>
+
+      <file-pond
+        ref="pond"
+        class="w-full"
+        :allow-multiple="allowMultiple"
+        :accepted-file-types="acceptedFileTypes"
+        :max-file-size="maxFileSize"
+        :max-files="maxFiles"
+        :label-idle="labelIdle"
+        :allow-image-preview="allowImagePreview"
+        :image-preview-height="imagePreviewHeight"
+        :server="null"
+        @addfile="onAddFile"
+        @removefile="onRemoveFile"
+      />
+
+      <!-- Upload Progress -->
+      <div
+        v-if="isUploading"
+        class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg"
+      >
+        <div class="flex items-center">
+          <svg
+            class="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-500"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            ></circle>
+            <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
+          <div class="text-blue-700 dark:text-blue-300">
+            <p class="font-medium">{{ uploadingText }}</p>
+            <p v-if="showProgress" class="text-sm">
+              {{ uploadProgress }}% complete
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex justify-end space-x-3 pt-4">
+        <button
+          type="button"
+          class="inline-flex justify-center rounded-md bg-white dark:bg-gray-700 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-gray-100 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+          :disabled="isUploading"
+          @click="handleClose"
+        >
+          {{ isUploading ? 'Please wait...' : 'Cancel' }}
+        </button>
+
+        <button
+          v-if="showUploadButton"
+          type="button"
+          class="inline-flex justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          :disabled="!hasFiles || isUploading"
+          @click="handleUpload"
+        >
+          <svg
+            v-if="isUploading"
+            class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            ></circle>
+            <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
+          {{ isUploading ? uploadingText : uploadButtonText }}
+        </button>
+      </div>
+    </div>
+  </DialogComponent>
+</template>
+
+<script setup lang="ts">
+import { ref, nextTick, watch, type Ref } from 'vue'
+import vueFilePond from 'vue-filepond'
+import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type'
+import FilePondPluginFileValidateSize from 'filepond-plugin-file-validate-size'
+import FilePondPluginImagePreview from 'filepond-plugin-image-preview'
+import { uploadFilesToSupabase } from '@/utils/fileUpload'
+import DialogComponent from '@/components/DialogComponent.vue'
+import type { FileUploadOptions, FileNamingOptions } from '@/utils/fileUpload'
+
+// Import FilePond styles
+import 'filepond/dist/filepond.min.css'
+import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css'
+
+// Create FilePond component
+const FilePond = vueFilePond(
+  FilePondPluginFileValidateType,
+  FilePondPluginFileValidateSize,
+  FilePondPluginImagePreview,
+)
+
+// Props interface
+interface Props {
+  open: boolean
+  title?: string
+  description?: string | null
+  allowMultiple?: boolean
+  acceptedFileTypes?: string[] | null
+  maxFileSize?: string
+  maxFiles?: number | null
+  supabaseBucket: string
+  supabasePath?: string
+  supabaseOptions?: {
+    cacheControl?: string
+    upsert?: boolean
+    metadata?: Record<string, unknown>
+  }
+  fileNamingStrategy?: 'uuid' | 'timestamp' | 'original' | 'custom'
+  customFileNamer?: ((file: File, index: number) => string) | null
+  allowImagePreview?: boolean
+  imagePreviewHeight?: number
+  labelIdle?: string
+  showUploadButton?: boolean
+  uploadButtonText?: string
+  uploadingText?: string
+  showProgress?: boolean
+}
+
+// Props with defaults
+const props = withDefaults(defineProps<Props>(), {
+  title: 'Upload Files',
+  description: null,
+  allowMultiple: true,
+  acceptedFileTypes: () => null,
+  maxFileSize: '10MB',
+  maxFiles: null,
+  supabasePath: '',
+  supabaseOptions: () => ({
+    cacheControl: '3600',
+    upsert: false,
+  }),
+  fileNamingStrategy: 'uuid',
+  customFileNamer: null,
+  allowImagePreview: true,
+  imagePreviewHeight: 144,
+  labelIdle:
+    'Drag & Drop your files or <span class="filepond--label-action">Browse</span>',
+  showUploadButton: true,
+  uploadButtonText: 'Upload Files',
+  uploadingText: 'Uploading...',
+  showProgress: true,
+})
+
+// Emits interface
+interface Emits {
+  (e: 'close'): void
+  (e: 'upload-success', urls: string | string[]): void
+  (e: 'upload-error', error: unknown): void
+  (e: 'file-added', file: unknown): void
+  (e: 'file-removed', file: unknown): void
+  (e: 'file-error', error: unknown): void
+}
+
+const emit = defineEmits<Emits>()
+
+// Reactive data
+const hasFiles = ref(false)
+const isUploading = ref(false)
+const uploadProgress = ref(0)
+const pond: Ref<FilePondInstance | null> = ref(null)
+
+// FilePond file item interface
+interface FilePondFileItem {
+  file: File
+  getFiles(): FilePondFileItem[]
+}
+
+// FilePond instance interface
+interface FilePondInstance {
+  getFiles(): FilePondFileItem[]
+  removeFiles(): void
+}
+
+// Methods
+const handleClose = (): void => {
+  if (isUploading.value) {
+    return
+  }
+  emit('close')
+  resetState()
+}
+
+const handleUpload = (): void => {
+  if (!hasFiles.value || isUploading.value || !pond.value) {
+    return
+  }
+
+  const pondInstance = pond.value as unknown as FilePondInstance
+  const files = pondInstance.getFiles().map((fileItem) => fileItem.file)
+  void uploadFiles(files)
+}
+
+const uploadFiles = async (files: File[]): Promise<void> => {
+  if (files.length === 0) {
+    return
+  }
+
+  isUploading.value = true
+  uploadProgress.value = 0
+
+  try {
+    const uploadOptions: FileUploadOptions = {
+      bucket: props.supabaseBucket,
+      path: props.supabasePath,
+      ...props.supabaseOptions,
+    }
+
+    const namingOptions: FileNamingOptions = {
+      strategy: props.fileNamingStrategy,
+      customNamer: props.customFileNamer,
+    }
+
+    const result = await uploadFilesToSupabase(
+      files,
+      uploadOptions,
+      namingOptions,
+      (progress) => {
+        uploadProgress.value = Math.round(progress.progress)
+      },
+    )
+
+    // Handle errors
+    if (result.errors.length > 0) {
+      result.errors.forEach((error) => {
+        emit('upload-error', error)
+      })
+    }
+
+    // Emit success with URLs
+    if (result.successful.length > 0) {
+      const urls = result.successful
+        .map((r) => r.publicUrl)
+        .filter(Boolean) as string[]
+
+      if (props.allowMultiple) {
+        emit('upload-success', urls)
+      } else {
+        // For single file uploads, emit just the URL string
+        emit('upload-success', urls[0])
+      }
+
+      // Close dialog after successful upload
+      handleClose()
+    }
+  } catch (error) {
+    console.error('Upload error:', error)
+    emit('upload-error', {
+      error: error,
+      message: error instanceof Error ? error.message : 'Unknown upload error',
+    })
+  } finally {
+    isUploading.value = false
+    uploadProgress.value = 0
+  }
+}
+
+const onAddFile = (error: unknown, file: unknown): void => {
+  if (error) {
+    console.error('Add file error:', error)
+    emit('file-error', error)
+    return
+  }
+
+  updateFileState()
+  emit('file-added', file)
+}
+
+const onRemoveFile = (error: unknown, file: unknown): void => {
+  if (error) {
+    console.error('Remove file error:', error)
+    return
+  }
+
+  updateFileState()
+  emit('file-removed', file)
+}
+
+const updateFileState = (): void => {
+  void nextTick(() => {
+    if (!pond.value) {
+      hasFiles.value = false
+      return
+    }
+
+    const pondInstance = pond.value as unknown as FilePondInstance
+    const files = pondInstance.getFiles() || []
+    hasFiles.value = files.length > 0
+  })
+}
+
+const resetState = (): void => {
+  hasFiles.value = false
+  isUploading.value = false
+  uploadProgress.value = 0
+
+  // Clear FilePond
+  if (pond.value) {
+    const pondInstance = pond.value as unknown as FilePondInstance
+    pondInstance.removeFiles()
+  }
+}
+
+// Watchers
+watch(
+  () => props.open,
+  (newValue: boolean) => {
+    if (!newValue) {
+      resetState()
+    }
+  },
+)
+
+// Expose public methods (required by Vue 3 composition API)
+defineExpose({
+  resetState,
+})
+</script>
+
+<style scoped>
+/* Minimal overrides - let FilePond handle its own styling */
+:deep(.filepond--root) {
+  margin-bottom: 0;
+}
+</style>

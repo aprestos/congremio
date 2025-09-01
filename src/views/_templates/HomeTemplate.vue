@@ -13,9 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import TopNavigation from "@/components/TopNavigation.vue";
+import TopNavigation from '@/components/TopNavigation.vue'
 
-const props = defineProps({
-  title: { type: String, required: true },
-});
+defineProps({})
 </script>

@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { RouterView } from "vue-router";
+import { RouterView } from 'vue-router'
 
-import { Toaster } from "vue-sonner";
-import "vue-sonner/style.css";
+import { Toaster } from 'vue-sonner'
+import 'vue-sonner/style.css'
 </script>
 
 <template>
-  <Toaster richColors theme="system" position="top-center" />
+  <Toaster rich-colors theme="system" position="top-center" />
   <RouterView />
 </template>
 

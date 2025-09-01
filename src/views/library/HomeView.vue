@@ -1,7 +1,7 @@
 <template>
   <main class="min-h-full">
     <HomeTemplate title="Library">
-      <template v-slot:default>
+      <template #default>
         <!--        <div class="mx-auto max-w-2xl lg:max-w-7xl">-->
         <!--          <h2 class="sr-only">Products</h2>-->
 
@@ -29,33 +29,24 @@
   </main>
 </template>
 
-<script lang="ts">
-import { reactive, watch } from "vue";
-import type { LibraryGame } from "@/features/library/game.model.ts";
-import Service from "@/features/library/service.ts";
-import { eventStore } from "@/stores/event";
-import HomeTemplate from "@/views/_templates/HomeTemplate.vue";
-import GamesView from "@/views/library/GamesView.vue";
+<script setup lang="ts">
+import { reactive, watch } from 'vue'
+import type { LibraryGame } from '@/features/library/game.model.ts'
+import Service from '@/features/library/service.ts'
+import { eventStore } from '@/stores/event'
+import HomeTemplate from '@/views/_templates/HomeTemplate.vue'
+import GamesView from '@/views/library/GamesView.vue'
 
-export default {
-  components: { GamesView, HomeTemplate },
-  setup() {
-    const games = reactive<LibraryGame[]>([]);
+const games = reactive<LibraryGame[]>([])
 
-    watch(
-      () => eventStore.value,
-      async (event) => {
-        if (event) {
-          const result = await Service.get();
-          games.push(...result);
-        }
-      },
-      { immediate: true }
-    );
-
-    return {
-      games,
-    };
+watch(
+  () => eventStore.value,
+  async (event) => {
+    if (event) {
+      const result = await Service.get()
+      games.push(...result)
+    }
   },
-};
+  { immediate: true },
+)
 </script>

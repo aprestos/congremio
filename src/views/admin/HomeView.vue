@@ -19,104 +19,82 @@
 
 <script setup lang="ts">
 import {
-  Dialog,
-  DialogPanel,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuItems,
-  TransitionChild,
-  TransitionRoot,
-} from "@headlessui/vue";
-import { ChevronDownIcon, MagnifyingGlassIcon } from "@heroicons/vue/20/solid";
-import {
-  Bars3Icon,
-  BellIcon,
   BuildingLibraryIcon,
   CalendarDaysIcon,
-  CalendarIcon,
   Cog6ToothIcon,
-  DocumentDuplicateIcon,
-  FolderIcon,
   HomeIcon,
   TrophyIcon,
-  XMarkIcon,
-} from "@heroicons/vue/24/outline";
-import { computed, onMounted, ref } from "vue";
-import { useRoute } from "vue-router";
-import BottomNavBar from "@/components/navigation/BottomNavBar.vue";
-import SidebarNavigation from "@/components/navigation/SidebarNavigation.vue";
-import SidebarNavigationGrey from "@/components/navigation/SidebarNavigationGrey.vue";
-import { useSearch } from "@/composables/useSearch.ts";
-import { authService } from "@/features/auth/service.ts";
-import { navigationGuard } from "@/router/guards.ts";
-import { RouteNames } from "@/router/routeNames.ts";
+} from '@heroicons/vue/24/outline'
+import { computed, onMounted, ref } from 'vue'
+import { useRoute } from 'vue-router'
+import BottomNavBar from '@/components/navigation/BottomNavBar.vue'
+import SidebarNavigationGrey from '@/components/navigation/SidebarNavigationGrey.vue'
+import { authService } from '@/features/auth/service.ts'
+import { RouteNames } from '@/router/routeNames.ts'
 
-const route = useRoute();
-const userEmail = ref<string | null>(null);
-const searchInput = ref("");
-const { executeSearch } = useSearch();
+const route = useRoute()
+const userEmail = ref<string | null>(null)
 
 // Load user email on component mount
 onMounted(async () => {
   try {
-    const { data } = await authService.getUser();
+    const { data } = await authService.getUser()
     if (data.user?.email) {
-      userEmail.value = data.user.email;
+      userEmail.value = data.user.email
     }
   } catch (error) {
-    console.error("Error loading user email:", error);
+    console.error('Error loading user email:', error)
   }
-});
+})
 
 const navigation = computed(() => [
   {
-    name: "Dashboard",
+    name: 'Dashboard',
     to: { name: RouteNames.admin.dashboard },
     icon: HomeIcon,
     current: route.name === RouteNames.admin.dashboard,
   },
   {
-    name: "Library",
+    name: 'Library',
     to: { name: RouteNames.admin.library },
     icon: BuildingLibraryIcon,
     current: route.name === RouteNames.admin.library,
   },
   {
-    name: "Events",
+    name: 'Events',
     to: { name: RouteNames.admin.events },
     icon: CalendarDaysIcon,
     current: route.name === RouteNames.admin.events,
   },
   {
-    name: "Tournaments",
+    name: 'Tournaments',
     to: { name: RouteNames.admin.tournaments },
     icon: TrophyIcon,
     current: route.name === RouteNames.admin.tournaments,
   },
   {
-    name: "Settings",
+    name: 'Settings',
     to: { name: RouteNames.admin.settings },
     icon: Cog6ToothIcon,
     current: route.name === RouteNames.admin.settings,
   },
-]);
+])
 const publicPages = [
   {
     id: 1,
-    name: "Library",
+    name: 'Library',
     to: { name: RouteNames.public.library },
-    initial: "L",
+    initial: 'L',
     current: false,
   },
   {
     id: 2,
-    name: "Flee Market",
+    name: 'Flee Market',
     to: { name: RouteNames.public.fleeMarket },
-    initial: "FM",
+    initial: 'FM',
     current: false,
   },
-];
+]
 
-const sidebarOpen = ref(false);
+const sidebarOpen = ref(false)
 </script>

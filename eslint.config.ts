@@ -54,6 +54,7 @@ export default defineConfigWithVueTs(
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-unsafe-assignment': 'warn',
       '@typescript-eslint/no-floating-promises': 'error',
+      '@typescript-eslint/no-unsafe-argument': 'warn',
       '@typescript-eslint/await-thenable': 'error',
       '@typescript-eslint/require-await': 'error',
       '@typescript-eslint/consistent-type-imports': 'error',

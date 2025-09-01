@@ -1,8 +1,8 @@
 export type Access = {
-  [key: string]: TenantAccess;
-};
+  [key: string]: TenantAccess
+}
 
 export type TenantAccess = {
-  role: string;
-  permissions: string[];
-};
+  role: string
+  permissions: string[]
+}

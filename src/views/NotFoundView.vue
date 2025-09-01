@@ -22,8 +22,8 @@
           Go back home
         </router-link>
         <button
-          @click="$router.back()"
           class="text-sm font-semibold text-gray-900"
+          @click="$router.back()"
         >
           Go back
         </button>

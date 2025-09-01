@@ -28,8 +28,9 @@
                   :key="page.name"
                   :to="page.href"
                   class="text-nowrap flex items-center text-sm font-medium text-gray-700 hover:text-gray-800"
-                  >{{ page.name }}</RouterLink
                 >
+                  {{ page.name }}
+                </RouterLink>
               </div>
             </PopoverGroup>
 
@@ -52,50 +53,50 @@
 </template>
 
 <script setup lang="ts">
-import { PopoverGroup } from "@headlessui/vue";
-import { CogIcon } from "@heroicons/vue/24/outline";
-import { onMounted, ref } from "vue";
-import { authService } from "@/features/auth/service.ts";
+import { PopoverGroup } from '@headlessui/vue'
+import { CogIcon } from '@heroicons/vue/24/outline'
+import { onMounted, ref } from 'vue'
+import { authService } from '@/features/auth/service.ts'
 
-const userEmail = ref<string | null>(null);
-const isStaffOrAdmin = ref(false);
+const userEmail = ref<string | null>(null)
+const isStaffOrAdmin = ref(false)
 
 // Load user email and check admin role on component mount
 onMounted(async () => {
   try {
-    const { data } = await authService.getUser();
+    const { data } = await authService.getUser()
     if (data.user?.email) {
-      userEmail.value = data.user.email;
+      userEmail.value = data.user.email
     }
 
     // Check if user has staff or admin role
-    const isStaff = await authService.hasAdminAccess();
-    isStaffOrAdmin.value = isStaff;
+    const isStaff = await authService.hasAdminAccess()
+    isStaffOrAdmin.value = isStaff
   } catch (error) {
-    console.error("Error loading user data:", error);
+    console.error('Error loading user data:', error)
   }
-});
+})
 
 interface Category {
-  name: string;
+  name: string
 }
 
 interface NavigationItem {
-  name: string;
-  href: string;
-  current: boolean;
-  categories: Category[];
+  name: string
+  href: string
+  current: boolean
+  categories: Category[]
 }
 
 const navigation: NavigationItem[] = [
   {
-    name: "Library",
-    href: "/library",
+    name: 'Library',
+    href: '/library',
     current: true,
-    categories: [{ name: "Popular" }, { name: "New" }, { name: "All" }],
+    categories: [{ name: 'Popular' }, { name: 'New' }, { name: 'All' }],
   },
-  { name: "Flee Market", href: "/flee-market", current: false, categories: [] },
-  { name: "Tournaments", href: "/tournaments", current: false, categories: [] },
-  { name: "Prototypes", href: "/prototypes", current: false, categories: [] },
-];
+  { name: 'Flee Market', href: '/flee-market', current: false, categories: [] },
+  { name: 'Tournaments', href: '/tournaments', current: false, categories: [] },
+  { name: 'Prototypes', href: '/prototypes', current: false, categories: [] },
+]
 </script>
