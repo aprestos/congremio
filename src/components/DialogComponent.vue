@@ -97,4 +97,12 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+
+const emit = defineEmits<{
+  close: []
+}>()
+
+const closeDialog = () => {
+  emit('close')
+}
 </script>

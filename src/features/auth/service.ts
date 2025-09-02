@@ -8,10 +8,7 @@ export const authService = {
     name: string,
     email: string,
     password: string,
-  ): Promise<{
-    data: { user: any; properties: any; identities: any[] }
-    error: any
-  }> {
+  ): Promise<UserResponse> {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,

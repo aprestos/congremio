@@ -154,7 +154,7 @@ const props = withDefaults(defineProps<Props>(), {
   title: 'Upload Files',
   description: null,
   allowMultiple: true,
-  acceptedFileTypes: () => null,
+  acceptedFileTypes: () => [],
   maxFileSize: '10MB',
   maxFiles: null,
   supabasePath: '',
@@ -163,7 +163,7 @@ const props = withDefaults(defineProps<Props>(), {
     upsert: false,
   }),
   fileNamingStrategy: 'uuid',
-  customFileNamer: null,
+  customFileNamer: undefined,
   allowImagePreview: true,
   imagePreviewHeight: 144,
   labelIdle:
@@ -240,7 +240,7 @@ const uploadFiles = async (files: File[]): Promise<void> => {
 
     const namingOptions: FileNamingOptions = {
       strategy: props.fileNamingStrategy,
-      customNamer: props.customFileNamer,
+      customNamer: props.customFileNamer || undefined,
     }
 
     const result = await uploadFilesToSupabase(

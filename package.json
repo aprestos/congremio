@@ -36,6 +36,7 @@
     "tailwind-merge": "^3.3.1",
     "tailwindcss-primeui": "^0.6.1",
     "vue": "^3.5.20",
+    "vue-eslint-parser": "^10.2.0",
     "vue-filepond": "^7.0.4",
     "vue-i18n": "^10.0.8",
     "vue-multiselect": "^3.3.1",

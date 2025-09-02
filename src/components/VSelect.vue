@@ -3,14 +3,16 @@ import { useDebounceFn } from '@vueuse/core'
 import { defineEmits, defineProps, ref } from 'vue'
 import VueSelect, { type Option } from 'vue3-select-component'
 
-const props = defineProps<{
+interface Props<T = any> {
   modelValue?: string | number | object | unknown[] | null
   placeholder?: string
   optionValue?: string
   optionLabel?: string
   optionSecondaryLabel?: string
   onSearch?: (query: string) => Promise<Array<T>>
-}>()
+}
+
+const props = defineProps<Props>()
 
 const isLoading = ref<boolean>(false)
 const options = ref<Option<string>[]>([])

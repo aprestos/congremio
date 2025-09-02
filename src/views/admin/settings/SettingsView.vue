@@ -243,8 +243,9 @@ const handleImageLoad = (event: Event): void => {
 }
 
 // Handle logo upload success
-const handleLogoUploadSuccess = (url: string): void => {
+const handleLogoUploadSuccess = (urls: string | string[]): void => {
   showUploadDialog.value = false
+  const url = Array.isArray(urls) ? urls[0] : urls
   logoUrl.value = url
   console.log('Logo uploaded successfully:', url)
 }

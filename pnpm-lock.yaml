@@ -62,6 +62,9 @@ importers:
       vue:
         specifier: ^3.5.20
         version: 3.5.20(typescript@5.8.3)
+      vue-eslint-parser:
+        specifier: ^10.2.0
+        version: 10.2.0(eslint@9.34.0(jiti@2.5.1))
       vue-filepond:
         specifier: ^7.0.4
         version: 7.0.4(filepond@4.32.8)(vue@3.5.20(typescript@5.8.3))
