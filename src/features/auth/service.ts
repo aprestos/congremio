@@ -8,8 +8,8 @@ export const authService = {
     name: string,
     email: string,
     password: string,
-  ): Promise<UserResponse> {
-    const { data, error } = await supabase.auth.signUp({
+  ): Promise<unknown> {
+    const { data } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -29,7 +29,7 @@ export const authService = {
       })
     }
 
-    return { data, error }
+    return data
   },
   async signIn(email: string, password: string): Promise<void> {
     await supabase.auth.signInWithPassword({
