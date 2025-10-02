@@ -11,8 +11,8 @@
               placeholder="Type to search"
               :on-search="gameService.search"
               option-label="name"
-              option-value="id"
-              option-secondary-label="yearPublished"
+              option-value="external_id"
+              option-secondary-label="year"
               :errors="r$.$errors.selectedGame"
             />
 

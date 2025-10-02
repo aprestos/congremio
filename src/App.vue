@@ -3,6 +3,13 @@ import { RouterView } from 'vue-router'
 
 import { Toaster } from 'vue-sonner'
 import 'vue-sonner/style.css'
+
+import { useHead } from '@unhead/vue'
+import { tenantStore } from './stores/tenant'
+
+useHead({
+  title: tenantStore.value?.name || 'congrem.io',
+})
 </script>
 
 <template>

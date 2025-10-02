@@ -1,15 +1,20 @@
-export interface Game {
+export type Game = GameSummary & {
+  min_players: number
+  max_players: number
+  min_playtime: number
+  max_playtime: number
+  min_age: string
+  best_at: string
+  recommended_at: string
+}
+
+export interface GameSummary {
   id: number
-  external_id: string
+  externalId: string
+  bggId: string
   name: string
   image: string
   year: string
-  min_players: string
-  max_players: string
-  min_playtime: string
-  max_playtime: string
-  min_age: string
-  created_at: string
 }
 
 export interface ExternalGameSearchResult {

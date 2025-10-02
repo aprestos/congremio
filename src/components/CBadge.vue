@@ -18,7 +18,7 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const baseClasses =
-  'inline-flex items-center rounded-full px-2 py-1 text-xs font-medium'
+  'inline-flex items-center rounded-full px-2 py-1 text-sm uppercase font-bold'
 
 const colorClasses = {
   gray: 'bg-gray-100 text-gray-600 dark:bg-gray-400/10 dark:text-gray-400',

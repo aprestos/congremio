@@ -18,12 +18,15 @@
     "format": "run-s format:*"
   },
   "dependencies": {
+    "@chenfengyuan/vue-countdown": "2",
     "@headlessui/vue": "^1.7.23",
     "@heroicons/vue": "^2.2.0",
     "@primevue/icons": "^4.3.8",
     "@regle/core": "^1.7.2",
     "@regle/rules": "^1.7.2",
     "@supabase/supabase-js": "^2.56.1",
+    "@tabler/icons-vue": "^3.35.0",
+    "@unhead/vue": "^2.0.17",
     "@vueuse/core": "^13.9.0",
     "filepond": "^4.32.8",
     "filepond-plugin-file-validate-size": "^2.2.8",

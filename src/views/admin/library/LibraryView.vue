@@ -1,165 +1,107 @@
 <template>
-  <div
-    class="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 bg-white dark:bg-gray-900 dark:border-white/5 border-b border-gray-200 px-4 shadow-xs sm:gap-x-6 sm:px-6 lg:px-8"
+  <DataTable
+    :items="filteredGames"
+    :columns="tableColumns"
+    :items-per-page="20"
   >
-    <div class="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
-      <form
-        class="grid flex-1 grid-cols-1"
-        @submit.prevent="handleSearchSubmit"
+    <!-- Header slot with search functionality -->
+    <template #header>
+      <SearchBar
+        v-model:search-value="searchInput"
+        search-placeholder="Search games..."
+        search-label="Search"
       >
-        <input
-          v-model="searchInput"
-          type="search"
-          name="search"
-          aria-label="Search"
-          class="col-start-1 row-start-1 block size-full bg-white pl-8 text-base text-gray-900 outline-hidden placeholder:text-gray-400 sm:text-sm/6"
-          placeholder="Search games..."
-        />
-        <MagnifyingGlassIcon
-          class="pointer-events-none col-start-1 row-start-1 size-5 self-center text-gray-400"
-          aria-hidden="true"
-        />
-      </form>
-      <div class="flex items-center gap-x-4 lg:gap-x-6">
-        <!-- Separator -->
-        <div
-          class="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-900/10"
-          aria-hidden="true"
-        />
+        <template #additional-inputs>
+          <!-- Reservation quick-search (required) -->
+          <div class="grid flex-1 grid-cols-1 max-w-xs">
+            <input
+              v-model="reservationInput"
+              type="text"
+              name="reservation"
+              aria-label="Reservation"
+              class="col-start-1 row-start-1 block bg-white dark:bg-gray-800 pl-8 text-base text-gray-900 dark:text-white outline-hidden placeholder:text-gray-400 dark:placeholder:text-gray-500 rounded-md"
+              placeholder="Reservation"
+            />
+            <span
+              class="pointer-events-none col-start-1 row-start-1 text-2xl self-center text-gray-400 dark:text-gray-500"
+              aria-hidden="true"
+              >#</span
+            >
+          </div>
+        </template>
+      </SearchBar>
+    </template>
 
-        <!-- Filter dropdown -->
-        <select class="text-sm border-gray-300 rounded-md">
-          <option value="">All</option>
-          <option value="name">Name</option>
-          <option value="owner">Owner</option>
-          <option value="location">Location</option>
-        </select>
+    <!-- Custom cell for game name with image -->
+    <template #cell-name="{ item }">
+      <div class="flex items-center">
+        <div class="size-11 shrink-0">
+          <img
+            class="size-11 rounded-sm object-cover bg-gray-200 dark:bg-gray-700"
+            :src="item.game.image"
+            alt=""
+            @error="handleImageError"
+            @load="handleImageLoad"
+          />
+        </div>
+        <div class="ml-4">
+          <div class="font-medium text-gray-900 dark:text-white">
+            {{ item.game.name }}
+          </div>
+          <div class="mt-1 text-gray-500 dark:text-gray-400">
+            {{ item.game.year }}
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
+    </template>
 
-  <div class="px-4 sm:gap-x-6 sm:px-0">
-    <div class="-mx-4 sm:-mx-0">
-      <table class="min-w-full divide-y divide-gray-200 dark:divide-white/15">
-        <thead>
-          <tr>
-            <th
-              scope="col"
-              class="pl-4 sm:pl-6 lg:pl-8 py-3 pr-3 text-left text-xs text-gray-500 uppercase"
-            >
-              Name
-            </th>
-            <th
-              scope="col"
-              class="px-3 py-4 text-left text-xs text-gray-500 uppercase table-cell"
-            >
-              Status
-            </th>
-            <th
-              scope="col"
-              class="hidden px-3 py-4 text-left text-xs font-semibold text-gray-500 uppercase lg:table-cell"
-            >
-              Location
-            </th>
-            <th
-              scope="col"
-              class="hidden px-3 py-4 text-left text-xs text-gray-500 uppercase lg:table-cell"
-            >
-              Players
-            </th>
-            <th
-              scope="col"
-              class="hidden px-3 py-4 text-left text-xs font-semibold text-gray-500 uppercase lg:table-cell"
-            >
-              Playtime
-            </th>
-            <th scope="col" class="relative py-4 pr-4 sm:pr-6 lg:pr-8 pl-3">
-              <span class="sr-only">Edit</span>
-            </th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-200 dark:divide-white/10">
-          <tr v-for="game in games" :key="game.id" />
-          <tr v-for="game in games" :key="game.id">
-            <td
-              class="pl-4 sm:pl-6 lg:pl-8 py-5 pr-3 text-sm whitespace-nowrap"
-            >
-              <div class="flex items-center">
-                <div class="size-11 shrink-0">
-                  <img
-                    class="size-11 rounded-sm"
-                    :src="game.game.image"
-                    alt=""
-                  />
-                </div>
-                <div class="ml-4">
-                  <div class="font-medium text-gray-900 dark:text-white">
-                    {{ game.game.name }}
-                  </div>
-                  <div class="mt-1 text-gray-500">
-                    {{ game.game.year }}
-                  </div>
-                </div>
-              </div>
-            </td>
-            <td class="px-3 py-4 text-sm">
-              <div class="flex items-center">
-                <CBadge
-                  v-show="game.status === 'available'"
-                  :text="game.status"
-                  type="green"
-                />
-                <CBadge
-                  v-show="game.status === 'withdrawn'"
-                  :text="game.status"
-                  type="yellow"
-                />
-                <CBadge
-                  v-show="game.status === 'not-available'"
-                  :text="game.status"
-                  type="red"
-                />
-              </div>
-            </td>
-            <td class="hidden px-3 py-4 text-sm text-gray-500 lg:table-cell">
-              {{ game.location?.name || '-' }}
-            </td>
-            <td class="hidden px-3 py-4 text-sm text-gray-500 lg:table-cell">
-              {{ game.game.min_players }} - {{ game.game.max_players }}
-            </td>
-            <td class="hidden px-3 py-4 text-sm text-gray-500 lg:table-cell">
-              {{ game.game.min_playtime }} - {{ game.game.max_playtime }}
-            </td>
-            <td
-              class="py-4 pr-4 sm:pr-6 lg:pr-8 pl-3 text-right text-sm font-medium"
-            >
-              <button
-                v-show="game.status === 'available'"
-                class="ml-2 p-3 text-gray-400 bg-yellow-50 dark:hover:bg-yellow-500/20 dark:bg-yellow-200/20 hover:text-yellow-500 hover:bg-yellow-200 rounded transition-colors"
-                :title="'Withdraw ' + game.game.name"
-                @click="openWithdrawDialog(game)"
-              >
-                <ArrowRightStartOnRectangleIcon class="size-5" />
-              </button>
-              <button
-                v-show="game.status === 'withdrawn'"
-                class="ml-2 p-3 text-gray-400 bg-green-50 dark:hover:bg-green-500/20 dark:bg-green-200/20 hover:text-green-500 rounded transition-colors"
-                :title="'Withdraw ' + game.game.name"
-                @click="returnGame(game)"
-              >
-                <ArrowRightEndOnRectangleIcon class="size-5" />
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
+    <!-- Custom cell for status -->
+    <template #cell-status="{ item }">
+      <GameStatus :data="item" />
+    </template>
+
+    <!-- Custom cell for location -->
+    <template #cell-location="{ item }">
+      {{ getLocationName(item) }}
+    </template>
+
+    <!-- Custom cell for players -->
+    <template #cell-players="{ item }">
+      {{ getRange(item.game.min_players, item.game.max_players) }}
+    </template>
+
+    <!-- Custom cell for playtime -->
+    <template #cell-playtime="{ item }">
+      {{ getRange(item.game.min_playtime, item.game.max_playtime) }}
+    </template>
+
+    <!-- Custom cell for age -->
+    <template #cell-age="{ item }">
+      {{ item.game.min_age ? item.game.min_age + '+' : '-' }}
+    </template>
+
+    <!-- Custom cell for owner -->
+    <template #cell-owner="{ item }">
+      {{ item.owner }}
+    </template>
+
+    <!-- Actions slot -->
+    <template #actions="{ item }">
+      <GameActions
+        :data="item"
+        @update-game="updateGame"
+        @withdraw="openWithdrawDialog"
+        @return-game="openReturnConfirmDialog"
+      />
+    </template>
+  </DataTable>
+
+  <!-- Floating Add Button -->
   <div
     class="group fixed bottom-20 lg:bottom-0 right-0 p-2 flex items-end justify-end w-24 h-24"
   >
     <button
-      class="z-50 rounded-4xl text-nowrap absolute shadow-xl mr-4 mb-4 py-4 px-6 font-semibold bg-slate-500 text-slate-50 hover:bg-slate-700 transition-colors"
+      class="z-50 rounded-4xl text-nowrap absolute shadow-xl mr-4 mb-4 py-4 px-6 font-semibold bg-slate-500 dark:bg-slate-600 text-slate-50 hover:bg-slate-700 dark:hover:bg-slate-700 transition-colors"
       @click="open = true"
     >
       <PlusIcon class="size-6 inline-block" />
@@ -167,6 +109,7 @@
     </button>
   </div>
 
+  <!-- Dialogs -->
   <DialogComponent :open="open" title="Add a library game">
     <AddLibraryGameView @game-added="onGameAdded" @close="open = false" />
   </DialogComponent>
@@ -177,109 +120,247 @@
     @close="withdrawDialogOpen = false"
   >
     <WithdrawGameView
-      v-if="selectedGameForWithdraw"
-      :game="selectedGameForWithdraw"
+      v-if="selectedGame"
+      :game="selectedGame"
       @game-withdrawn="onGameWithdrawn"
       @close="withdrawDialogOpen = false"
     />
   </DialogComponent>
+
+  <ConfirmationDialog
+    :open="returnConfirmDialogOpen"
+    title="Return Game"
+    message="Are you sure you want to return this game?"
+    confirm-text="Yes, return it"
+    cancel-text="Cancel"
+    :loading="isReturningGame"
+    @confirm="returnGame(gameToReturn)"
+    @cancel="returnConfirmDialogOpen = false"
+    @close="returnConfirmDialogOpen = false"
+  />
 </template>
 
 <script setup lang="ts">
-import { MagnifyingGlassIcon } from '@heroicons/vue/20/solid'
-import {
-  ArrowRightEndOnRectangleIcon,
-  ArrowRightStartOnRectangleIcon,
-  PlusIcon,
-} from '@heroicons/vue/24/outline'
-import { onMounted, onUnmounted, ref } from 'vue'
-//import { toast } from "vue3-toastify";
+import { PlusIcon } from '@heroicons/vue/24/outline'
+import { onMounted, onUnmounted, ref, computed, watch } from 'vue'
+import { useDebounceFn } from '@vueuse/core'
 import { toast } from 'vue-sonner'
 
-import CBadge from '@/components/CBadge.vue'
+import DataTable from '@/components/DataTable.vue'
+import SearchBar from '@/components/SearchBar.vue'
 import DialogComponent from '@/components/DialogComponent.vue'
-import { useSearch } from '@/composables/useSearch.ts'
+import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
 import type { LibraryGame } from '@/features/library/game.model.ts'
-import Service from '@/features/library/service.ts'
+import type { DataTableColumn } from '@/components/DataTable.vue'
+import Service, { libraryService } from '@/features/library/service.ts'
 import libraryWithdrawService from '@/features/library/withdraws/service.ts'
+import libraryReservationService from '@/features/library/reservations/service.ts'
 import AddLibraryGameView from '@/views/admin/library/AddLibraryGameView.vue'
 import WithdrawGameView from '@/views/admin/library/WithdrawGameView.vue'
+import GameActions from '@/views/admin/library/GameActions.vue'
+import GameStatus from '@/views/admin/library/GameStatus.vue'
 
-const games = ref<LibraryGame[]>([])
+// Data
+const allGames = ref<LibraryGame[]>([])
 const open = ref(false)
 const withdrawDialogOpen = ref(false)
-const selectedGameForWithdraw = ref<LibraryGame | null>(null)
-const isSearching = ref(false)
+const selectedGame = ref<LibraryGame | null>(null)
+const returnConfirmDialogOpen = ref(false)
+const gameToReturn = ref<LibraryGame | null>(null)
+const isReturningGame = ref(false)
 const searchInput = ref('')
+const reservationInput = ref('')
+const loadingReservation = ref(false)
+const searchQuery = ref('')
 let unsubscribe: (() => void) | null = null
 
-const { setSearchHandler, clearSearchHandler } = useSearch()
+console.log('LibraryView: Component is loading...')
 
-const onGameAdded = (): void => {
-  // Close the dialog - realtime will handle the list update
-  open.value = false
-}
+// Table column definitions
+const tableColumns: DataTableColumn[] = [
+  {
+    key: 'name',
+    label: 'Name',
+    cellClass: 'whitespace-nowrap',
+  },
+  {
+    key: 'status',
+    label: 'Status',
+  },
+  {
+    key: 'location',
+    label: 'Location',
+    hidden: true,
+  },
+  {
+    key: 'players',
+    label: 'Players',
+    hidden: true,
+  },
+  {
+    key: 'playtime',
+    label: 'Playtime',
+    hidden: true,
+  },
+  {
+    key: 'age',
+    label: 'Age',
+    hidden: true,
+  },
+  {
+    key: 'owner',
+    label: 'Owner',
+    hidden: true,
+  },
+]
 
-const handleSearch = async (query: string): Promise<void> => {
-  if (!query.trim()) {
-    // If empty search, reload all games
-    const allGames = await Service.get()
-    games.value = allGames
-    isSearching.value = false
-    return
-  }
+// Debounced search query
+const setSearchQuery = useDebounceFn((val: string) => {
+  searchQuery.value = val.trim().toLowerCase()
+}, 250)
 
-  isSearching.value = true
-  try {
-    const searchResults = await Service.search(query)
-    games.value = searchResults
-  } catch (error) {
-    console.error('Search failed:', error)
-  } finally {
-    isSearching.value = false
-  }
-}
-
-const handleSearchSubmit = (event: Event): void => {
-  event.preventDefault()
-  void handleSearch(searchInput.value)
-}
-
-onMounted(() => {
-  // Register search handler for this view
-  setSearchHandler(handleSearch)
+// Watch search input and update debounced query
+watch(searchInput, (val) => {
+  void setSearchQuery(val)
 })
 
-// Set up subscription with automatic initial load and updates
-unsubscribe = Service.subscribeToUpdates((updatedGames) => {
-  // Only update if not currently searching
-  if (!isSearching.value) {
-    games.value = updatedGames
-  }
+// Filtered games based on search
+const filteredGames = computed(() => {
+  const q = searchQuery.value
+  if (!q) return allGames.value
+  return allGames.value.filter((g) => {
+    const name = (g.game.name || '').toLowerCase()
+    return name.includes(q)
+  })
+})
+
+// Reservation lookup (debounced)
+const handleReservationChange = useDebounceFn(
+  async (reservationNumber: string): Promise<void> => {
+    if (!reservationNumber.trim()) return
+    loadingReservation.value = true
+    try {
+      const result =
+        await libraryReservationService.getByDisplayId(reservationNumber)
+      if (result) {
+        toast.success('Reservation found')
+      } else {
+        toast.error('Reservation not found')
+      }
+    } catch (error) {
+      console.error('Reservation lookup failed', error)
+      toast.error('Reservation lookup failed')
+    } finally {
+      loadingReservation.value = false
+    }
+  },
+  300,
+)
+
+watch(reservationInput, (newVal) => {
+  void handleReservationChange(newVal)
+})
+
+// Lifecycle
+onMounted(() => {
+  // subscribe to service updates
+  unsubscribe = Service.subscribeToUpdates((updatedGames) => {
+    console.log(
+      'LibraryView: Received games update:',
+      updatedGames?.length || 0,
+    )
+    allGames.value = updatedGames || []
+  })
 })
 
 onUnmounted(() => {
-  // Clean up the subscription when component is unmounted
-  if (unsubscribe) {
-    unsubscribe()
-  }
-  // Clear the search handler
-  clearSearchHandler()
+  if (unsubscribe) unsubscribe()
 })
 
+// Add watchers for debugging
+watch(
+  allGames,
+  (newGames) => {
+    console.log('LibraryView: allGames updated to', newGames.length, 'items')
+  },
+  { immediate: true },
+)
+
+watch(
+  filteredGames,
+  (newFilteredGames) => {
+    console.log(
+      'LibraryView: filteredGames updated to',
+      newFilteredGames.length,
+      'items',
+    )
+  },
+  { immediate: true },
+)
+
+// Event handlers
+const onGameAdded = (): void => {
+  open.value = false
+  toast.success('Game has been added to the library!')
+}
+
 const openWithdrawDialog = (game: LibraryGame): void => {
-  selectedGameForWithdraw.value = game
+  selectedGame.value = game
   withdrawDialogOpen.value = true
 }
 
-const onGameWithdrawn = (): void => {
-  // Close the dialog - realtime will handle the list update
-  withdrawDialogOpen.value = false
-  selectedGameForWithdraw.value = null
+const openReturnConfirmDialog = (game: LibraryGame): void => {
+  gameToReturn.value = game
+  returnConfirmDialogOpen.value = true
 }
 
-const returnGame = async (game: LibraryGame): Promise<void> => {
-  await libraryWithdrawService.returnGame(game.id)
-  toast.success(`Game ${game.game.name} has been returned to the library.`)
+const onGameWithdrawn = (): void => {
+  withdrawDialogOpen.value = false
+  selectedGame.value = null
+}
+
+const returnGame = async (game: LibraryGame | null): Promise<void> => {
+  if (!game) return
+
+  isReturningGame.value = true
+  try {
+    await libraryWithdrawService.returnGame(game.id)
+    toast.success(`Game ${game.game.name} has been returned to the library.`)
+    returnConfirmDialogOpen.value = false
+    gameToReturn.value = null
+  } catch (error) {
+    console.error('Failed to return game:', error)
+    toast.error('Failed to return the game. Please try again.')
+  } finally {
+    isReturningGame.value = false
+  }
+}
+
+const updateGame = async (
+  id: number,
+  updatedGame: Partial<LibraryGame>,
+): Promise<void> => {
+  await libraryService.updateGame(id, updatedGame)
+}
+
+// Image handlers
+const handleImageError = (event: Event): void => {
+  const target = event.target as HTMLImageElement
+  target.style.display = 'none'
+}
+
+const handleImageLoad = (event: Event): void => {
+  const target = event.target as HTMLImageElement
+  target.style.display = 'block'
+}
+
+// Helper for location display
+const getLocationName = (g: LibraryGame): string => {
+  return (g.location && g.location.name) || '-'
+}
+
+const getRange = (min: number, max: number): string => {
+  if (min === max) return String(min)
+  else return `${min} - ${max}`
 }
 </script>

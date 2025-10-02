@@ -35,8 +35,8 @@
 import { computed } from 'vue'
 
 interface Props {
-  variant?: 'primary' | 'secondary' | 'tertiary' | 'yellow'
-  size?: 'sm' | 'md' | 'lg'
+  variant?: 'primary' | 'secondary' | 'tertiary' | 'yellow' | 'danger'
+  size?: 'sm' | 'md' | 'lg' | 'xl'
   type?: 'button' | 'submit' | 'reset'
   disabled?: boolean
   loading?: boolean
@@ -71,6 +71,7 @@ const buttonClasses = computed(() => {
     'focus-visible:outline',
     'focus-visible:outline-2',
     'focus-visible:outline-offset-2',
+    'cursor-pointer',
     'disabled:opacity-50',
     'disabled:cursor-not-allowed',
   ]
@@ -80,6 +81,7 @@ const buttonClasses = computed(() => {
     sm: ['px-2.5', 'py-1.5', 'text-xs'],
     md: ['px-3', 'py-2', 'text-sm'],
     lg: ['px-4', 'py-2.5', 'text-base'],
+    xl: ['px-5', 'py-3', 'text-base'],
   }
 
   // Variant classes
@@ -88,8 +90,8 @@ const buttonClasses = computed(() => {
       'bg-indigo-600',
       'text-white',
       'shadow-xs',
-      'hover:bg-indigo-500',
-      'focus-visible:outline-indigo-600',
+      'hover:bg-indigo-700',
+      'focus-visible:outline-indigo-700',
       'dark:bg-indigo-500',
       'dark:shadow-none',
       'dark:hover:bg-indigo-400',
@@ -112,14 +114,15 @@ const buttonClasses = computed(() => {
       'dark:focus-visible:outline-indigo-500',
     ],
     tertiary: [
-      'bg-transparent',
-      'text-gray-700',
-      'hover:text-gray-900',
-      'hover:bg-gray-50',
+      'bg-gray-100',
+      'text-gray-900',
+      'bg-gray-100',
+      'dark:bg-gray-700',
+      'hover:bg-gray-200',
       'focus-visible:outline-indigo-600',
-      'dark:text-gray-300',
+      'dark:text-white',
       'dark:hover:text-white',
-      'dark:hover:bg-white/10',
+      'dark:hover:bg-gray-600',
       'dark:focus-visible:outline-indigo-500',
     ],
     yellow: [
@@ -132,6 +135,17 @@ const buttonClasses = computed(() => {
       'dark:shadow-none',
       'dark:hover:bg-amber-400',
       'dark:focus-visible:outline-amber-500',
+    ],
+    danger: [
+      'bg-red-600',
+      'text-white',
+      'shadow-xs',
+      'hover:bg-red-700',
+      'focus-visible:outline-red-700',
+      'dark:bg-red-500',
+      'dark:shadow-none',
+      'dark:hover:bg-red-400',
+      'dark:focus-visible:outline-red-500',
     ],
   }
 

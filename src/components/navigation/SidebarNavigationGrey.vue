@@ -1,9 +1,15 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import { tenantStore } from '@/stores/tenant.ts'
+import SkeletonLoader from '@/components/SkeletonLoader.vue'
+import { useRoute } from 'vue-router'
+import { RouteNames } from '@/router/routeNames.ts'
+
 interface NavigationItem {
-  name: string
-  to: string | { name: string }
+  label: string
   icon: unknown
-  current: boolean
+  routeName: string
+  enabled: boolean
 }
 
 interface PublicPage {
@@ -11,10 +17,10 @@ interface PublicPage {
   name: string
   to: string | { name: string }
   initial: string
-  current: boolean
+  enabled: boolean
 }
 
-defineProps<{
+const props = defineProps<{
   navigation: NavigationItem[]
   publicPages: PublicPage[]
   userEmail: string | null
@@ -23,6 +29,20 @@ defineProps<{
 defineEmits<{
   close: []
 }>()
+
+// Filter navigation items, separating Settings from main navigation
+const mainNavigation = computed(() =>
+  props.navigation.filter(
+    (item) => item.routeName !== (RouteNames.admin.settings as string),
+  ),
+)
+
+const settingsItem = computed(() =>
+  props.navigation.find(
+    (item) => item.routeName === (RouteNames.admin.settings as string),
+  ),
+)
+const route = useRoute()
 </script>
 
 <template>
@@ -34,26 +54,26 @@ defineEmits<{
       class="flex grow flex-col gap-y-5 overflow-y-auto bg-gray-50 px-6 ring-1 ring-gray-200 dark:bg-black/10 dark:ring-white/5"
     >
       <div class="flex h-16 shrink-0 items-center">
+        <!-- Logo SkeletonLoader -->
+        <SkeletonLoader v-if="!tenantStore?.logo" width="128px" height="32px" />
+        <!-- Actual Logo -->
         <img
-          class="h-8 w-auto dark:hidden"
-          src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600"
-          alt="Your Company"
-        />
-        <img
-          class="h-8 w-auto not-dark:hidden"
-          src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500"
-          alt="Your Company"
+          v-else
+          class="h-8 w-auto"
+          :src="tenantStore.logo"
+          :alt="tenantStore.name + ' logo'"
         />
       </div>
       <nav class="flex flex-1 flex-col">
         <ul role="list" class="flex flex-1 flex-col gap-y-7">
           <li>
             <ul role="list" class="-mx-2 space-y-1">
-              <li v-for="item in navigation" :key="item.name">
+              <li v-for="item in mainNavigation" :key="item.routeName">
                 <RouterLink
-                  :to="item.to"
+                  v-if="item.enabled"
+                  :to="{ name: item.routeName }"
                   :class="[
-                    item.current
+                    route.name === item.routeName
                       ? 'bg-gray-100 text-indigo-600 dark:bg-white/5 dark:text-white'
                       : 'text-gray-700 hover:bg-gray-100 hover:text-indigo-600 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-white',
                     'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold',
@@ -62,14 +82,14 @@ defineEmits<{
                   <component
                     :is="item.icon"
                     :class="[
-                      item.current
+                      route.name === item.routeName
                         ? 'text-indigo-600 dark:text-white'
                         : 'text-gray-400 group-hover:text-indigo-600 dark:group-hover:text-white',
                       'size-6 shrink-0',
                     ]"
                     aria-hidden="true"
                   />
-                  {{ item.name }}
+                  {{ item.label }}
                 </RouterLink>
               </li>
             </ul>
@@ -78,26 +98,17 @@ defineEmits<{
             <div
               class="text-xs/6 font-semibold text-gray-500 dark:text-gray-400"
             >
-              Your teams
+              Public pages
             </div>
             <ul role="list" class="-mx-2 mt-2 space-y-1">
               <li v-for="item in publicPages" :key="item.name">
                 <RouterLink
+                  v-if="item.enabled"
                   :to="item.to"
-                  :class="[
-                    item.current
-                      ? 'bg-gray-100 text-indigo-600 dark:bg-white/5 dark:text-white'
-                      : 'text-gray-700 hover:bg-gray-100 hover:text-indigo-600 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-white',
-                    'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold',
-                  ]"
+                  class="text-gray-700 hover:bg-gray-100 hover:text-indigo-600 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-white group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold"
                 >
                   <span
-                    :class="[
-                      item.current
-                        ? 'border-indigo-600 text-indigo-600 dark:border-white/20 dark:text-white'
-                        : 'border-gray-200 text-gray-400 group-hover:border-indigo-600 group-hover:text-indigo-600 dark:border-white/10 dark:group-hover:border-white/20 dark:group-hover:text-white',
-                      'flex size-6 shrink-0 items-center justify-center rounded-lg border bg-white text-[0.625rem] font-medium dark:bg-white/5',
-                    ]"
+                    class="border-gray-200 text-gray-400 group-hover:border-indigo-600 group-hover:text-indigo-600 dark:border-white/10 dark:group-hover:border-white/20 dark:group-hover:text-white flex size-6 shrink-0 items-center justify-center rounded-lg border bg-white text-[0.625rem] font-medium dark:bg-white/5"
                     >{{ item.initial }}</span
                   >
                   <span class="truncate">{{ item.name }}</span>
@@ -105,7 +116,38 @@ defineEmits<{
               </li>
             </ul>
           </li>
-          <li class="-mx-6 mt-auto">
+          <!-- Settings Section -->
+          <li v-if="settingsItem" class="mt-auto">
+            <RouterLink
+              :to="{ name: settingsItem.routeName }"
+              :class="[
+                route.name === settingsItem.routeName
+                  ? 'bg-gray-100 text-indigo-600 dark:bg-white/5 dark:text-white'
+                  : 'text-gray-700 hover:bg-gray-100 hover:text-indigo-600 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-white',
+                'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold -mx-2',
+              ]"
+            >
+              <component
+                :is="settingsItem.icon"
+                :class="[
+                  route.name === settingsItem.routeName
+                    ? 'text-indigo-600 dark:text-white'
+                    : 'text-gray-400 group-hover:text-indigo-600 dark:group-hover:text-white',
+                  'size-6 shrink-0',
+                ]"
+                aria-hidden="true"
+              />
+              {{ settingsItem.label }}
+            </RouterLink>
+          </li>
+
+          <!-- Separator -->
+          <li class="-mx-6">
+            <div class="border-t border-gray-200 dark:border-white/10"></div>
+          </li>
+
+          <!-- User Profile -->
+          <li class="-mx-6">
             <a
               href="#"
               class="flex items-center gap-x-4 px-6 py-3 text-sm/6 font-semibold text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-white/5"

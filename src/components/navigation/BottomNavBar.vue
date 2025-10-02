@@ -1,14 +1,18 @@
 <script setup lang="ts">
+import { useRoute } from 'vue-router'
+
 interface NavigationItem {
-  name: string
-  to: string | { name: string }
+  label: string
+  routeName: string
   icon: unknown
-  current: boolean
+  enabled: boolean
 }
 
 defineProps<{
   navigation: NavigationItem[]
 }>()
+
+const route = useRoute()
 </script>
 
 <template>
@@ -20,16 +24,16 @@ defineProps<{
         <div class="flex">
           <div
             v-for="item in navigation"
-            :key="item.name"
+            :key="item.label"
             :class="[
-              item.current
+              item.routeName === route.name
                 ? 'bg-gray-100 text-indigo-600 dark:bg-white/5 dark:text-white'
                 : 'text-gray-700 hover:bg-gray-100 hover:text-indigo-600 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-white',
               'group flex gap-x-3 p-1 text-sm/6 font-semibold flex-1',
             ]"
           >
             <RouterLink
-              :to="item.to"
+              :to="{ name: item.routeName }"
               class="flex items-end justify-center text-center mx-auto px-4 pt-1 w-full"
             >
               <span class="block px-1 pt-1 pb-1 text-center">
@@ -39,7 +43,7 @@ defineProps<{
                   aria-hidden="true"
                 />
                 <span class="block text-xs font-semibold pb-2">{{
-                  item.name
+                  item.label
                 }}</span>
                 <span
                   class="block w-5 mx-auto h-1 group-hover:bg-indigo-500 rounded-full"

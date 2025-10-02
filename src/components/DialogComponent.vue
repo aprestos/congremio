@@ -12,7 +12,7 @@
           leave-to="opacity-0"
         >
           <div
-            class="fixed inset-0 bg-gray-500/75 dark:bg-gray-900/80 transition-opacity"
+            class="fixed inset-0 bg-gray-800/40 dark:bg-gray-900/80 transition-opacity backdrop-blur-xs"
           />
         </TransitionChild>
 
@@ -30,28 +30,20 @@
               leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
               <DialogPanel
-                class="relative transform overflow-hidden rounded-none sm:rounded-lg bg-white dark:bg-gray-800 text-left shadow-xl transition-all w-full h-full sm:h-auto sm:my-8 sm:max-w-lg"
+                class="relative transform overflow-visible rounded-none sm:rounded-lg bg-white dark:bg-gray-800 text-left shadow-2xl transition-all w-full h-full sm:h-auto sm:my-8 sm:max-w-lg"
               >
-                <div
-                  class="border-b border-gray-200 px-4 py-5 sm:px-6 dark:border-white/10"
-                >
+                <div class="px-4 py-5 sm:px-6">
                   <div
                     class="-mt-4 -ml-4 flex flex-wrap items-center justify-between sm:flex-nowrap"
                   >
                     <div class="mt-4 ml-4">
                       <div class="flex items-center">
-                        <div class="shrink-0">
-                          <BuildingLibraryIcon class="size-10 text-gray-500" />
-                        </div>
-                        <div class="ml-4">
+                        <div class="">
                           <h3
-                            class="text-base font-semibold text-gray-900 dark:text-white"
+                            class="text-xl font-semibold text-gray-900 dark:text-white"
                           >
                             {{ title }}
                           </h3>
-                          <p class="text-sm text-gray-500 dark:text-gray-400">
-                            <a href="#">Library</a>
-                          </p>
                         </div>
                       </div>
                     </div>
@@ -89,20 +81,22 @@ import {
   TransitionChild,
   TransitionRoot,
 } from '@headlessui/vue'
-import { BuildingLibraryIcon, XMarkIcon } from '@heroicons/vue/24/outline'
+import { XMarkIcon } from '@heroicons/vue/24/outline'
 
 interface Props {
   open: boolean
   title?: string
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  title: '',
+})
 
 const emit = defineEmits<{
   close: []
 }>()
 
-const closeDialog = () => {
+const closeDialog = (): void => {
   emit('close')
 }
 </script>

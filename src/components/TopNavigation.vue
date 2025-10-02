@@ -1,17 +1,25 @@
 <template>
-  <div class="bg-white">
-    <header class="relative bg-white">
+  <div>
+    <header class="relative">
       <nav aria-label="Top" class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-        <div class="border-b border-gray-200 px-4 pb-14 sm:px-0 sm:pb-0">
+        <div
+          class="border-b border-gray-200 dark:border-white/5 px-4 pb-14 sm:px-0 sm:pb-0"
+        >
           <div class="flex h-16 items-center justify-between">
             <!-- Logo -->
             <div class="flex flex-1">
               <a href="#">
-                <span class="sr-only">Your Company</span>
+                <span class="sr-only">{{
+                  tenantStore?.name || 'Your Company'
+                }}</span>
+                <!-- Logo SkeletonLoader -->
+                <SkeletonLoader v-if="!tenantStore?.logo" class="h-12 w-auto" />
+                <!-- Actual Logo -->
                 <img
-                  class="h-8 w-auto"
-                  src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600"
-                  alt=""
+                  v-else
+                  class="h-12 w-auto"
+                  :src="tenantStore.logo"
+                  :alt="tenantStore.name + ' logo'"
                 />
               </a>
             </div>
@@ -21,28 +29,84 @@
               class="absolute inset-x-0 bottom-0 sm:static sm:flex-1 sm:self-stretch"
             >
               <div
-                class="flex h-14 space-x-8 overflow-x-auto border-t border-gray-200 px-4 pb-px sm:h-full sm:justify-center sm:overflow-visible sm:border-t-0 sm:pb-0"
+                class="flex h-14 space-x-8 overflow-x-auto border-t border-gray-200 dark:border-white/5 px-4 pb-px sm:h-full sm:justify-center sm:overflow-visible sm:border-t-0 sm:pb-0"
               >
                 <RouterLink
                   v-for="page in navigation"
                   :key="page.name"
                   :to="page.href"
-                  class="text-nowrap flex items-center text-sm font-medium text-gray-700 hover:text-gray-800"
+                  class="text-nowrap flex items-center text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white"
                 >
                   {{ page.name }}
                 </RouterLink>
               </div>
             </PopoverGroup>
 
-            <div class="flex flex-1 items-center justify-end">
-              <!-- Admin Panel Button (only show if user is staff or admin) -->
+            <div class="flex flex-1 items-center justify-end space-x-4">
+              <!-- Show authenticated user elements -->
+              <template v-if="isAuthenticated">
+                <!-- Admin Panel Button (only show if user is staff or admin) -->
+                <RouterLink
+                  v-if="isStaffOrAdmin"
+                  :to="{ name: RouteNames.admin.dashboard }"
+                  class="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                >
+                  <CogIcon class="h-4 w-4" aria-hidden="true" />
+                  Admin
+                </RouterLink>
+
+                <!-- Separator (only show if admin button is visible) -->
+                <div
+                  v-if="isStaffOrAdmin"
+                  class="h-6 w-px bg-gray-300 dark:bg-gray-600"
+                ></div>
+
+                <!-- Profile Dropdown -->
+                <Menu as="div" class="relative">
+                  <MenuButton
+                    class="flex items-center rounded-full hover:ring-2 hover:ring-gray-300 dark:hover:ring-gray-600 transition-all"
+                  >
+                    <img
+                      class="h-8 w-8 rounded-full bg-gray-300 object-cover"
+                      src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                      alt="Profile picture"
+                    />
+                  </MenuButton>
+
+                  <transition
+                    enter-active-class="transition ease-out duration-200"
+                    enter-from-class="transform opacity-0 scale-95"
+                    enter-to-class="transform opacity-100 scale-100"
+                    leave-active-class="transition ease-in duration-75"
+                    leave-from-class="transform opacity-100 scale-100"
+                    leave-to-class="transform opacity-0 scale-95"
+                  >
+                    <MenuItems
+                      class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white dark:bg-gray-800 py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                    >
+                      <MenuItem v-slot="{ active }">
+                        <button
+                          :class="[
+                            active ? 'bg-gray-100 dark:bg-gray-700' : '',
+                            'block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300',
+                          ]"
+                          @click="handleSignOut"
+                        >
+                          Sign out
+                        </button>
+                      </MenuItem>
+                    </MenuItems>
+                  </transition>
+                </Menu>
+              </template>
+
+              <!-- Show sign in button when not authenticated -->
               <RouterLink
-                v-if="isStaffOrAdmin"
-                to="/admin"
-                class="ml-4 flex items-center gap-2 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                v-else
+                :to="{ name: RouteNames.auth.signIn }"
+                class="flex items-center gap-2 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-colors"
               >
-                <CogIcon class="h-4 w-4" aria-hidden="true" />
-                Admin Panel
+                Sign in
               </RouterLink>
             </div>
           </div>
@@ -53,13 +117,24 @@
 </template>
 
 <script setup lang="ts">
-import { PopoverGroup } from '@headlessui/vue'
+import {
+  PopoverGroup,
+  Menu,
+  MenuButton,
+  MenuItems,
+  MenuItem,
+} from '@headlessui/vue'
 import { CogIcon } from '@heroicons/vue/24/outline'
 import { onMounted, ref } from 'vue'
+
 import { authService } from '@/features/auth/service.ts'
+import { tenantStore } from '@/stores/tenant.ts'
+import SkeletonLoader from '@/components/SkeletonLoader.vue'
+import { RouteNames } from '@/router/routeNames'
 
 const userEmail = ref<string | null>(null)
 const isStaffOrAdmin = ref(false)
+const isAuthenticated = ref(false)
 
 // Load user email and check admin role on component mount
 onMounted(async () => {
@@ -67,15 +142,31 @@ onMounted(async () => {
     const { data } = await authService.getUser()
     if (data.user?.email) {
       userEmail.value = data.user.email
-    }
+      isAuthenticated.value = true
 
-    // Check if user has staff or admin role
-    const isStaff = await authService.hasAdminAccess()
-    isStaffOrAdmin.value = isStaff
+      // Check if user has staff or admin role
+      const isStaff = await authService.hasAdminAccess()
+      isStaffOrAdmin.value = isStaff
+    } else {
+      isAuthenticated.value = false
+    }
   } catch (error) {
     console.error('Error loading user data:', error)
+    isAuthenticated.value = false
   }
 })
+
+const handleSignOut = async (): Promise<void> => {
+  try {
+    await authService.signOut()
+    // Reset authentication state
+    isAuthenticated.value = false
+    isStaffOrAdmin.value = false
+    userEmail.value = null
+  } catch (error) {
+    console.error('Error signing out:', error)
+  }
+}
 
 interface Category {
   name: string
@@ -95,8 +186,5 @@ const navigation: NavigationItem[] = [
     current: true,
     categories: [{ name: 'Popular' }, { name: 'New' }, { name: 'All' }],
   },
-  { name: 'Flee Market', href: '/flee-market', current: false, categories: [] },
-  { name: 'Tournaments', href: '/tournaments', current: false, categories: [] },
-  { name: 'Prototypes', href: '/prototypes', current: false, categories: [] },
 ]
 </script>

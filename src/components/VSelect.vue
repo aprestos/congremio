@@ -38,6 +38,10 @@ const handleSearch = useDebounceFn(async (value) => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     if (value?.length > 1) {
       const result = await props.onSearch(value)
+      if (!Array.isArray(result)) {
+        console.log('Result is not an array:', result)
+        return
+      }
       options.value = result.map((item) => {
         // Type assertion to access properties safely
         const typedItem = item as Record<string, any>
