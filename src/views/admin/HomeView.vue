@@ -57,19 +57,19 @@ const navigation = ref([
     label: 'Library',
     routeName: RouteNames.admin.library as string,
     icon: BuildingLibraryIcon,
-    enabled: settingsStore?.value?.library?.enabled,
+    enabled: settingsStore?.value?.library?.enabled ?? false,
   },
   {
     label: 'Events',
     routeName: RouteNames.admin.events as string,
     icon: CalendarDaysIcon,
-    enabled: settingsStore?.value?.events?.enabled,
+    enabled: settingsStore?.value?.events?.enabled ?? false,
   },
   {
     label: 'Tournaments',
     routeName: RouteNames.admin.tournaments as string,
     icon: TrophyIcon,
-    enabled: settingsStore?.value?.tournaments?.enabled,
+    enabled: settingsStore?.value?.tournaments?.enabled ?? false,
   },
   {
     label: 'Settings',
@@ -85,14 +85,14 @@ const publicPages = [
     name: 'Library',
     to: { name: RouteNames.public.library },
     initial: 'L',
-    enabled: settingsStore?.value?.library?.enabled,
+    enabled: settingsStore?.value?.library?.enabled ?? false,
   },
   {
     id: 2,
     name: 'Flea Market',
     to: { name: RouteNames.public.fleeMarket },
     initial: 'FM',
-    enabled: settingsStore?.value?.flea?.enabled,
+    enabled: settingsStore?.value?.flea?.enabled ?? false,
   },
 ]
 

@@ -90,7 +90,6 @@
       <GameActions
         :data="item"
         @update-game="updateGame"
-        @open-update-dialog="openUpdateDialog"
         @withdraw="openWithdrawDialog"
         @return-game="openReturnConfirmDialog"
       />
@@ -361,7 +360,7 @@ const getLocationName = (g: LibraryGame): string => {
 }
 
 const getRange = (min: number, max: number): string => {
-  if (min === max) return min
+  if (min === max) return String(min)
   else return `${min} - ${max}`
 }
 </script>

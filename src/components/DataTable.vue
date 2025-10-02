@@ -77,40 +77,6 @@
                 <slot name="actions" :item="item" :index="rowIndex" />
               </td>
             </tr>
-
-            <!-- Loading skeleton rows -->
-            <template v-if="isLoadingMore">
-              <tr
-                v-for="n in skeletonRows"
-                :key="`skeleton-${n}`"
-                class="animate-pulse"
-              >
-                <td
-                  v-for="(column, colIndex) in columns"
-                  :key="column.key"
-                  :class="[
-                    'py-4 text-sm',
-                    colIndex === 0 ? 'pl-4 sm:pl-6 lg:pl-8 pr-3' : 'px-3',
-                    column.hidden ? 'hidden lg:table-cell' : 'table-cell',
-                  ]"
-                >
-                  <div
-                    :class="[
-                      'bg-gray-200 dark:bg-gray-700 rounded',
-                      column.skeletonClass || 'h-4 w-20',
-                    ]"
-                  />
-                </td>
-                <td
-                  v-if="$slots.actions"
-                  class="py-4 pr-4 sm:pr-6 lg:pr-8 pl-3 text-right"
-                >
-                  <div
-                    class="h-8 w-12 bg-gray-200 dark:bg-gray-700 rounded ml-auto"
-                  />
-                </td>
-              </tr>
-            </template>
           </tbody>
         </table>
       </div>

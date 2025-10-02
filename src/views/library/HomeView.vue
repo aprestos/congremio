@@ -443,9 +443,9 @@ const currentFilters = computed((): FilterOptions => {
 })
 
 const sortOptions = [
-  { name: 'Best Rating', href: '#', current: false },
-  { name: 'Newest', href: '#', current: false },
-  { name: 'Name', href: '#', current: false },
+  { name: 'Best Rating', id: 'rating', current: false },
+  { name: 'Newest', id: 'newest', current: false },
+  { name: 'Name', id: 'name', current: false },
 ]
 const subCategories = [
   { name: 'New arrivals', href: '#', icon: SparklesIcon },

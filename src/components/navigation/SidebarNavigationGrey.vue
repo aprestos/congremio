@@ -17,7 +17,6 @@ interface PublicPage {
   name: string
   to: string | { name: string }
   initial: string
-  current: boolean
   enabled: boolean
 }
 
@@ -106,20 +105,10 @@ const route = useRoute()
                 <RouterLink
                   v-if="item.enabled"
                   :to="item.to"
-                  :class="[
-                    item.current
-                      ? 'bg-gray-100 text-indigo-600 dark:bg-white/5 dark:text-white'
-                      : 'text-gray-700 hover:bg-gray-100 hover:text-indigo-600 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-white',
-                    'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold',
-                  ]"
+                  class="text-gray-700 hover:bg-gray-100 hover:text-indigo-600 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-white group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold"
                 >
                   <span
-                    :class="[
-                      item.current
-                        ? 'border-indigo-600 text-indigo-600 dark:border-white/20 dark:text-white'
-                        : 'border-gray-200 text-gray-400 group-hover:border-indigo-600 group-hover:text-indigo-600 dark:border-white/10 dark:group-hover:border-white/20 dark:group-hover:text-white',
-                      'flex size-6 shrink-0 items-center justify-center rounded-lg border bg-white text-[0.625rem] font-medium dark:bg-white/5',
-                    ]"
+                    class="border-gray-200 text-gray-400 group-hover:border-indigo-600 group-hover:text-indigo-600 dark:border-white/10 dark:group-hover:border-white/20 dark:group-hover:text-white flex size-6 shrink-0 items-center justify-center rounded-lg border bg-white text-[0.625rem] font-medium dark:bg-white/5"
                     >{{ item.initial }}</span
                   >
                   <span class="truncate">{{ item.name }}</span>
