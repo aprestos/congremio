@@ -258,7 +258,11 @@ const createUser = async (): Promise<void> => {
     newUserR$.$reset()
   } catch (error) {
     console.error('Error creating user:')
-    toast.error(error.message)
+    if (error instanceof Error) {
+      toast.error(error.message)
+    } else {
+      toast.error('An unknown error occurred')
+    }
   } finally {
     isCreatingUser.value = false
   }
