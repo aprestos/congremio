@@ -90,7 +90,7 @@
       <GameActions
         :data="item"
         @update-game="updateGame"
-        @withdraw="openWithdrawDialog"
+        @withdraw-game="openWithdrawDialog"
         @return-game="openReturnConfirmDialog"
       />
     </template>
