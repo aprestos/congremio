@@ -42,7 +42,6 @@ const handleSearch = useDebounceFn(async (value) => {
         console.log('Result is not an array:', result)
         return
       }
-      console.log(result)
       options.value = result.map((item) => {
         // Type assertion to access properties safely
         const typedItem = item as Record<string, any>
