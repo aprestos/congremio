@@ -18,7 +18,7 @@
                 <img
                   v-else
                   class="h-12 w-auto"
-                  :src="tenantStore.logo"
+                  :src="tenantStore.logo || '@/assets/logoipsum-381.svg'"
                   :alt="tenantStore.name + ' logo'"
                 />
               </a>

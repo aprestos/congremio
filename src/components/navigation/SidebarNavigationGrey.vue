@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { tenantStore } from '@/stores/tenant.ts'
-import SkeletonLoader from '@/components/SkeletonLoader.vue'
 import { useRoute } from 'vue-router'
 import { RouteNames } from '@/router/routeNames.ts'
 
@@ -55,13 +54,12 @@ const route = useRoute()
     >
       <div class="flex h-16 shrink-0 items-center">
         <!-- Logo SkeletonLoader -->
-        <SkeletonLoader v-if="!tenantStore?.logo" width="128px" height="32px" />
+        <!--        <SkeletonLoader v-if="!tenantStore?.logo" width="128px" height="32px" />-->
         <!-- Actual Logo -->
         <img
-          v-else
           class="h-8 w-auto"
-          :src="tenantStore.logo"
-          :alt="tenantStore.name + ' logo'"
+          :src="tenantStore?.logo || '@/assets/logoipsum-381.svg'"
+          :alt="tenantStore?.name + ' logo'"
         />
       </div>
       <nav class="flex flex-1 flex-col">

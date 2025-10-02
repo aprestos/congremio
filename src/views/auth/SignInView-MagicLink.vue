@@ -160,17 +160,6 @@
         </p>
       </div>
 
-      <!-- Instructions -->
-      <div class="mt-8">
-        <div class="rounded-md bg-blue-50 p-4">
-          <div class="flex">
-            <div class="flex-shrink-0">
-              <EnvelopeIcon class="h-5 w-5 text-blue-400" aria-hidden="true" />
-            </div>
-          </div>
-        </div>
-      </div>
-
       <!-- Additional help -->
       <div class="mt-6 text-center">
         <p class="text-xs text-gray-500">
@@ -217,7 +206,6 @@
 import {
   ArrowLeftIcon,
   AtSymbolIcon,
-  EnvelopeIcon,
   InboxIcon,
   LockClosedIcon,
   PaperAirplaneIcon,

@@ -9,9 +9,7 @@
           <div class="flex items-center gap-x-8">
             <img
               :src="
-                logoUrl ||
-                tenantStore?.logo ||
-                'https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600'
+                logoUrl || tenantStore?.logo || '@/assets/logoipsum-381.svg'
               "
               alt="Organization logo"
               class="size-24 flex-none rounded-lg bg-gray-100 object-cover outline -outline-offset-1 outline-black/5 dark:bg-gray-800 dark:outline-white/10"
