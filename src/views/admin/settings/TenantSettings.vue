@@ -100,9 +100,8 @@ const showUploadDialog = ref(false)
 
 // Computed folder path with actual tenant ID
 const logoFolder = computed((): string => {
-  //const tenantId = tenantStore.value?.id
-  //return tenantId ? `tenants/${tenantId}/logos` : 'tenants/default/logos'
-  return ''
+  const tenantId = tenantStore.value?.id
+  return tenantId ? `tenants/${tenantId}/logos` : 'tenants/default/logos'
 })
 
 // Handle image load/error events for debugging
