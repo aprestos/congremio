@@ -170,9 +170,7 @@ const emit = defineEmits<{
   close: []
 }>()
 
-const formData = ref<{ selectedUser: string | undefined }>({
-  selectedUser: undefined,
-})
+const formData = ref({ selectedUser: undefined as string | undefined })
 
 const isSubmitting = ref(false)
 const showCreateUser = ref(false)
