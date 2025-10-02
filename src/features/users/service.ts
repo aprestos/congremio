@@ -56,10 +56,13 @@ export const userService = {
     if (data) return data as User
     else {
       if (error instanceof FunctionsHttpError) {
-        //eslint-disable-next-line
-        const errorMessage = await error.context.json()
-        //eslint-disable-next-line
-        throw new Error(errorMessage.message)
+        type ErrorMessage = { message?: string }
+        const errorMessage = await error.context.json() as ErrorMessage
+        if (typeof errorMessage.message === 'string') {
+          throw new Error(errorMessage.message)
+        } else {
+          throw new Error('Unknown error occurred while creating user')
+        }
       } else {
         console.log('Unknown error:', JSON.stringify(error))
         throw new Error('Unable to create user')
