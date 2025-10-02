@@ -34,7 +34,7 @@
           searchInput:
             '!text-base !text-gray-900 dark:!text-white placeholder:!text-gray-400 dark:placeholder:!text-gray-300 sm:!text-sm/6',
           menuContainer:
-            'mt-1 border border-gray-200 dark:border-gray-600 rounded-md shadow-lg bg-white dark:bg-gray-700 z-[150]',
+            'mt-1 border border-gray-200 dark:border-gray-600 rounded-md shadow-lg bg-white dark:bg-gray-700 z-[200]',
           menuOption:
             'px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 text-gray-900 dark:text-white',
           //menuOptionFocused: 'bg-indigo-600 dark:bg-indigo-500 text-white',
@@ -108,6 +108,7 @@ const handleSearch = useDebounceFn(async (value: string) => {
   try {
     if (value?.length > 1) {
       const result = await props.onSearch(value)
+      console.log('search results:', result)
       internalOptions.value = result.map((item) => {
         // Type assertion to access properties safely
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -20,9 +20,26 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/',
+      path: '',
       name: RouteNames.public.home,
       component: HomeView,
+      children: [
+        {
+          path: 'library',
+          name: RouteNames.public.library,
+          component: () => import('../views/library/HomeView.vue'),
+        },
+        {
+          path: 'flee-market',
+          name: RouteNames.public.fleeMarket,
+          component: () => import('../views/flee-market/HomeView.vue'),
+        },
+        {
+          path: 'tournaments',
+          name: RouteNames.public.tournaments,
+          component: () => import('../views/flee-market/HomeView.vue'),
+        },
+      ],
     },
     {
       path: '/auth',
@@ -44,21 +61,6 @@ const router = createRouter({
           component: () => import('../views/auth/ConfirmView.vue'),
         },
       ],
-    },
-    {
-      path: '/library',
-      name: RouteNames.public.library,
-      component: () => import('../views/library/HomeView.vue'),
-    },
-    {
-      path: '/flee-market',
-      name: RouteNames.public.fleeMarket,
-      component: () => import('../views/flee-market/HomeView.vue'),
-    },
-    {
-      path: '/tournaments',
-      name: RouteNames.public.tournaments,
-      component: () => import('../views/flee-market/HomeView.vue'),
     },
     {
       path: '/admin',

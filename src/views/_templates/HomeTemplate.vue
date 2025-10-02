@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-full">
+  <div class="min-h-full bg-white dark:bg-gray-900">
     <TopNavigation />
 
     <div class="py-10">

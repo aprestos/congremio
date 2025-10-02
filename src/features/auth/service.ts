@@ -92,4 +92,15 @@ export const authService = {
       method: 'POST',
     })
   },
+  async updateUserMetadata(metadata: Record<string, any>): Promise<void> {
+    const { error } = await supabase.auth.updateUser({
+      data: metadata,
+    })
+    if (error) {
+      throw error
+    }
+  },
+  async signOut(): Promise<void> {
+    await supabase.auth.signOut()
+  },
 }

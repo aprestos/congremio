@@ -5,17 +5,23 @@ import {
   CheckIcon,
   InformationCircleIcon,
   XMarkIcon,
+  UserIcon,
 } from '@heroicons/vue/24/outline'
 import { onMounted, ref } from 'vue'
 import { authService } from '@/features/auth/service.ts'
 import router from '@/router'
 import { RouteNames } from '@/router/routeNames.ts'
 import { tenantStore } from '@/stores/tenant.ts'
+import CInput from '@/components/CInput.vue'
 
 const isValidating = ref(true)
 const isSuccess = ref(false)
+const needsDisplayName = ref(false)
+const isUpdatingDisplayName = ref(false)
 const errorMessage = ref('')
 const countdown = ref(5)
+const displayName = ref('')
+const displayNameErrors = ref<string[]>([])
 
 onMounted(async () => {
   try {
@@ -40,12 +46,21 @@ onMounted(async () => {
         )
       }
 
-      // Show success state
-      isValidating.value = false
-      isSuccess.value = true
+      // Check if user has display_name in user_metadata
+      const userDisplayName = data.user.user_metadata?.display_name
 
-      // Start countdown timer
-      startCountdown()
+      if (!userDisplayName) {
+        // User needs to set display name
+        isValidating.value = false
+        needsDisplayName.value = true
+      } else {
+        // Show success state
+        isValidating.value = false
+        isSuccess.value = true
+
+        // Start countdown timer
+        startCountdown()
+      }
     } else {
       throw new Error('No authenticated user found')
     }
@@ -57,6 +72,40 @@ onMounted(async () => {
       error instanceof Error ? error.message : 'An unexpected error occurred'
   }
 })
+
+const updateDisplayName = async (): Promise<void> => {
+  displayNameErrors.value = []
+
+  if (!displayName.value.trim()) {
+    displayNameErrors.value.push('Display name is required')
+    return
+  }
+
+  if (displayName.value.trim().length < 2) {
+    displayNameErrors.value.push('Display name must be at least 2 characters')
+    return
+  }
+
+  isUpdatingDisplayName.value = true
+
+  try {
+    await authService.updateUserMetadata({
+      display_name: displayName.value.trim(),
+    })
+
+    // Update completed, show success state
+    needsDisplayName.value = false
+    isSuccess.value = true
+    startCountdown()
+  } catch (error) {
+    console.error('Failed to update display name:', error)
+    displayNameErrors.value.push(
+      error instanceof Error ? error.message : 'Failed to update display name',
+    )
+  } finally {
+    isUpdatingDisplayName.value = false
+  }
+}
 
 const startCountdown = (): void => {
   const timer = setInterval(() => {
@@ -106,7 +155,7 @@ const backToSignIn = async (): Promise<void> => {
     <h2 class="mt-6 text-lg font-semibold text-gray-900">
       Confirming your sign-in...
     </h2>
-    <p class="mt-2 text-sm text-gray-600">
+    <p class="mt-2 text-md text-gray-600">
       Please wait while we verify your authentication.
     </p>
   </div>
@@ -120,7 +169,7 @@ const backToSignIn = async (): Promise<void> => {
     </div>
 
     <h2 class="mt-6 text-lg font-semibold text-gray-900">Welcome back!</h2>
-    <p class="mt-2 text-sm text-gray-600">
+    <p class="mt-2 text-md text-gray-600">
       You have been successfully signed in to your account.
     </p>
 
@@ -149,6 +198,44 @@ const backToSignIn = async (): Promise<void> => {
       >
         <ArrowRightIcon class="h-4 w-4" aria-hidden="true" />
         Continue to Home
+      </button>
+    </div>
+  </div>
+
+  <div v-else-if="needsDisplayName" class="mt-6 text-center">
+    <!-- Display Name required state -->
+    <div
+      class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-yellow-100"
+    >
+      <UserIcon class="h-8 w-8 text-yellow-600" aria-hidden="true" />
+    </div>
+
+    <h2 class="mt-6 text-lg font-semibold text-gray-900">Almost there!</h2>
+    <p class="mt-2 text-md text-gray-600">
+      Please provide a display name to complete your profile.
+    </p>
+
+    <!-- Display Name form -->
+    <div class="mt-4">
+      <CInput
+        id="display-name"
+        v-model="displayName"
+        label="Display Name"
+        type="text"
+        placeholder="Enter your display name"
+        :errors="displayNameErrors"
+      />
+    </div>
+
+    <div class="mt-6">
+      <button
+        class="flex w-full justify-center items-center gap-2 rounded-md bg-indigo-600 px-3 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+        :disabled="isUpdatingDisplayName"
+        @click="updateDisplayName"
+      >
+        <CheckIcon class="h-4 w-4" aria-hidden="true" />
+        <span v-if="isUpdatingDisplayName">Updating...</span>
+        <span v-else>Update Display Name</span>
       </button>
     </div>
   </div>

@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase.ts'
-import { eventStore } from '@/stores/event'
+import { eventStore } from '@/stores/edition'
 import { tenantStore } from '@/stores/tenant.ts'
 
 export interface LibraryWithdraw {
@@ -61,9 +61,9 @@ export const libraryWithdrawService = {
     }
   },
 
-  async getByLibraryGameId(
+  async getActiveByLibraryGameId(
     libraryGameId: number,
-  ): Promise<Array<LibraryWithdraw>> {
+  ): Promise<LibraryWithdraw | undefined> {
     try {
       const result = await supabase
         .from('library_withdraws')
@@ -71,15 +71,17 @@ export const libraryWithdrawService = {
         .eq('library_game_id', libraryGameId)
         .eq('tenant_id', tenantStore.value?.id)
         .eq('edition_id', eventStore.value?.id)
+        .is('ended_at', null)
         .order('started_at', { ascending: false })
+        .single()
 
-      return result.data as LibraryWithdraw[]
+      return result.data as LibraryWithdraw
     } catch (error) {
       console.error(
         'Error fetching withdraws by library game:',
         (error as Error).message,
       )
-      return []
+      return undefined
     }
   },
 

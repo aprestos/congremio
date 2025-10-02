@@ -25,14 +25,13 @@ import {
   HomeIcon,
   TrophyIcon,
 } from '@heroicons/vue/24/outline'
-import { computed, onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { onMounted, ref } from 'vue'
 import BottomNavBar from '@/components/navigation/BottomNavBar.vue'
 import SidebarNavigationGrey from '@/components/navigation/SidebarNavigationGrey.vue'
 import { authService } from '@/features/auth/service.ts'
 import { RouteNames } from '@/router/routeNames.ts'
+import { settingsStore } from '@/features/settings/useSettings.store.ts'
 
-const route = useRoute()
 const userEmail = ref<string | null>(null)
 
 // Load user email on component mount
@@ -47,52 +46,53 @@ onMounted(async () => {
   }
 })
 
-const navigation = computed(() => [
+const navigation = ref([
   {
-    name: 'Dashboard',
-    to: { name: RouteNames.admin.dashboard },
+    label: 'Dashboard',
+    routeName: RouteNames.admin.dashboard as string,
     icon: HomeIcon,
-    current: route.name === RouteNames.admin.dashboard,
+    enabled: true,
   },
   {
-    name: 'Library',
-    to: { name: RouteNames.admin.library },
+    label: 'Library',
+    routeName: RouteNames.admin.library as string,
     icon: BuildingLibraryIcon,
-    current: route.name === RouteNames.admin.library,
+    enabled: settingsStore?.value?.library?.enabled,
   },
   {
-    name: 'Events',
-    to: { name: RouteNames.admin.events },
+    label: 'Events',
+    routeName: RouteNames.admin.events as string,
     icon: CalendarDaysIcon,
-    current: route.name === RouteNames.admin.events,
+    enabled: settingsStore?.value?.events?.enabled,
   },
   {
-    name: 'Tournaments',
-    to: { name: RouteNames.admin.tournaments },
+    label: 'Tournaments',
+    routeName: RouteNames.admin.tournaments as string,
     icon: TrophyIcon,
-    current: route.name === RouteNames.admin.tournaments,
+    enabled: settingsStore?.value?.tournaments?.enabled,
   },
   {
-    name: 'Settings',
-    to: { name: RouteNames.admin.settings },
+    label: 'Settings',
+    routeName: RouteNames.admin.settings as string,
     icon: Cog6ToothIcon,
-    current: route.name === RouteNames.admin.settings,
+    enabled: true,
   },
 ])
+
 const publicPages = [
   {
     id: 1,
     name: 'Library',
     to: { name: RouteNames.public.library },
     initial: 'L',
-    current: false,
+    enabled: settingsStore?.value?.library?.enabled,
   },
   {
     id: 2,
-    name: 'Flee Market',
+    name: 'Flea Market',
     to: { name: RouteNames.public.fleeMarket },
     initial: 'FM',
-    current: false,
+    enabled: settingsStore?.value?.flea?.enabled,
   },
 ]
 

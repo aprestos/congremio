@@ -1,6 +1,6 @@
 import type { GameLocation } from '@/features/locations/model.ts'
 import { supabase } from '@/lib/supabase.ts'
-import { eventStore } from '@/stores/event.ts'
+import { eventStore } from '@/stores/edition'
 import { tenantStore } from '@/stores/tenant.ts'
 
 export const locationService = {
