@@ -33,6 +33,7 @@ const route = useRoute()
             ]"
           >
             <RouterLink
+              v-if="item.enabled"
               :to="{ name: item.routeName }"
               class="flex items-end justify-center text-center mx-auto px-4 pt-1 w-full"
             >

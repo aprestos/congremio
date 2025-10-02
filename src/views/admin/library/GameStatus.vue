@@ -12,6 +12,13 @@ import {
   XCircleIcon,
   ClockIcon,
 } from '@heroicons/vue/24/outline'
+import {
+  IconCheck,
+  IconX,
+  IconClockFilled,
+  IconUserFilled,
+  IconExclamationMark,
+} from '@tabler/icons-vue'
 import { useTimeAgo } from '@vueuse/core'
 import SkeletonLoader from '@/components/SkeletonLoader.vue'
 
@@ -80,27 +87,34 @@ const fetchWithdrawDetails = async (): Promise<void> => {
     <PopoverButton
       class="cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-full"
     >
-      <CBadge
-        v-show="getStatus(props.data) === 'available'"
-        text="Available"
-        type="green"
-      />
+      <CBadge v-show="getStatus(props.data) === 'available'" type="green"
+        ><span class="hidden md:inline">Available</span
+        ><span class="md:hidden"><IconCheck /></span
+      ></CBadge>
       <CBadge
         v-show="getStatus(props.data) === 'withdrawn'"
-        text="Withdrawn"
+        text=""
         type="yellow"
         @click="fetchWithdrawDetails"
-      />
+        ><span class="hidden md:inline">Withdrawn</span
+        ><span class="md:hidden"><IconExclamationMark /></span
+      ></CBadge>
       <CBadge
         v-show="getStatus(props.data) === 'not-available'"
         text="Not available"
         type="red"
-      />
+      >
+        <span class="hidden md:inline">Reserved</span
+        ><span class="md:hidden"><IconX /></span>
+      </CBadge>
       <CBadge
         v-show="getStatus(props.data) === 'reserved'"
         text="Reserved"
         type="blue"
-      />
+      >
+        <span class="hidden md:inline">Reserved</span
+        ><span class="md:hidden"><IconX /></span>
+      </CBadge>
     </PopoverButton>
 
     <Transition

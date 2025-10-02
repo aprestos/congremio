@@ -39,7 +39,7 @@ const badgeClasses = `${baseClasses} ${colorClasses[props.type]}`
 
 <template>
   <span :class="badgeClasses">
-    {{ props.text }}
+    <slot>{{ props.text }}</slot>
   </span>
 </template>
 

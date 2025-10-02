@@ -43,7 +43,7 @@ const updateStatus = (status: LibraryGameStatus): void => {
         @click="emit('return-game', props.data)"
       >
         <IconArrowBarToDownDashed class="-ml-0.5 size-5" aria-hidden="true" />
-        Return
+        <span class="hidden md:inline">Return</span>
       </button>
       <button
         v-show="getStatus(props.data) === 'available'"
@@ -52,7 +52,7 @@ const updateStatus = (status: LibraryGameStatus): void => {
         @click="emit('withdraw-game', props.data)"
       >
         <IconArrowBarUp class="-ml-0.5 size-5" aria-hidden="true" />
-        Loan
+        <span class="hidden md:inline">Load</span>
       </button>
       <Menu as="div" class="relative inline-block">
         <MenuButton

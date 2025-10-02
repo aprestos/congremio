@@ -7,10 +7,10 @@
     @close="sidebarOpen = false"
   />
 
-  <div class="lg:pl-72 bg-white dark:bg-gray-900 dark:border-white/5">
-    <div>
-      <router-view />
-    </div>
+  <div
+    class="lg:pl-72 bg-white dark:bg-gray-900 dark:border-white/5 min-h-full"
+  >
+    <router-view />
   </div>
   <!-- component -->
 
