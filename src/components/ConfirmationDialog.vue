@@ -10,7 +10,8 @@
       <div class="flex flex-col sm:flex-row gap-3 sm:gap-2 sm:justify-end">
         <CButton
           variant="secondary"
-          class="order-2 sm:order-1"
+          size="lg"
+          class="order-2 sm:order-1 w-full sm:w-auto"
           :disabled="loading"
           @click="handleCancel"
         >
@@ -18,7 +19,8 @@
         </CButton>
         <CButton
           variant="primary"
-          class="order-1 sm:order-2"
+          size="lg"
+          class="order-1 sm:order-2 w-full sm:w-auto"
           :loading="loading"
           @click="handleConfirm"
         >

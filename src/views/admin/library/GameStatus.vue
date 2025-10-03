@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import { getStatus, type LibraryGame } from '@/features/library/game.model.ts'
+import {
+  getStatus,
+  getStatusLabel,
+  type LibraryGame,
+} from '@/features/library/game.model.ts'
 import CBadge from '@/components/CBadge.vue'
 import { Popover, PopoverButton, PopoverPanel } from '@headlessui/vue'
 import libraryWithdrawService, {
@@ -96,7 +100,7 @@ const fetchWithdrawDetails = async (): Promise<void> => {
         text=""
         type="yellow"
         @click="fetchWithdrawDetails"
-        ><span class="hidden md:inline">Withdrawn</span
+        ><span class="hidden md:inline">{{ getStatusLabel(props.data) }}</span
         ><span class="md:hidden"><IconExclamationMark /></span
       ></CBadge>
       <CBadge
@@ -104,7 +108,7 @@ const fetchWithdrawDetails = async (): Promise<void> => {
         text="Not available"
         type="red"
       >
-        <span class="hidden md:inline">Reserved</span
+        <span class="hidden md:inline">{{ getStatusLabel(props.data) }}</span
         ><span class="md:hidden"><IconX /></span>
       </CBadge>
       <CBadge
@@ -112,7 +116,7 @@ const fetchWithdrawDetails = async (): Promise<void> => {
         text="Reserved"
         type="blue"
       >
-        <span class="hidden md:inline">Reserved</span
+        <span class="hidden md:inline">{{ getStatusLabel(props.data) }}</span
         ><span class="md:hidden"><IconX /></span>
       </CBadge>
     </PopoverButton>

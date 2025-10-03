@@ -17,7 +17,7 @@ const route = useRoute()
 
 <template>
   <div
-    class="bg-gray-50 dark:bg-gray-900 bg-opacity-25 sticky bottom-0 flex items-center justify-center border-0 border-t-1 backdrop-blur-sm border-t-indigo-100 lg:hidden"
+    class="bg-gray-50 dark:bg-gray-900 bg-opacity-25 sticky bottom-0 flex items-center justify-center border-0 border-t-1 backdrop-blur-sm dark:border-white/5 border-t-indigo-100 lg:hidden"
   >
     <div class="w-full">
       <div class="opacity-90 shadow-lg">

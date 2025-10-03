@@ -14,7 +14,7 @@ useHead({
 
 const icon = useFavicon()
 
-icon.value = tenantStore?.value?.logo || '@/assets/logoipsum-381.svg' // change current icon
+icon.value = tenantStore?.value?.logo || 'assets/logoipsum-381.svg' // change current icon
 </script>
 
 <template>

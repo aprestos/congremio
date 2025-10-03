@@ -106,16 +106,24 @@
       </div>
 
       <!-- Action Buttons -->
-      <div
-        class="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3"
-      >
+      <div class="flex flex-col sm:flex-row gap-3 sm:gap-2 sm:justify-end">
+        <CButton
+          type="button"
+          variant="secondary"
+          size="lg"
+          class="order-2 sm:order-1 w-full sm:w-auto"
+          @click="emit('close')"
+        >
+          Cancel
+        </CButton>
         <CButton
           type="submit"
           variant="yellow"
+          size="lg"
+          class="order-1 sm:order-2 w-full sm:w-auto"
           :loading="isSubmitting"
           :disabled="isCreatingUser"
           loading-text="Withdrawing..."
-          class="sm:col-start-2"
         >
           <svg
             class="size-4 mr-2"
@@ -131,14 +139,6 @@
             />
           </svg>
           Withdraw Game
-        </CButton>
-        <CButton
-          type="button"
-          variant="secondary"
-          class="mt-3 sm:col-start-1 sm:mt-0"
-          @click="emit('close')"
-        >
-          Cancel
         </CButton>
       </div>
     </form>

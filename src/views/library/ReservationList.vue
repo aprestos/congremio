@@ -122,13 +122,20 @@
 
         <!-- Actions -->
         <div
-          class="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-600"
+          class="flex flex-col sm:flex-row gap-3 sm:gap-2 sm:justify-end pt-4 border-t border-gray-200 dark:border-gray-600"
         >
-          <CButton variant="secondary" @click="closeReservationDetail">
+          <CButton
+            variant="secondary"
+            size="lg"
+            class="order-2 sm:order-1 w-full sm:w-auto"
+            @click="closeReservationDetail"
+          >
             Close
           </CButton>
           <CButton
             variant="danger"
+            size="lg"
+            class="order-1 sm:order-2 w-full sm:w-auto"
             :loading="cancellingReservation"
             @click="cancelReservation"
           >

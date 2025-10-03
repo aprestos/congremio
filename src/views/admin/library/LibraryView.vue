@@ -1,5 +1,9 @@
 <template>
-  <DataTable :items="filteredGames" :columns="tableColumns" :items-per-page="1">
+  <DataTable
+    :items="filteredGames"
+    :columns="tableColumns"
+    :items-per-page="40"
+  >
     <!-- Header slot with search functionality -->
     <template #header>
       <SearchBar
