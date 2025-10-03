@@ -192,7 +192,7 @@ const handleScroll = (): void => {
   const threshold = 100 // pixels from bottom to trigger load
 
   if (scrollTop + clientHeight >= scrollHeight - threshold) {
-    void loadMoreItems()
+    loadMoreItems().catch(console.error)
   }
 }
 
