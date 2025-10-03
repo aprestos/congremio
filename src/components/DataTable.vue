@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col h-full">
+  <div class="flex flex-col min-h-0 h-full">
     <!-- Header slot for search and other controls -->
     <div
       v-if="$slots.header"
@@ -9,7 +9,7 @@
     </div>
 
     <!-- Table container -->
-    <div class="flex-1 overflow-hidden">
+    <div class="flex-1 min-h-0 overflow-hidden">
       <div
         ref="scrollContainer"
         class="h-full overflow-auto"
@@ -331,6 +331,15 @@ watch(
   () => {
     resetInfiniteScroll()
   },
+)
+
+// Also watch for items reference change (important for search)
+watch(
+  () => props.items,
+  () => {
+    resetInfiniteScroll()
+  },
+  { deep: false },
 )
 
 // Also watch for items reference change (important for search)
