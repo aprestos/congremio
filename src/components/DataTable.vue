@@ -10,7 +10,11 @@
 
     <!-- Table container -->
     <div class="flex-1 overflow-hidden">
-      <div class="h-full overflow-auto">
+      <div
+        ref="scrollContainer"
+        class="h-full overflow-auto"
+        @scroll="handleScroll"
+      >
         <table class="w-full divide-y divide-gray-200 dark:divide-white/15">
           <!-- Table header -->
           <thead>
@@ -79,59 +83,23 @@
             </tr>
           </tbody>
         </table>
-      </div>
-    </div>
 
-    <!-- Pagination controls -->
-    <div
-      class="flex items-center justify-center border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 pb-3 sm:px-6"
-    >
-      <div class="flex flex-1 justify-between sm:hidden">
-        <!-- Mobile pagination -->
-        <button
-          :disabled="currentPage === 1"
-          class="relative inline-flex items-center rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          @click="goToPage(currentPage - 1)"
+        <!-- Loading indicator -->
+        <div
+          v-if="isLoading && hasMoreItems"
+          class="flex justify-center items-center py-8"
         >
-          Previous
-        </button>
-        <button
-          :disabled="currentPage === totalPages"
-          class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          @click="goToPage(currentPage + 1)"
+          <div
+            class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"
+          ></div>
+        </div>
+
+        <!-- End of results indicator -->
+        <div
+          v-if="!hasMoreItems && displayedItems.length > 0"
+          class="flex justify-center items-center py-4 text-sm text-gray-500 dark:text-gray-400"
         >
-          Next
-        </button>
-      </div>
-      <div class="hidden sm:flex sm:flex-col sm:items-center sm:gap-2">
-        <div>
-          <nav
-            class="flex items-center justify-between border-t border-gray-200 px-4 sm:px-0 dark:border-white/10"
-          >
-            <div class="hidden md:-mt-px md:flex">
-              <template v-for="page in visiblePages" :key="page">
-                <button
-                  v-if="page !== '...'"
-                  :class="[
-                    'inline-flex items-center border-t-2 px-4 pt-4 text-sm font-medium',
-                    page === currentPage
-                      ? 'border-indigo-500 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400'
-                      : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:border-white/20 dark:hover:text-gray-200',
-                  ]"
-                  :aria-current="page === currentPage ? 'page' : undefined"
-                  @click="goToPage(page)"
-                >
-                  {{ page }}
-                </button>
-                <span
-                  v-else
-                  class="inline-flex items-center border-t-2 border-transparent px-4 pt-4 text-sm font-medium text-gray-500 dark:text-gray-400"
-                >
-                  ...
-                </span>
-              </template>
-            </div>
-          </nav>
+          {{ displayedItems.length }} of {{ totalItems }} items loaded
         </div>
       </div>
     </div>
@@ -172,64 +140,19 @@ const props = defineProps({
   },
 })
 
-const currentPage = ref(1)
+const scrollContainer = ref<HTMLElement>()
+const currentLoadedCount = ref(props.itemsPerPage)
+const isLoading = ref(false)
 
-// Computed properties for pagination
+// Computed properties for infinite scroll
 const totalItems = computed(() => props.items.length)
 
-const totalPages = computed(() => {
-  return Math.ceil(totalItems.value / props.itemsPerPage)
-})
-
 const displayedItems = computed((): T[] => {
-  const start = (currentPage.value - 1) * props.itemsPerPage
-  const end = start + props.itemsPerPage
-  return props.items.slice(start, end)
+  return props.items.slice(0, currentLoadedCount.value)
 })
 
-const visiblePages = computed(() => {
-  const total = totalPages.value
-  const current = currentPage.value
-  const pages: (number | string)[] = []
-
-  if (total <= 7) {
-    // Show all pages if 7 or fewer
-    for (let i = 1; i <= total; i++) {
-      pages.push(i)
-    }
-  } else {
-    // Show smart pagination with ellipsis
-    if (current <= 4) {
-      // Show 1, 2, 3, 4, 5, ..., last
-      for (let i = 1; i <= 5; i++) {
-        pages.push(i)
-      }
-      if (total > 6) {
-        pages.push('...')
-        pages.push(total)
-      }
-    } else if (current >= total - 3) {
-      // Show 1, ..., last-4, last-3, last-2, last-1, last
-      pages.push(1)
-      if (total > 6) {
-        pages.push('...')
-      }
-      for (let i = total - 4; i <= total; i++) {
-        pages.push(i)
-      }
-    } else {
-      // Show 1, ..., current-1, current, current+1, ..., last
-      pages.push(1)
-      pages.push('...')
-      for (let i = current - 1; i <= current + 1; i++) {
-        pages.push(i)
-      }
-      pages.push('...')
-      pages.push(total)
-    }
-  }
-
-  return pages
+const hasMoreItems = computed(() => {
+  return currentLoadedCount.value < totalItems.value
 })
 
 // Helper functions
@@ -248,28 +171,62 @@ const getNestedValue = (obj: T, path: string): unknown => {
   }, obj)
 }
 
-// Pagination functions
-const goToPage = (page: number | string): void => {
-  if (typeof page === 'string') return
-  if (page < 1 || page > totalPages.value) return
-  currentPage.value = page
+// Infinite scroll functions
+const loadMoreItems = async (): Promise<void> => {
+  if (isLoading.value || !hasMoreItems.value) return
+
+  isLoading.value = true
+
+  // Simulate slight delay for smooth UX (optional)
+  await new Promise((resolve) => setTimeout(resolve, 100))
+
+  currentLoadedCount.value = Math.min(
+    currentLoadedCount.value + props.itemsPerPage,
+    totalItems.value,
+  )
+
+  isLoading.value = false
 }
 
-// Reset pagination when items change (e.g., after search)
-const resetPagination = (): void => {
-  currentPage.value = 1
+const handleScroll = (): void => {
+  if (!scrollContainer.value || isLoading.value || !hasMoreItems.value) return
+
+  const { scrollTop, scrollHeight, clientHeight } = scrollContainer.value
+  const threshold = 100 // pixels from bottom to trigger load
+
+  if (scrollTop + clientHeight >= scrollHeight - threshold) {
+    void loadMoreItems()
+  }
 }
 
-// Watch for items changes to reset pagination
+// Reset when items change (e.g., after search)
+const resetInfiniteScroll = (): void => {
+  currentLoadedCount.value = props.itemsPerPage
+  isLoading.value = false
+  if (scrollContainer.value) {
+    scrollContainer.value.scrollTop = 0
+  }
+}
+
+// Watch for items changes to reset scroll
 watch(
   () => props.items.length,
   () => {
-    currentPage.value = 1
+    resetInfiniteScroll()
   },
+)
+
+// Also watch for items reference change (important for search)
+watch(
+  () => props.items,
+  () => {
+    resetInfiniteScroll()
+  },
+  { deep: false },
 )
 
 // Expose methods for parent component
 defineExpose({
-  resetPagination,
+  resetInfiniteScroll,
 })
 </script>
