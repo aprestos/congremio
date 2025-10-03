@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col h-full">
+  <div class="flex flex-col min-h-0 h-full">
     <!-- Header slot for search and other controls -->
     <div
       v-if="$slots.header"
@@ -9,7 +9,7 @@
     </div>
 
     <!-- Table container -->
-    <div class="flex-1 overflow-hidden">
+    <div class="flex-1 min-h-0 overflow-hidden">
       <div
         ref="scrollContainer"
         class="h-full overflow-auto"
@@ -172,7 +172,7 @@ const getNestedValue = (obj: T, path: string): unknown => {
 }
 
 // Infinite scroll functions
-const loadMoreItems = async (): Promise<void> => {
+const loadMoreItems = (): void => {
   if (isLoading.value || !hasMoreItems.value) return
 
   isLoading.value = true
@@ -192,7 +192,7 @@ const handleScroll = (): void => {
   const threshold = 100 // pixels from bottom to trigger load
 
   if (scrollTop + clientHeight >= scrollHeight - threshold) {
-    loadMoreItems().catch(console.error)
+    loadMoreItems()
   }
 }
 
