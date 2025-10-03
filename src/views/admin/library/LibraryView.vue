@@ -150,7 +150,7 @@ import DataTable from '@/components/DataTable.vue'
 import SearchBar from '@/components/SearchBar.vue'
 import DialogComponent from '@/components/DialogComponent.vue'
 import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
-import type { LibraryGame } from '@/features/library/game.model.ts'
+import { getStatus, type LibraryGame } from '@/features/library/game.model.ts'
 import type { DataTableColumn } from '@/components/DataTable.vue'
 import Service, { libraryService } from '@/features/library/service.ts'
 import libraryWithdrawService from '@/features/library/withdraws/service.ts'
@@ -177,15 +177,21 @@ let unsubscribe: (() => void) | null = null
 console.log('LibraryView: Component is loading...')
 
 // Table column definitions
-const tableColumns: DataTableColumn[] = [
+const tableColumns: DataTableColumn<LibraryGame>[] = [
   {
     key: 'name',
     label: 'Name',
     cellClass: 'whitespace-nowrap',
+    sortFn: (a: LibraryGame, b: LibraryGame): number => {
+      return a.game.name.localeCompare(b.game.name)
+    },
   },
   {
     key: 'status',
     label: 'Status',
+    sortFn: (a: LibraryGame, b: LibraryGame): number => {
+      return getStatus(a).localeCompare(getStatus(b))
+    },
   },
   {
     key: 'location',
