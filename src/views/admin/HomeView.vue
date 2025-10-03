@@ -8,9 +8,11 @@
   />
 
   <div
-    class="lg:pl-72 bg-white dark:bg-gray-900 dark:border-white/5 min-h-full"
+    class="lg:pl-72 bg-white dark:bg-gray-900 dark:border-white/5 h-screen flex flex-col"
   >
-    <router-view />
+    <div class="flex-1 min-h-0">
+      <router-view />
+    </div>
   </div>
   <!-- component -->
 

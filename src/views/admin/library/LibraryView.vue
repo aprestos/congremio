@@ -1,100 +1,102 @@
 <template>
-  <DataTable
-    :items="filteredGames"
-    :columns="tableColumns"
-    :items-per-page="40"
-  >
-    <!-- Header slot with search functionality -->
-    <template #header>
-      <SearchBar
-        v-model:search-value="searchInput"
-        search-placeholder="Search games..."
-        search-label="Search"
-      >
-        <template #additional-inputs>
-          <!-- Reservation quick-search (required) -->
-          <div class="grid flex-1 grid-cols-1 max-w-xs">
-            <input
-              v-model="reservationInput"
-              type="text"
-              name="reservation"
-              aria-label="Reservation"
-              class="col-start-1 row-start-1 block bg-white dark:bg-gray-800 pl-8 text-base text-gray-900 dark:text-white outline-hidden placeholder:text-gray-400 dark:placeholder:text-gray-500 rounded-md"
-              placeholder="Reservation"
+  <div class="flex flex-col h-full overflow-hidden">
+    <DataTable
+      :items="filteredGames"
+      :columns="tableColumns"
+      :items-per-page="25"
+    >
+      <!-- Header slot with search functionality -->
+      <template #header>
+        <SearchBar
+          v-model:search-value="searchInput"
+          search-placeholder="Search games..."
+          search-label="Search"
+        >
+          <template #additional-inputs>
+            <!-- Reservation quick-search (required) -->
+            <div class="grid flex-1 grid-cols-1 max-w-xs">
+              <input
+                v-model="reservationInput"
+                type="text"
+                name="reservation"
+                aria-label="Reservation"
+                class="col-start-1 row-start-1 block bg-white dark:bg-gray-800 pl-8 text-base text-gray-900 dark:text-white outline-hidden placeholder:text-gray-400 dark:placeholder:text-gray-500 rounded-md"
+                placeholder="Reservation"
+              />
+              <span
+                class="pointer-events-none col-start-1 row-start-1 text-2xl self-center text-gray-400 dark:text-gray-500"
+                aria-hidden="true"
+                >#</span
+              >
+            </div>
+          </template>
+        </SearchBar>
+      </template>
+
+      <!-- Custom cell for game name with image -->
+      <template #cell-name="{ item }">
+        <div class="flex items-center">
+          <div class="size-11 shrink-0">
+            <img
+              class="size-11 rounded-sm object-cover bg-gray-200 dark:bg-gray-700"
+              :src="item.game.image"
+              alt=""
+              @error="handleImageError"
+              @load="handleImageLoad"
             />
-            <span
-              class="pointer-events-none col-start-1 row-start-1 text-2xl self-center text-gray-400 dark:text-gray-500"
-              aria-hidden="true"
-              >#</span
-            >
           </div>
-        </template>
-      </SearchBar>
-    </template>
-
-    <!-- Custom cell for game name with image -->
-    <template #cell-name="{ item }">
-      <div class="flex items-center">
-        <div class="size-11 shrink-0">
-          <img
-            class="size-11 rounded-sm object-cover bg-gray-200 dark:bg-gray-700"
-            :src="item.game.image"
-            alt=""
-            @error="handleImageError"
-            @load="handleImageLoad"
-          />
-        </div>
-        <div class="ml-4">
-          <div class="font-medium text-gray-900 dark:text-white">
-            {{ item.game.name }}
-          </div>
-          <div class="mt-1 text-gray-500 dark:text-gray-400">
-            {{ item.game.year }}
+          <div class="ml-4">
+            <div class="font-medium text-gray-900 dark:text-white">
+              {{ item.game.name }}
+            </div>
+            <div class="mt-1 text-gray-500 dark:text-gray-400">
+              {{ item.game.year }}
+            </div>
           </div>
         </div>
-      </div>
-    </template>
+      </template>
 
-    <!-- Custom cell for status -->
-    <template #cell-status="{ item }">
-      <GameStatus :data="item" />
-    </template>
+      <!-- Custom cell for status -->
+      <template #cell-status="{ item }">
+        <GameStatus :data="item" />
+      </template>
 
-    <!-- Custom cell for location -->
-    <template #cell-location="{ item }">
-      {{ getLocationName(item) }}
-    </template>
+      <!-- Custom cell for location -->
+      <template #cell-location="{ item }">
+        {{ getLocationName(item) }}
+      </template>
 
-    <!-- Custom cell for players -->
-    <template #cell-players="{ item }">
-      {{ getRange(item.game.min_players, item.game.max_players) }}
-    </template>
+      <!-- Custom cell for players -->
+      <template #cell-players="{ item }">
+        {{ getRange(item.game.min_players, item.game.max_players) }}
+      </template>
 
-    <!-- Custom cell for playtime -->
-    <template #cell-playtime="{ item }">
-      {{ getRange(item.game.min_playtime, item.game.max_playtime) }}
-    </template>
+      <!-- Custom cell for playtime -->
+      <template #cell-playtime="{ item }">
+        {{ getRange(item.game.min_playtime, item.game.max_playtime) }}
+      </template>
 
-    <!-- Custom cell for age -->
-    <template #cell-age="{ item }">
-      {{ item.game.min_age ? item.game.min_age + '+' : '-' }}
-    </template>
+      <!-- Custom cell for age -->
+      <template #cell-age="{ item }">
+        {{ item.game.min_age ? item.game.min_age + '+' : '-' }}
+      </template>
 
-    <!-- Custom cell for owner -->
-    <template #cell-owner="{ item }">
-      {{ item.owner }}
-    </template>
+      <!-- Custom cell for owner -->
+      <template #cell-owner="{ item }">
+        {{ item.owner }}
+      </template>
 
-    <!-- Actions slot -->
-    <template #actions="{ item }">
-      <GameActions
-        :data="item"
-        @update-game="updateGame"
-        @withdraw-game="openWithdrawDialog"
-        @return-game="openReturnConfirmDialog"
-      />
-    </template>
-  </DataTable>
+      <!-- Actions slot -->
+      <template #actions="{ item }">
+        <GameActions
+          :data="item"
+          @update-game="updateGame"
+          @withdraw-game="openWithdrawDialog"
+          @return-game="openReturnConfirmDialog"
+        />
+      </template>
+    </DataTable>
+  </div>
 
   <!-- Floating Add Button -->
   <div
