@@ -177,9 +177,6 @@ const loadMoreItems = async (): Promise<void> => {
 
   isLoading.value = true
 
-  // Simulate slight delay for smooth UX (optional)
-  await new Promise((resolve) => setTimeout(resolve, 100))
-
   currentLoadedCount.value = Math.min(
     currentLoadedCount.value + props.itemsPerPage,
     totalItems.value,
