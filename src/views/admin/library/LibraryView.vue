@@ -2,7 +2,7 @@
   <DataTable
     :items="filteredGames"
     :columns="tableColumns"
-    :items-per-page="40"
+    :items-per-page="10"
   >
     <!-- Header slot with search functionality -->
     <template #header>

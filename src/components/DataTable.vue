@@ -9,7 +9,7 @@
     </div>
 
     <!-- Table container -->
-    <div class="flex-1 overflow-hidden sm:gap-x-6">
+    <div class="flex-1 overflow-hidden">
       <div class="h-full overflow-auto">
         <table class="w-full divide-y divide-gray-200 dark:divide-white/15">
           <!-- Table header -->
