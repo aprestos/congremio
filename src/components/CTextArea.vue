@@ -26,6 +26,9 @@
           )
         "
       />
+      <p v-if="helperText" class="text-xs mt-1 text-muted-color">
+        {{ helperText }}
+      </p>
     </div>
     <ValidationErrors v-if="errors" :errors="errors" />
   </div>
@@ -42,6 +45,7 @@ interface Props {
   placeholder?: string
   name?: string
   errors?: string[]
+  helperText?: string
 }
 
 withDefaults(defineProps<Props>(), {
@@ -49,6 +53,7 @@ withDefaults(defineProps<Props>(), {
   placeholder: '',
   name: undefined,
   errors: undefined,
+  helperText: undefined,
 })
 
 defineEmits<{

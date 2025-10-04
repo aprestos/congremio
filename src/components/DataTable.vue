@@ -23,13 +23,7 @@
                 v-for="(column, index) in columns"
                 :key="column.key"
                 scope="col"
-                :class="[
-                  'py-3 text-left text-xs text-gray-500 dark:text-gray-400 uppercase',
-                  index === 0 ? 'pl-4 sm:pl-6 lg:pl-8 pr-3' : 'px-3 py-4',
-                  column.hidden ? 'hidden lg:table-cell' : 'table-cell',
-                  column.align === 'right' ? 'text-right' : 'text-left',
-                  column.headerClass || '',
-                ]"
+                :class="getColumnClasses(column, true, index)"
               >
                 {{ column.label }}
               </th>
@@ -54,13 +48,7 @@
               <td
                 v-for="(column, colIndex) in columns"
                 :key="column.key"
-                :class="[
-                  'py-4 text-sm',
-                  colIndex === 0 ? 'pl-4 sm:pl-6 lg:pl-8 pr-3' : 'px-3',
-                  column.hidden ? 'hidden lg:table-cell' : 'table-cell',
-                  column.align === 'right' ? 'text-right' : 'text-left',
-                  column.cellClass || 'text-gray-500 dark:text-gray-400',
-                ]"
+                :class="getColumnClasses(column, false, colIndex)"
               >
                 <slot
                   :name="`cell-${column.key}`"
@@ -113,10 +101,10 @@ export interface DataTableColumn {
   key: string
   label: string
   hidden?: boolean
-  align?: 'left' | 'right' | 'center'
   headerClass?: string
   cellClass?: string
   skeletonClass?: string
+  breakpoint?: 'sm' | 'md' | 'lg' | 'xl' | '2xl'
 }
 
 const props = defineProps({
@@ -169,6 +157,54 @@ const getNestedValue = (obj: T, path: string): unknown => {
       ? (current as Record<string, unknown>)[key]
       : undefined
   }, obj)
+}
+
+// Get responsive classes for columns with breakpoints
+const getColumnClasses = (
+  column: DataTableColumn,
+  isHeader: boolean,
+  index: number,
+): string => {
+  const baseClasses = isHeader
+    ? 'py-3 text-left text-xs text-gray-500 dark:text-gray-400 uppercase'
+    : 'py-4 text-sm text-left'
+
+  const paddingClasses =
+    index === 0
+      ? isHeader
+        ? 'pl-4 sm:pl-6 lg:pl-8 pr-3'
+        : 'pl-4 sm:pl-6 lg:pl-8 pr-3'
+      : 'px-3'
+
+  const cellClasses =
+    !isHeader && !column.cellClass
+      ? 'text-gray-500 dark:text-gray-400'
+      : column.cellClass || ''
+
+  const headerExtraClasses = isHeader ? column.headerClass || '' : ''
+
+  // Responsive visibility classes - explicit mapping for Tailwind JIT
+  let visibilityClasses = ''
+  if (column.breakpoint) {
+    const breakpointMap: Record<string, string> = {
+      sm: 'hidden sm:table-cell',
+      md: 'hidden md:table-cell',
+      lg: 'hidden lg:table-cell',
+      xl: 'hidden xl:table-cell',
+      '2xl': 'hidden 2xl:table-cell',
+    }
+    visibilityClasses = breakpointMap[column.breakpoint] || ''
+  }
+
+  return [
+    baseClasses,
+    paddingClasses,
+    cellClasses,
+    headerExtraClasses,
+    visibilityClasses,
+  ]
+    .filter(Boolean)
+    .join(' ')
 }
 
 // Infinite scroll functions

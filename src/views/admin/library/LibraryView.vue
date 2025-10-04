@@ -1,4 +1,8 @@
 <template>
+  <div class="px-4 py-3">
+    <CInput id="test" label="" placeholder="Search" model-value=""></CInput>
+  </div>
+
   <div class="flex flex-col h-full overflow-hidden">
     <DataTable
       :items="filteredGames"
@@ -103,7 +107,7 @@
     class="group fixed bottom-20 lg:bottom-0 right-0 p-2 flex items-end justify-end w-24 h-24"
   >
     <button
-      class="z-50 rounded-4xl text-nowrap absolute shadow-xl mr-4 mb-4 py-4 px-6 font-semibold bg-slate-500 dark:bg-slate-600 text-slate-50 hover:bg-slate-700 dark:hover:bg-slate-700 transition-colors"
+      class="z-50 rounded-full text-nowrap absolute shadow-xl mr-4 mb-4 py-4 px-6 font-semibold bg-slate-500 dark:bg-slate-600 text-slate-50 hover:bg-slate-700 dark:hover:bg-slate-700 transition-colors"
       @click="open = true"
     >
       <PlusIcon class="size-6 inline-block" />
@@ -161,6 +165,7 @@ import AddLibraryGameView from '@/views/admin/library/AddLibraryGameView.vue'
 import WithdrawGameView from '@/views/admin/library/WithdrawGameView.vue'
 import GameActions from '@/views/admin/library/GameActions.vue'
 import GameStatus from '@/views/admin/library/GameStatus.vue'
+import CInput from '@/components/CInput.vue'
 
 // Data
 const allGames = ref<LibraryGame[]>([])
@@ -183,36 +188,41 @@ const tableColumns: DataTableColumn[] = [
   {
     key: 'name',
     label: 'Name',
-    cellClass: 'whitespace-nowrap',
   },
   {
     key: 'status',
     label: 'Status',
+    cellClass: 'whitespace-nowrap',
   },
   {
     key: 'location',
     label: 'Location',
-    hidden: true,
+    breakpoint: 'md',
+    cellClass: 'whitespace-nowrap',
   },
   {
     key: 'players',
     label: 'Players',
-    hidden: true,
+    breakpoint: 'xl',
+    cellClass: 'whitespace-nowrap',
   },
   {
     key: 'playtime',
     label: 'Playtime',
-    hidden: true,
+    breakpoint: 'xl',
+    cellClass: 'whitespace-nowrap',
   },
   {
     key: 'age',
     label: 'Age',
-    hidden: true,
+    breakpoint: 'xl',
+    cellClass: 'whitespace-nowrap',
   },
   {
     key: 'owner',
     label: 'Owner',
-    hidden: true,
+    breakpoint: 'md',
+    cellClass: 'whitespace-nowrap',
   },
 ]
 
