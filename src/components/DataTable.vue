@@ -207,8 +207,8 @@ const sortedItems = computed((): T[] => {
   } else {
     // Default sort function
     sortedArray.sort((a, b) => {
-      const aValue = getNestedValue(a, sortConfig.value.key!) as any
-      const bValue = getNestedValue(b, sortConfig.value.key!) as any
+      const aValue = getNestedValue(a, sortConfig.value.key!) as unknown
+      const bValue = getNestedValue(b, sortConfig.value.key!) as unknown
 
       // Handle null/undefined values
       if (aValue == null && bValue == null) return 0
