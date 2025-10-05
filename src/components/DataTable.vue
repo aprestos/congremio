@@ -29,9 +29,44 @@
                   column.hidden ? 'hidden lg:table-cell' : 'table-cell',
                   column.align === 'right' ? 'text-right' : 'text-left',
                   column.headerClass || '',
+                  column.sortable !== false
+                    ? 'cursor-pointer hover:text-gray-700 dark:hover:text-gray-200 select-none'
+                    : '',
+                  // Add light background when sorting is active
+                  sortConfig.key === column.key
+                    ? 'bg-indigo-50 dark:bg-gray-800/50'
+                    : '',
                 ]"
+                @click="
+                  column.sortable !== false ? handleSort(column.key) : null
+                "
               >
-                {{ column.label }}
+                <div class="flex items-center justify-between w-full">
+                  <span>{{ column.label }}</span>
+                  <div
+                    v-if="column.sortable !== false"
+                    class="flex flex-col ml-1"
+                  >
+                    <IconSortAscending
+                      v-if="
+                        sortConfig.key === column.key &&
+                        sortConfig.direction === 'asc'
+                      "
+                      class="h-3 w-3 text-gray-700 dark:text-gray-300"
+                    />
+                    <IconSortDescending
+                      v-else-if="
+                        sortConfig.key === column.key &&
+                        sortConfig.direction === 'desc'
+                      "
+                      class="h-3 w-3 text-gray-700 dark:text-gray-300"
+                    />
+                    <IconArrowsSort
+                      v-else
+                      class="h-3 w-3 text-gray-400 dark:text-gray-500"
+                    />
+                  </div>
+                </div>
               </th>
               <!-- Actions column if actions slot is provided -->
               <th
@@ -106,10 +141,15 @@
   </div>
 </template>
 
-<script setup lang="ts" generic="T extends Record<string, unknown>">
+<script setup lang="ts" generic="T">
 import { ref, computed, type PropType, watch } from 'vue'
+import {
+  IconArrowsSort,
+  IconSortAscending,
+  IconSortDescending,
+} from '@tabler/icons-vue'
 
-export interface DataTableColumn {
+export interface DataTableColumn<T = Record<string, unknown>> {
   key: string
   label: string
   hidden?: boolean
@@ -117,6 +157,13 @@ export interface DataTableColumn {
   headerClass?: string
   cellClass?: string
   skeletonClass?: string
+  sortable?: boolean
+  sortFn?: (a: T, b: T) => number
+}
+
+interface SortConfig {
+  key: string | null
+  direction: 'asc' | 'desc' | null
 }
 
 const props = defineProps({
@@ -125,7 +172,7 @@ const props = defineProps({
     required: true,
   },
   columns: {
-    type: Array as PropType<DataTableColumn[]>,
+    type: Array as PropType<DataTableColumn<T>[]>,
     required: true,
   },
   itemsPerPage: {
@@ -143,12 +190,62 @@ const props = defineProps({
 const scrollContainer = ref<HTMLElement>()
 const currentLoadedCount = ref(props.itemsPerPage)
 const isLoading = ref(false)
+const sortConfig = ref<SortConfig>({ key: null, direction: null })
 
-// Computed properties for infinite scroll
-const totalItems = computed(() => props.items.length)
+// Computed properties for sorting and infinite scroll
+const sortedItems = computed((): T[] => {
+  if (!sortConfig.value.key || !sortConfig.value.direction) {
+    return [...props.items]
+  }
+
+  const column = props.columns.find((col) => col.key === sortConfig.value.key)
+  const sortedArray = [...props.items]
+
+  if (column?.sortFn) {
+    // Use custom sort function
+    sortedArray.sort(column.sortFn)
+  } else {
+    // Default sort function
+    sortedArray.sort((a, b) => {
+      const aValue = getNestedValue(a, sortConfig.value.key!) as unknown
+      const bValue = getNestedValue(b, sortConfig.value.key!) as unknown
+
+      // Handle null/undefined values
+      if (aValue == null && bValue == null) return 0
+      if (aValue == null) return 1
+      if (bValue == null) return -1
+
+      // Handle different types
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
+        return aValue.localeCompare(bValue)
+      }
+
+      if (typeof aValue === 'number' && typeof bValue === 'number') {
+        return aValue - bValue
+      }
+
+      // Handle dates
+      if (aValue instanceof Date && bValue instanceof Date) {
+        return aValue.getTime() - bValue.getTime()
+      }
+
+      // Fallback to string comparison
+      return String(aValue).localeCompare(String(bValue))
+    })
+  }
+
+  // Reverse if descending
+  if (sortConfig.value.direction === 'desc') {
+    sortedArray.reverse()
+  }
+
+  return sortedArray
+})
+
+const totalItems = computed(() => sortedItems.value.length)
 
 const displayedItems = computed((): T[] => {
-  return props.items.slice(0, currentLoadedCount.value)
+  return sortedItems.value.slice(0, currentLoadedCount.value)
 })
 
 const hasMoreItems = computed(() => {
@@ -160,7 +257,10 @@ const getRowKey = (item: T, index: number): string | number => {
   if (typeof props.rowKey === 'function') {
     return props.rowKey(item, index)
   }
-  return (item[props.rowKey] as string | number) || index
+  return (
+    ((item as { [props.rowKey]: string })[props.rowKey] as string | number) ||
+    index
+  )
 }
 
 const getNestedValue = (obj: T, path: string): unknown => {
@@ -171,11 +271,34 @@ const getNestedValue = (obj: T, path: string): unknown => {
   }, obj)
 }
 
+// Sort functions
+const handleSort = (columnKey: string): void => {
+  if (sortConfig.value.key === columnKey) {
+    // Same column: cycle through asc -> desc -> none
+    if (sortConfig.value.direction === 'asc') {
+      sortConfig.value.direction = 'desc'
+    } else if (sortConfig.value.direction === 'desc') {
+      sortConfig.value.key = null
+      sortConfig.value.direction = null
+    }
+  } else {
+    // New column: start with ascending
+    sortConfig.value.key = columnKey
+    sortConfig.value.direction = 'asc'
+  }
+
+  // Reset infinite scroll when sorting changes
+  resetInfiniteScroll()
+}
+
 // Infinite scroll functions
-const loadMoreItems = (): void => {
+const loadMoreItems = async (): Promise<void> => {
   if (isLoading.value || !hasMoreItems.value) return
 
   isLoading.value = true
+
+  // Simulate slight delay for smooth UX (optional)
+  await new Promise((resolve) => setTimeout(resolve, 100))
 
   currentLoadedCount.value = Math.min(
     currentLoadedCount.value + props.itemsPerPage,
@@ -192,7 +315,9 @@ const handleScroll = (): void => {
   const threshold = 100 // pixels from bottom to trigger load
 
   if (scrollTop + clientHeight >= scrollHeight - threshold) {
-    loadMoreItems()
+    loadMoreItems().catch((err) => {
+      console.error('Error loading more items:', err)
+    })
   }
 }
 
@@ -222,8 +347,23 @@ watch(
   { deep: false },
 )
 
+// Also watch for items reference change (important for search)
+watch(
+  () => props.items,
+  () => {
+    resetInfiniteScroll()
+  },
+  { deep: false },
+)
+
 // Expose methods for parent component
 defineExpose({
   resetInfiniteScroll,
+  clearSort: () => {
+    sortConfig.value.key = null
+    sortConfig.value.direction = null
+    resetInfiniteScroll()
+  },
+  getSortConfig: () => sortConfig.value,
 })
 </script>

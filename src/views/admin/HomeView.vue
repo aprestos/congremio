@@ -10,7 +10,7 @@
   <div
     class="lg:pl-72 bg-white dark:bg-gray-900 dark:border-white/5 h-screen flex flex-col"
   >
-    <div class="flex-1 min-h-0">
+    <div class="flex-1 overflow-hidden min-h-0">
       <router-view />
     </div>
   </div>
@@ -20,19 +20,14 @@
 </template>
 
 <script setup lang="ts">
-import {
-  BuildingLibraryIcon,
-  CalendarDaysIcon,
-  Cog6ToothIcon,
-  HomeIcon,
-  TrophyIcon,
-} from '@heroicons/vue/24/outline'
+import { CalendarDaysIcon, Cog6ToothIcon } from '@heroicons/vue/24/outline'
 import { onMounted, ref } from 'vue'
 import BottomNavBar from '@/components/navigation/BottomNavBar.vue'
 import SidebarNavigationGrey from '@/components/navigation/SidebarNavigationGrey.vue'
 import { authService } from '@/features/auth/service.ts'
 import { RouteNames } from '@/router/routeNames.ts'
 import { settingsStore } from '@/features/settings/useSettings.store.ts'
+import { IconBooks, IconHome, IconTrophy } from '@tabler/icons-vue'
 
 const userEmail = ref<string | null>(null)
 
@@ -52,13 +47,13 @@ const navigation = ref([
   {
     label: 'Dashboard',
     routeName: RouteNames.admin.dashboard as string,
-    icon: HomeIcon,
+    icon: IconHome,
     enabled: true,
   },
   {
     label: 'Library',
     routeName: RouteNames.admin.library as string,
-    icon: BuildingLibraryIcon,
+    icon: IconBooks,
     enabled: settingsStore?.value?.library?.enabled ?? false,
   },
   {
@@ -70,7 +65,7 @@ const navigation = ref([
   {
     label: 'Tournaments',
     routeName: RouteNames.admin.tournaments as string,
-    icon: TrophyIcon,
+    icon: IconTrophy,
     enabled: settingsStore?.value?.tournaments?.enabled ?? false,
   },
   {

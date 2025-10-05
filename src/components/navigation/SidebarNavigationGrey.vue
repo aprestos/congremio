@@ -79,6 +79,7 @@ const route = useRoute()
                 >
                   <component
                     :is="item.icon"
+                    stroke="1.5"
                     :class="[
                       route.name === item.routeName
                         ? 'text-indigo-600 dark:text-white'
