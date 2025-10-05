@@ -141,7 +141,7 @@
   </div>
 </template>
 
-<script setup lang="ts" generic="T extends Record<string, unknown>">
+<script setup lang="ts" generic="T">
 import { ref, computed, type PropType, watch } from 'vue'
 import {
   IconArrowsSort,
@@ -172,7 +172,7 @@ const props = defineProps({
     required: true,
   },
   columns: {
-    type: Array as PropType<DataTableColumn[]>,
+    type: Array as PropType<DataTableColumn<T>[]>,
     required: true,
   },
   itemsPerPage: {
@@ -257,7 +257,10 @@ const getRowKey = (item: T, index: number): string | number => {
   if (typeof props.rowKey === 'function') {
     return props.rowKey(item, index)
   }
-  return (item[props.rowKey] as string | number) || index
+  return (
+    ((item as { [props.rowKey]: string })[props.rowKey] as string | number) ||
+    index
+  )
 }
 
 const getNestedValue = (obj: T, path: string): unknown => {
