@@ -1,40 +1,42 @@
 <template>
-  <div class="px-4 py-3">
-    <CInput id="test" label="" placeholder="Search" model-value=""></CInput>
-  </div>
-
   <div class="flex flex-col h-full overflow-hidden">
     <DataTable
       :items="filteredGames"
       :columns="tableColumns"
       :items-per-page="25"
     >
-      <!-- Header slot with search functionality -->
       <template #header>
-        <SearchBar
-          v-model:search-value="searchInput"
-          search-placeholder="Search games..."
-          search-label="Search"
-        >
-          <template #additional-inputs>
-            <!-- Reservation quick-search (required) -->
-            <div class="grid flex-1 grid-cols-1 max-w-xs">
-              <input
-                v-model="reservationInput"
-                type="text"
-                name="reservation"
-                aria-label="Reservation"
-                class="col-start-1 row-start-1 block bg-white dark:bg-gray-800 pl-8 text-base text-gray-900 dark:text-white outline-hidden placeholder:text-gray-400 dark:placeholder:text-gray-500 rounded-md"
-                placeholder="Reservation"
-              />
-              <span
-                class="pointer-events-none col-start-1 row-start-1 text-2xl self-center text-gray-400 dark:text-gray-500"
-                aria-hidden="true"
-                >#</span
-              >
-            </div>
-          </template>
-        </SearchBar>
+        <div class="flex flex-row px-4 py-3 gap-4">
+          <div class="flex-1 mt-2 grid grid-cols-1">
+            <input
+              id="search"
+              v-model="searchInput"
+              aria-label="Search"
+              placeholder="Search"
+              type="text"
+              name="search"
+              class="col-start-1 row-start-1 block rounded-md bg-white py-3 pr-3 pl-10 text-4 text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:pl-9 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
+            />
+            <IconSearch
+              class="pointer-events-none col-start-1 row-start-1 ml-3 size-4 self-center text-gray-400 sm:size-5 dark:text-gray-500"
+              aria-hidden="true"
+            />
+          </div>
+          <div class="mt-2 grid grid-cols-1">
+            <input
+              id="reservation"
+              v-model="reservationInput"
+              type="text"
+              name="reservation"
+              class="col-start-1 row-start-1 block rounded-md bg-white py-3 pr-3 pl-10 text-xl text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:pl-9 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
+              placeholder="Reservation number"
+            />
+            <IconNumber
+              class="pointer-events-none col-start-1 row-start-1 ml-3 size-5 self-center text-gray-400 sm:size-5 dark:text-gray-500"
+              aria-hidden="true"
+            />
+          </div>
+        </div>
       </template>
 
       <!-- Custom cell for game name with image -->
@@ -67,27 +69,35 @@
 
       <!-- Custom cell for location -->
       <template #cell-location="{ item }">
-        {{ getLocationName(item) }}
+        <span class="text-gray-500 dark:text-gray-200">{{
+          getLocationName(item)
+        }}</span>
       </template>
 
       <!-- Custom cell for players -->
       <template #cell-players="{ item }">
-        {{ getRange(item.game.min_players, item.game.max_players) }}
+        <span class="text-gray-500 dark:text-gray-200">{{
+          getRange(item.game.min_players, item.game.max_players)
+        }}</span>
       </template>
 
       <!-- Custom cell for playtime -->
       <template #cell-playtime="{ item }">
-        {{ getRange(item.game.min_playtime, item.game.max_playtime) }}
+        <span class="text-gray-500 dark:text-gray-200">{{
+          getRange(item.game.min_playtime, item.game.max_playtime)
+        }}</span>
       </template>
 
       <!-- Custom cell for age -->
       <template #cell-age="{ item }">
-        {{ item.game.min_age ? item.game.min_age + '+' : '-' }}
+        <span class="text-gray-500 dark:text-gray-200">{{
+          item.game.min_age ? item.game.min_age + '+' : '-'
+        }}</span>
       </template>
 
       <!-- Custom cell for owner -->
       <template #cell-owner="{ item }">
-        {{ item.owner }}
+        <span class="text-gray-500 dark:text-gray-200">{{ item.owner }}</span>
       </template>
 
       <!-- Actions slot -->
@@ -151,12 +161,12 @@ import { PlusIcon } from '@heroicons/vue/24/outline'
 import { onMounted, onUnmounted, ref, computed, watch } from 'vue'
 import { useDebounceFn } from '@vueuse/core'
 import { toast } from 'vue-sonner'
+import { IconSearch, IconNumber } from '@tabler/icons-vue'
 
 import DataTable from '@/components/DataTable.vue'
-import SearchBar from '@/components/SearchBar.vue'
 import DialogComponent from '@/components/DialogComponent.vue'
 import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
-import type { LibraryGame } from '@/features/library/game.model.ts'
+import { getStatus, type LibraryGame } from '@/features/library/game.model.ts'
 import type { DataTableColumn } from '@/components/DataTable.vue'
 import Service, { libraryService } from '@/features/library/service.ts'
 import libraryWithdrawService from '@/features/library/withdraws/service.ts'
@@ -165,7 +175,6 @@ import AddLibraryGameView from '@/views/admin/library/AddLibraryGameView.vue'
 import WithdrawGameView from '@/views/admin/library/WithdrawGameView.vue'
 import GameActions from '@/views/admin/library/GameActions.vue'
 import GameStatus from '@/views/admin/library/GameStatus.vue'
-import CInput from '@/components/CInput.vue'
 
 // Data
 const allGames = ref<LibraryGame[]>([])
@@ -184,15 +193,21 @@ let unsubscribe: (() => void) | null = null
 console.log('LibraryView: Component is loading...')
 
 // Table column definitions
-const tableColumns: DataTableColumn[] = [
+const tableColumns: DataTableColumn<LibraryGame>[] = [
   {
     key: 'name',
     label: 'Name',
+    sortFn: (a: LibraryGame, b: LibraryGame): number => {
+      return a.game.name.localeCompare(b.game.name)
+    },
   },
   {
     key: 'status',
     label: 'Status',
     cellClass: 'whitespace-nowrap',
+    sortFn: (a: LibraryGame, b: LibraryGame): number => {
+      return getStatus(a).localeCompare(getStatus(b))
+    },
   },
   {
     key: 'location',
