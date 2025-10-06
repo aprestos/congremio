@@ -13,7 +13,6 @@ export const libraryLocationService = {
         .eq('edition_id', eventStore.value?.id)
         .or(`name.ilike.%${query}%`)
 
-      console.log('Search results:', result.data)
       return result.data as LibraryLocation[]
     } catch (error) {
       console.error('Search error:', (error as Error).message)
