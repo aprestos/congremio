@@ -15,7 +15,7 @@
               placeholder="Search"
               type="text"
               name="search"
-              class="col-start-1 row-start-1 block rounded-md bg-white py-3 pr-3 pl-10 text-4 text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:pl-9 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
+              class="col-start-1 row-start-1 block rounded-md bg-white py-3 pr-3 pl-10 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:pl-9 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
             />
             <IconSearch
               class="pointer-events-none col-start-1 row-start-1 ml-3 size-4 self-center text-gray-400 sm:size-5 dark:text-gray-500"
