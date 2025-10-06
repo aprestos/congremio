@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { tenantStore } from '@/stores/tenant.ts'
 import { useRoute } from 'vue-router'
 import { RouteNames } from '@/router/routeNames.ts'
+import type { User } from '@supabase/supabase-js'
 
 interface NavigationItem {
   label: string
@@ -22,7 +23,7 @@ interface PublicPage {
 const props = defineProps<{
   navigation: NavigationItem[]
   publicPages: PublicPage[]
-  userEmail: string | null
+  user: User | null
 }>()
 
 defineEmits<{
@@ -154,11 +155,16 @@ const route = useRoute()
               <div
                 class="size-8 rounded-full bg-indigo-600 flex items-center justify-center text-white text-sm font-medium uppercase dark:bg-indigo-500"
               >
-                {{ userEmail?.[0] || 'U' }}
+                {{
+                  (user?.user_metadata['display_name'] ?? user?.email)[0] || 'U'
+                }}
               </div>
               <div class="flex flex-col">
                 <span class="sr-only">Your profile</span>
-                <span aria-hidden="true">{{ userEmail?.split('@')[0] }}</span>
+                <span aria-hidden="true">{{
+                  user?.user_metadata['display_name'] ??
+                  user?.email?.split('@')[0]
+                }}</span>
                 <span class="text-xs text-gray-500 dark:text-gray-400"
                   >Admin</span
                 >

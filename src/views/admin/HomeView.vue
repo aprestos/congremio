@@ -3,7 +3,7 @@
     :sidebar-open="sidebarOpen"
     :navigation="navigation"
     :public-pages="publicPages"
-    :user-email="userEmail"
+    :user="user"
     @close="sidebarOpen = false"
   />
 
@@ -28,15 +28,18 @@ import { authService } from '@/features/auth/service.ts'
 import { RouteNames } from '@/router/routeNames.ts'
 import { settingsStore } from '@/features/settings/useSettings.store.ts'
 import { IconBooks, IconHome, IconTrophy } from '@tabler/icons-vue'
+import type { User } from '@supabase/supabase-js'
 
 const userEmail = ref<string | null>(null)
+const user = ref<User | null>(null)
 
 // Load user email on component mount
 onMounted(async () => {
   try {
     const { data } = await authService.getUser()
-    if (data.user?.email) {
-      userEmail.value = data.user.email
+    if (data.user) {
+      userEmail.value = data.user?.email || null
+      user.value = data.user
     }
   } catch (error) {
     console.error('Error loading user email:', error)

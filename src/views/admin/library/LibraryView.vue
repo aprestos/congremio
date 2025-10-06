@@ -53,10 +53,10 @@
           </div>
           <div class="ml-4">
             <div class="font-medium text-gray-900 dark:text-white">
-              {{ item.game.name }}
+              {{ (item as LibraryGame).game.name }}
             </div>
             <div class="mt-1 text-gray-500 dark:text-gray-400">
-              {{ item.game.year }}
+              {{ (item as LibraryGame).game.year }}
             </div>
           </div>
         </div>
@@ -77,27 +77,37 @@
       <!-- Custom cell for players -->
       <template #cell-players="{ item }">
         <span class="text-gray-500 dark:text-gray-200">{{
-          getRange(item.game.min_players, item.game.max_players)
+          getRange(
+            (item as LibraryGame).game.min_players,
+            (item as LibraryGame).game.max_players,
+          )
         }}</span>
       </template>
 
       <!-- Custom cell for playtime -->
       <template #cell-playtime="{ item }">
         <span class="text-gray-500 dark:text-gray-200">{{
-          getRange(item.game.min_playtime, item.game.max_playtime)
+          getRange(
+            (item as LibraryGame).game.min_playtime,
+            (item as LibraryGame).game.max_playtime,
+          )
         }}</span>
       </template>
 
       <!-- Custom cell for age -->
       <template #cell-age="{ item }">
         <span class="text-gray-500 dark:text-gray-200">{{
-          item.game.min_age ? item.game.min_age + '+' : '-'
+          (item as LibraryGame).game.min_age
+            ? (item as LibraryGame).game.min_age + '+'
+            : '-'
         }}</span>
       </template>
 
       <!-- Custom cell for owner -->
       <template #cell-owner="{ item }">
-        <span class="text-gray-500 dark:text-gray-200">{{ item.owner }}</span>
+        <span class="text-gray-500 dark:text-gray-200">{{
+          (item as LibraryGame).owner
+        }}</span>
       </template>
 
       <!-- Actions slot -->
@@ -151,7 +161,7 @@
     confirm-text="Yes, return it"
     cancel-text="Cancel"
     :loading="isReturningGame"
-    @confirm="returnGame(gameToReturn)"
+    @confirm="returnGame"
     @cancel="returnConfirmDialogOpen = false"
     @close="returnConfirmDialogOpen = false"
   />
@@ -161,14 +171,14 @@
     title="Move Game"
     @close="cancelMoveGame"
   >
-    <div v-if="gameToMove" class="space-y-6">
+    <div v-if="selectedGame" class="space-y-6">
       <!-- Game Info -->
       <div class="flex items-center space-x-4">
         <div class="shrink-0">
           <img
             class="size-16 rounded-lg object-cover shadow-sm"
-            :src="gameToMove.game.image"
-            :alt="gameToMove.game.name"
+            :src="selectedGame.game.image"
+            :alt="selectedGame.game.name"
             @error="handleImageError"
           />
         </div>
@@ -176,10 +186,10 @@
           <h3
             class="text-lg font-semibold text-gray-900 dark:text-white truncate"
           >
-            {{ gameToMove.game.name }}
+            {{ selectedGame.game.name }}
           </h3>
           <p class="text-sm text-gray-500 dark:text-gray-400">
-            Current location: {{ getLocationName(gameToMove) }}
+            Current location: {{ getLocationName(selectedGame) }}
           </p>
         </div>
       </div>
@@ -204,7 +214,7 @@
         </button>
         <button
           type="button"
-          class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed"
+          class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed"
           :disabled="isMovingGame || selectedLocationId === null"
           @click="confirmMoveGame"
         >
@@ -236,8 +246,8 @@ import AddLibraryGameView from '@/views/admin/library/AddLibraryGameView.vue'
 import WithdrawGameView from '@/views/admin/library/WithdrawGameView.vue'
 import GameActions from '@/views/admin/library/GameActions.vue'
 import GameStatus from '@/views/admin/library/GameStatus.vue'
-import type { LibraryLocation } from '@/features/library/locations/model.ts'
 import { libraryLocationService } from '@/features/library/locations/service.ts'
+import type { LibraryLocation } from '@/features/library/locations/location.model.ts'
 
 // Data
 const allGames = ref<LibraryGame[]>([])
@@ -245,20 +255,16 @@ const open = ref(false)
 const withdrawDialogOpen = ref(false)
 const selectedGame = ref<LibraryGame | null>(null)
 const returnConfirmDialogOpen = ref(false)
-const gameToReturn = ref<LibraryGame | null>(null)
 const isReturningGame = ref(false)
 const searchInput = ref('')
 const reservationInput = ref('')
 const loadingReservation = ref(false)
 const searchQuery = ref('')
 const moveDialogOpen = ref(false)
-const gameToMove = ref<LibraryGame | null>(null)
 const selectedLocationId = ref<number | null>(null)
-const locations = ref<GameLocation[]>([])
+const locations = ref<LibraryLocation[]>([])
 const isMovingGame = ref(false)
 let unsubscribe: (() => void) | null = null
-
-console.log('LibraryView: Component is loading...')
 
 // Table column definitions
 const tableColumns: DataTableColumn<LibraryGame>[] = [
@@ -409,7 +415,7 @@ const openWithdrawDialog = (game: LibraryGame): void => {
 }
 
 const openReturnConfirmDialog = (game: LibraryGame): void => {
-  gameToReturn.value = game
+  selectedGame.value = game
   returnConfirmDialogOpen.value = true
 }
 
@@ -418,15 +424,17 @@ const onGameWithdrawn = (): void => {
   selectedGame.value = null
 }
 
-const returnGame = async (game: LibraryGame | null): Promise<void> => {
-  if (!game) return
+const returnGame = async (): Promise<void> => {
+  if (!selectedGame.value) return
 
   isReturningGame.value = true
   try {
-    await libraryWithdrawService.returnGame(game.id)
-    toast.success(`Game ${game.game.name} has been returned to the library.`)
+    await libraryWithdrawService.returnGame(selectedGame.value.id)
+    toast.success(
+      `${selectedGame.value.game.name} has been returned to the library.`,
+    )
     returnConfirmDialogOpen.value = false
-    gameToReturn.value = null
+    selectedGame.value = null
   } catch (error) {
     console.error('Failed to return game:', error)
     toast.error('Failed to return the game. Please try again.')
@@ -443,7 +451,7 @@ const updateGame = async (
 }
 
 const moveGame = async (game: LibraryGame): Promise<void> => {
-  gameToMove.value = game
+  selectedGame.value = game
   selectedLocationId.value = game.location?.id || null
 
   // Load locations
@@ -457,19 +465,19 @@ const moveGame = async (game: LibraryGame): Promise<void> => {
 }
 
 const confirmMoveGame = async (): Promise<void> => {
-  if (!gameToMove.value || selectedLocationId.value === null) return
+  if (!selectedGame.value || selectedLocationId.value === null) return
 
   isMovingGame.value = true
   try {
     // Update with raw database column name since we're updating directly
-    await libraryService.updateGame(gameToMove.value.id, {
+    await libraryService.updateGame(selectedGame.value.id, {
       location_id: selectedLocationId.value,
     } as Partial<LibraryGame>)
     toast.success(
-      `Game ${gameToMove.value.game.name} has been moved to a new location.`,
+      `${selectedGame.value.game.name} has been moved to a new location.`,
     )
     moveDialogOpen.value = false
-    gameToMove.value = null
+    selectedGame.value = null
     selectedLocationId.value = null
   } catch (error) {
     console.error('Failed to move game:', error)
@@ -481,7 +489,7 @@ const confirmMoveGame = async (): Promise<void> => {
 
 const cancelMoveGame = (): void => {
   moveDialogOpen.value = false
-  gameToMove.value = null
+  selectedGame.value = null
   selectedLocationId.value = null
 }
 
@@ -508,7 +516,7 @@ const getRange = (min: number, max: number): string => {
 
 // Computed options for location select
 const locationOptions = computed(() => {
-  return locations.value?.map((loc) => ({
+  return locations.value?.map((loc: LibraryLocation) => ({
     value: loc.id,
     label: loc.name,
   }))
