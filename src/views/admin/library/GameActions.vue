@@ -22,6 +22,7 @@ const emit = defineEmits<{
   (e: 'open-update-dialog', game: LibraryGame): void
   (e: 'return-game', game: LibraryGame): void
   (e: 'withdraw-game', game: LibraryGame, userId?: string): void
+  (e: 'move', game: LibraryGame): void
 }>()
 
 const props = defineProps<{ data: LibraryGame }>()
@@ -155,6 +156,7 @@ const updateStatus = (status: LibraryGameStatus): void => {
                       : 'text-gray-700 dark:text-gray-300',
                     'flex items-center px-4 py-2 text-sm',
                   ]"
+                  @click="emit('move', props.data)"
                 >
                   <IconChevronsRight
                     :class="[

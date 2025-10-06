@@ -24,7 +24,7 @@
                 <div class="flex items-center justify-between w-full">
                   <span>{{ column.label }}</span>
                   <div
-                    v-if="column.sortable !== false"
+                    v-if="column.sortable === true"
                     class="flex flex-col ml-1"
                   >
                     <IconSortAscending
@@ -283,9 +283,9 @@ const getColumnClasses = (
   }
 
   let sortClasses = ''
-  if (column.sortable)
+  if (column.sortable && isHeader)
     sortClasses +=
-      'cursor-pointer hover:text-gray-700 dark:hover:text-gray-200 select-none'
+      'cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800/60 hover:text-gray-700 dark:hover:text-gray-200 select-none'
 
   return [
     baseClasses,

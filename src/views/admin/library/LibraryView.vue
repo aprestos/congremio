@@ -104,6 +104,7 @@
       <template #actions="{ item }">
         <GameActions
           :data="item"
+          @move="moveGame"
           @update-game="updateGame"
           @withdraw-game="openWithdrawDialog"
           @return-game="openReturnConfirmDialog"
@@ -154,6 +155,65 @@
     @cancel="returnConfirmDialogOpen = false"
     @close="returnConfirmDialogOpen = false"
   />
+
+  <DialogComponent
+    :open="moveDialogOpen"
+    title="Move Game"
+    @close="cancelMoveGame"
+  >
+    <div v-if="gameToMove" class="space-y-6">
+      <!-- Game Info -->
+      <div class="flex items-center space-x-4">
+        <div class="shrink-0">
+          <img
+            class="size-16 rounded-lg object-cover shadow-sm"
+            :src="gameToMove.game.image"
+            :alt="gameToMove.game.name"
+            @error="handleImageError"
+          />
+        </div>
+        <div class="flex-1 min-w-0">
+          <h3
+            class="text-lg font-semibold text-gray-900 dark:text-white truncate"
+          >
+            {{ gameToMove.game.name }}
+          </h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            Current location: {{ getLocationName(gameToMove) }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Location Selection -->
+      <CSelect
+        id="location"
+        v-model="selectedLocationId"
+        label="New Location"
+        :options="locationOptions"
+        placeholder="Select a location"
+      />
+
+      <!-- Actions -->
+      <div class="flex gap-3 justify-end">
+        <button
+          type="button"
+          class="rounded-md bg-white dark:bg-gray-700 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600"
+          @click="cancelMoveGame"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed"
+          :disabled="isMovingGame || selectedLocationId === null"
+          @click="confirmMoveGame"
+        >
+          <span v-if="isMovingGame">Moving...</span>
+          <span v-else>Move Game</span>
+        </button>
+      </div>
+    </div>
+  </DialogComponent>
 </template>
 
 <script setup lang="ts">
@@ -166,6 +226,7 @@ import { IconSearch, IconNumber } from '@tabler/icons-vue'
 import DataTable from '@/components/DataTable.vue'
 import DialogComponent from '@/components/DialogComponent.vue'
 import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
+import CSelect from '@/components/CSelect.vue'
 import { getStatus, type LibraryGame } from '@/features/library/game.model.ts'
 import type { DataTableColumn } from '@/components/DataTable.vue'
 import Service, { libraryService } from '@/features/library/service.ts'
@@ -175,6 +236,8 @@ import AddLibraryGameView from '@/views/admin/library/AddLibraryGameView.vue'
 import WithdrawGameView from '@/views/admin/library/WithdrawGameView.vue'
 import GameActions from '@/views/admin/library/GameActions.vue'
 import GameStatus from '@/views/admin/library/GameStatus.vue'
+import type { GameLocation } from '@/features/locations/model.ts'
+import { libraryLocationService } from '@/features/library/locations/service.ts'
 
 // Data
 const allGames = ref<LibraryGame[]>([])
@@ -188,6 +251,11 @@ const searchInput = ref('')
 const reservationInput = ref('')
 const loadingReservation = ref(false)
 const searchQuery = ref('')
+const moveDialogOpen = ref(false)
+const gameToMove = ref<LibraryGame | null>(null)
+const selectedLocationId = ref<number | null>(null)
+const locations = ref<GameLocation[]>([])
+const isMovingGame = ref(false)
 let unsubscribe: (() => void) | null = null
 
 console.log('LibraryView: Component is loading...')
@@ -197,6 +265,7 @@ const tableColumns: DataTableColumn<LibraryGame>[] = [
   {
     key: 'name',
     label: 'Name',
+    sortable: true,
     sortFn: (a: LibraryGame, b: LibraryGame): number => {
       return a.game.name.localeCompare(b.game.name)
     },
@@ -205,6 +274,7 @@ const tableColumns: DataTableColumn<LibraryGame>[] = [
     key: 'status',
     label: 'Status',
     cellClass: 'whitespace-nowrap',
+    sortable: true,
     sortFn: (a: LibraryGame, b: LibraryGame): number => {
       return getStatus(a).localeCompare(getStatus(b))
     },
@@ -213,6 +283,7 @@ const tableColumns: DataTableColumn<LibraryGame>[] = [
     key: 'location',
     label: 'Location',
     breakpoint: 'md',
+    sortable: true,
     cellClass: 'whitespace-nowrap',
   },
   {
@@ -237,6 +308,7 @@ const tableColumns: DataTableColumn<LibraryGame>[] = [
     key: 'owner',
     label: 'Owner',
     breakpoint: 'md',
+    sortable: true,
     cellClass: 'whitespace-nowrap',
   },
 ]
@@ -370,6 +442,49 @@ const updateGame = async (
   await libraryService.updateGame(id, updatedGame)
 }
 
+const moveGame = async (game: LibraryGame): Promise<void> => {
+  gameToMove.value = game
+  selectedLocationId.value = game.location?.id || null
+
+  // Load locations
+  try {
+    locations.value = await libraryLocationService.get()
+    moveDialogOpen.value = true
+  } catch (error) {
+    console.error('Failed to load locations:', error)
+    toast.error('Failed to load locations. Please try again.')
+  }
+}
+
+const confirmMoveGame = async (): Promise<void> => {
+  if (!gameToMove.value || selectedLocationId.value === null) return
+
+  isMovingGame.value = true
+  try {
+    // Update with raw database column name since we're updating directly
+    await libraryService.updateGame(gameToMove.value.id, {
+      location_id: selectedLocationId.value,
+    } as Partial<LibraryGame>)
+    toast.success(
+      `Game ${gameToMove.value.game.name} has been moved to a new location.`,
+    )
+    moveDialogOpen.value = false
+    gameToMove.value = null
+    selectedLocationId.value = null
+  } catch (error) {
+    console.error('Failed to move game:', error)
+    toast.error('Failed to move the game. Please try again.')
+  } finally {
+    isMovingGame.value = false
+  }
+}
+
+const cancelMoveGame = (): void => {
+  moveDialogOpen.value = false
+  gameToMove.value = null
+  selectedLocationId.value = null
+}
+
 // Image handlers
 const handleImageError = (event: Event): void => {
   const target = event.target as HTMLImageElement
@@ -390,4 +505,12 @@ const getRange = (min: number, max: number): string => {
   if (min === max) return String(min)
   else return `${min} - ${max}`
 }
+
+// Computed options for location select
+const locationOptions = computed(() => {
+  return locations.value?.map((loc) => ({
+    value: loc.id,
+    label: loc.name,
+  }))
+})
 </script>
