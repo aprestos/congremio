@@ -236,7 +236,7 @@ import AddLibraryGameView from '@/views/admin/library/AddLibraryGameView.vue'
 import WithdrawGameView from '@/views/admin/library/WithdrawGameView.vue'
 import GameActions from '@/views/admin/library/GameActions.vue'
 import GameStatus from '@/views/admin/library/GameStatus.vue'
-import type { GameLocation } from '@/features/locations/model.ts'
+import type { LibraryLocation } from '@/features/library/locations/model.ts'
 import { libraryLocationService } from '@/features/library/locations/service.ts'
 
 // Data
