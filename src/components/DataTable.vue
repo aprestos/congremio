@@ -24,7 +24,7 @@
                 <div class="flex items-center justify-between w-full">
                   <span>{{ column.label }}</span>
                   <div
-                    v-if="column.sortable === true"
+                    v-if="column.sortable !== false"
                     class="flex flex-col ml-1"
                   >
                     <IconSortAscending
