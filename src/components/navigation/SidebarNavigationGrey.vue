@@ -42,6 +42,12 @@ const settingsItem = computed(() =>
     (item) => item.routeName === (RouteNames.admin.settings as string),
   ),
 )
+
+const userName = computed(() => {
+  return (props.user?.user_metadata['display_name'] ||
+    props.user?.email?.split('@')[0] ||
+    'User') as string
+})
 const route = useRoute()
 </script>
 
@@ -155,16 +161,11 @@ const route = useRoute()
               <div
                 class="size-8 rounded-full bg-indigo-600 flex items-center justify-center text-white text-sm font-medium uppercase dark:bg-indigo-500"
               >
-                {{
-                  (user?.user_metadata['display_name'] ?? user?.email)[0] || 'U'
-                }}
+                {{ userName[0] }}
               </div>
               <div class="flex flex-col">
                 <span class="sr-only">Your profile</span>
-                <span aria-hidden="true">{{
-                  user?.user_metadata['display_name'] ??
-                  user?.email?.split('@')[0]
-                }}</span>
+                <span aria-hidden="true">{{ userName }}</span>
                 <span class="text-xs text-gray-500 dark:text-gray-400"
                   >Admin</span
                 >
