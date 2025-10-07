@@ -11,7 +11,7 @@ export const libraryLocationService = {
         .select('*')
         .eq('tenant_id', tenantStore.value?.id)
         .eq('edition_id', eventStore.value?.id)
-        .or(`name.ilike.%${query}%`)
+        .ilike('name', `%${query}%`)
 
       return result.data as LibraryLocation[]
     } catch (error) {
