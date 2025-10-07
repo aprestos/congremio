@@ -114,7 +114,7 @@
       <template #actions="{ item }">
         <GameActions
           :data="item"
-          @move="moveGame"
+          @move="openMoveGameDialog"
           @update-game="updateGame"
           @withdraw-game="openWithdrawDialog"
           @return-game="openReturnConfirmDialog"
@@ -216,7 +216,7 @@
           type="button"
           class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed"
           :disabled="isMovingGame || selectedLocationId === null"
-          @click="confirmMoveGame"
+          @click="moveGame"
         >
           <span v-if="isMovingGame">Moving...</span>
           <span v-else>Move Game</span>
@@ -450,7 +450,7 @@ const updateGame = async (
   await libraryService.updateGame(id, updatedGame)
 }
 
-const moveGame = async (game: LibraryGame): Promise<void> => {
+const openMoveGameDialog = async (game: LibraryGame): Promise<void> => {
   selectedGame.value = game
   selectedLocationId.value = game.location?.id || null
 
@@ -464,7 +464,7 @@ const moveGame = async (game: LibraryGame): Promise<void> => {
   }
 }
 
-const confirmMoveGame = async (): Promise<void> => {
+const moveGame = async (): Promise<void> => {
   if (!selectedGame.value || selectedLocationId.value === null) return
 
   isMovingGame.value = true

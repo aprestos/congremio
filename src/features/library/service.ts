@@ -192,7 +192,10 @@ export const libraryService = {
     }
   },
 
-  async updateGame(id: number, update: Partial<LibraryGame>) {
+  async updateGame(
+    id: number,
+    update: Partial<LibraryGame> & { location_id?: number },
+  ) {
     await supabase.from('library_games').update(update).eq('id', id)
   },
 

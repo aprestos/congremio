@@ -16,7 +16,7 @@
                 v-for="(column, index) in columns"
                 :key="column.key"
                 scope="col"
-                :class="getColumnClasses(column, true, index)"
+                :class="getHeaderClasses(column, index)"
                 @click="
                   column.sortable !== false ? handleSort(column.key) : null
                 "
@@ -69,7 +69,7 @@
               <td
                 v-for="(column, colIndex) in columns"
                 :key="column.key"
-                :class="getColumnClasses(column, false, colIndex)"
+                :class="getCellClasses(column, colIndex)"
               >
                 <slot
                   :name="`cell-${column.key}`"
@@ -203,8 +203,8 @@ const sortedItems = computed((): T[] => {
         return aValue.getTime() - bValue.getTime()
       }
 
-      // Fallback to string comparison
-      return JSON.stringify(aValue).localeCompare(JSON.stringify(bValue))
+      // If other types or mixed types, do not sort
+      return 0
     })
   }
 
@@ -245,56 +245,60 @@ const getNestedValue = (obj: T, path: string): unknown => {
   }, obj)
 }
 
-// Get responsive classes for columns with breakpoints
-const getColumnClasses = (
+const getVisibilityClasses = (breakpoint?: string): string => {
+  if (!breakpoint) return ''
+  const breakpointMap: Record<string, string> = {
+    sm: 'hidden sm:table-cell',
+    md: 'hidden md:table-cell',
+    lg: 'hidden lg:table-cell',
+    xl: 'hidden xl:table-cell',
+    '2xl': 'hidden 2xl:table-cell',
+  }
+  return breakpointMap[breakpoint] || ''
+}
+
+// Get responsive classes for header columns
+const getHeaderClasses = (
   column: DataTableColumn<T>,
-  isHeader: boolean,
   index: number,
 ): string => {
-  const baseClasses = isHeader
-    ? 'py-3 text-left text-xs text-gray-500 dark:text-gray-400 uppercase'
-    : 'py-4 text-sm text-left'
+  const baseClasses = 'py-3 text-xs text-gray-500 dark:text-gray-400 uppercase'
 
-  const paddingClasses =
-    index === 0
-      ? isHeader
-        ? 'pl-4 sm:pl-6 lg:pl-8 pr-3'
-        : 'pl-4 sm:pl-6 lg:pl-8 pr-3'
-      : 'px-3'
+  const paddingClasses = index === 0 ? 'pl-4 sm:pl-6 lg:pl-8 pr-3' : 'px-3'
 
-  const cellClasses =
-    !isHeader && !column.cellClass
-      ? 'text-gray-500 dark:text-gray-400'
-      : column.cellClass || ''
-
-  const headerExtraClasses = isHeader ? column.headerClass || '' : ''
+  const headerExtraClasses = column.headerClass || ''
 
   // Responsive visibility classes - explicit mapping for Tailwind JIT
-  let visibilityClasses = ''
-  if (column.breakpoint) {
-    const breakpointMap: Record<string, string> = {
-      sm: 'hidden sm:table-cell',
-      md: 'hidden md:table-cell',
-      lg: 'hidden lg:table-cell',
-      xl: 'hidden xl:table-cell',
-      '2xl': 'hidden 2xl:table-cell',
-    }
-    visibilityClasses = breakpointMap[column.breakpoint] || ''
-  }
+  let visibilityClasses = getVisibilityClasses(column.breakpoint)
 
   let sortClasses = ''
-  if (column.sortable && isHeader)
-    sortClasses +=
+  if (column.sortable)
+    sortClasses =
       'cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800/60 hover:text-gray-700 dark:hover:text-gray-200 select-none'
 
   return [
     baseClasses,
     paddingClasses,
-    cellClasses,
     headerExtraClasses,
     visibilityClasses,
     sortClasses,
   ]
+    .filter(Boolean)
+    .join(' ')
+}
+
+// Get responsive classes for cell columns
+const getCellClasses = (column: DataTableColumn<T>, index: number): string => {
+  const baseClasses = 'py-4 text-sm'
+
+  const paddingClasses = index === 0 ? 'pl-4 sm:pl-6 lg:pl-8 pr-3' : 'px-3'
+
+  const cellClasses = column.cellClass || 'text-gray-500 dark:text-gray-400'
+
+  // Responsive visibility classes - explicit mapping for Tailwind JIT
+  let visibilityClasses = getVisibilityClasses(column.breakpoint)
+
+  return [baseClasses, paddingClasses, cellClasses, visibilityClasses]
     .filter(Boolean)
     .join(' ')
 }
