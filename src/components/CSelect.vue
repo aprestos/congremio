@@ -55,6 +55,9 @@
           </div>
         </template>
       </VueSelect>
+      <p v-if="helperText" class="text-xs mt-1 text-muted-color">
+        {{ helperText }}
+      </p>
     </div>
     <ValidationErrors v-if="errors" :errors="errors" />
   </div>
@@ -62,7 +65,7 @@
 
 <script setup lang="ts" generic="T = unknown">
 import { useDebounceFn } from '@vueuse/core'
-import { defineEmits, defineProps, ref } from 'vue'
+import { defineEmits, defineProps, ref, watchEffect } from 'vue'
 import VueSelect, { type Option } from 'vue3-select-component'
 import ValidationErrors from '@/components/ValidationErrors.vue'
 
@@ -77,6 +80,7 @@ const props = defineProps<{
   onSearch?: (query: string) => Promise<Array<T>>
   options?: Array<{ value: string | number; label: string }>
   errors?: string[]
+  helperText?: string
 }>()
 
 const isLoading = ref<boolean>(false)
@@ -93,13 +97,15 @@ function onUpdate(value: unknown): void {
   emit('update:modelValue', value)
 }
 
-// Initialize options from props if provided
-if (props.options) {
-  internalOptions.value = props.options.map((item) => ({
-    value: item.value,
-    label: item.label,
-  })) as Option<string>[]
-}
+// Initialize and watch options from props
+watchEffect(() => {
+  if (props.options && props.options.length > 0) {
+    internalOptions.value = props.options.map((item) => ({
+      value: item.value,
+      label: item.label,
+    })) as Option<string>[]
+  }
+})
 
 const handleSearch = useDebounceFn(async (value: string) => {
   if (!props.onSearch) return

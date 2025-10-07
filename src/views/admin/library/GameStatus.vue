@@ -130,7 +130,7 @@ const fetchWithdrawDetails = async (): Promise<void> => {
       leave-to-class="opacity-0 translate-y-1"
     >
       <PopoverPanel
-        class="absolute z-10 mt-2 w-64 rounded-lg bg-white ring-gray-200 p-4 shadow-lg ring-1 ring-opacity-5 focus:outline-none"
+        class="absolute z-10 mt-2 w-64 rounded-lg bg-white ring-gray-200 p-4 shadow-lg ring-1 ring-opacity-5 focus:outline-none whitespace-normal"
       >
         <div class="space-y-3">
           <!-- Available Status -->

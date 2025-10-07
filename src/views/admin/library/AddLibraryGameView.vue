@@ -1,71 +1,73 @@
 <template>
-  <div class="">
-    <form>
-      <div class="space-y-12 mt-8 mx-auto max-w-7xl">
-        <div class="pb-12">
-          <div class="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-            <CSelect
-              id="external-game"
-              v-model="formData.selectedGame"
-              label="Game"
-              placeholder="Type to search"
-              :on-search="gameService.search"
-              option-label="name"
-              option-value="external_id"
-              option-secondary-label="year"
-              :errors="r$.$errors.selectedGame"
-            />
+  <form>
+    <div class="space-y-12 mx-auto max-w-7xl">
+      <div class="pb-12">
+        <div class="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+          <CSelect
+            id="external-game"
+            v-model="formData.selectedGame"
+            label="Game"
+            placeholder="Type to search"
+            :on-search="gameService.search"
+            option-label="name"
+            option-value="external_id"
+            option-secondary-label="year"
+            :errors="r$.$errors.selectedGame"
+          />
 
-            <CInput
-              id="owner"
-              v-model="formData.owner"
-              label="Owner"
-              :errors="r$.$errors.owner"
-            />
+          <CInput
+            id="owner"
+            v-model="formData.owner"
+            label="Owner"
+            :errors="r$.$errors.owner"
+          />
 
-            <CSelect
-              id="location"
-              v-model="formData.selectedLocation"
-              label="Location"
-              placeholder="Select a location"
-              :options="locations"
-              :errors="r$.$errors.selectedLocation"
-            />
+          <CSelect
+            id="location"
+            v-model="formData.selectedLocation"
+            label="Location"
+            placeholder="Select a location"
+            :options="locations"
+            :errors="r$.$errors.selectedLocation"
+            helper-text="Optional"
+          />
 
-            <CTextArea
-              id="notes"
-              v-model="formData.notes"
-              label="Notes"
-              :rows="4"
-              :errors="r$.$errors.notes"
-            />
-          </div>
+          <CTextArea
+            id="notes"
+            v-model="formData.notes"
+            label="Notes"
+            :rows="4"
+            :errors="r$.$errors.notes"
+            helper-text="Optional"
+          />
         </div>
       </div>
-      <div
-        class="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3"
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex flex-col sm:flex-row gap-3 sm:gap-2 sm:justify-end">
+      <CButton
+        type="button"
+        variant="secondary"
+        size="lg"
+        class="order-2 sm:order-1 w-full sm:w-auto"
+        @click="emit('close')"
       >
-        <CButton
-          type="button"
-          variant="primary"
-          :loading="isSubmitting"
-          loading-text="Submitting..."
-          class="sm:col-start-2"
-          @click="submit"
-        >
-          Submit
-        </CButton>
-        <CButton
-          type="button"
-          variant="secondary"
-          class="mt-3 sm:col-start-1 sm:mt-0"
-          @click="emit('close')"
-        >
-          Cancel
-        </CButton>
-      </div>
-    </form>
-  </div>
+        Cancel
+      </CButton>
+      <CButton
+        type="button"
+        variant="primary"
+        size="lg"
+        class="order-1 sm:order-2 w-full sm:w-auto"
+        :loading="isSubmitting"
+        loading-text="Submitting..."
+        @click="submit"
+      >
+        Submit
+      </CButton>
+    </div>
+  </form>
 </template>
 
 <script lang="ts" setup>
@@ -80,7 +82,7 @@ import CTextArea from '@/components/CTextArea.vue'
 import type { Game } from '@/features/external-game/model.ts'
 import gameService from '@/features/external-game/service.ts'
 import { libraryService } from '@/features/library/service.ts'
-import { locationService } from '@/features/locations/service.ts'
+import { libraryLocationService } from '@/features/library/locations/service.ts'
 
 const formData = ref<{
   selectedGame: number | undefined
@@ -146,7 +148,7 @@ defineExpose({
 })
 
 onMounted(async () => {
-  const result = await locationService.get()
+  const result = await libraryLocationService.get()
 
   locations.value = result.map((result) => {
     return {

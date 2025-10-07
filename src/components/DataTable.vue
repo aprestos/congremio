@@ -1,13 +1,5 @@
 <template>
   <div class="flex flex-col min-h-0 h-full">
-    <!-- Header slot for search and other controls -->
-    <div
-      v-if="$slots.header"
-      class="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 bg-white dark:bg-gray-900 dark:border-white/5 border-b border-gray-200 px-4 shadow-xs sm:gap-x-6 sm:px-6 lg:px-8"
-    >
-      <slot name="header" />
-    </div>
-
     <!-- Table container -->
     <div class="flex-1 min-h-0 overflow-hidden">
       <div
@@ -15,6 +7,7 @@
         class="h-full overflow-auto"
         @scroll="handleScroll"
       >
+        <slot name="header"> </slot>
         <table class="w-full divide-y divide-gray-200 dark:divide-white/15">
           <!-- Table header -->
           <thead>
@@ -23,20 +16,7 @@
                 v-for="(column, index) in columns"
                 :key="column.key"
                 scope="col"
-                :class="[
-                  'py-3 text-left text-xs text-gray-500 dark:text-gray-400 uppercase',
-                  index === 0 ? 'pl-4 sm:pl-6 lg:pl-8 pr-3' : 'px-3 py-4',
-                  column.hidden ? 'hidden lg:table-cell' : 'table-cell',
-                  column.align === 'right' ? 'text-right' : 'text-left',
-                  column.headerClass || '',
-                  column.sortable !== false
-                    ? 'cursor-pointer hover:text-gray-700 dark:hover:text-gray-200 select-none'
-                    : '',
-                  // Add light background when sorting is active
-                  sortConfig.key === column.key
-                    ? 'bg-indigo-50 dark:bg-gray-800/50'
-                    : '',
-                ]"
+                :class="getHeaderClasses(column, index)"
                 @click="
                   column.sortable !== false ? handleSort(column.key) : null
                 "
@@ -89,13 +69,7 @@
               <td
                 v-for="(column, colIndex) in columns"
                 :key="column.key"
-                :class="[
-                  'py-4 text-sm',
-                  colIndex === 0 ? 'pl-4 sm:pl-6 lg:pl-8 pr-3' : 'px-3',
-                  column.hidden ? 'hidden lg:table-cell' : 'table-cell',
-                  column.align === 'right' ? 'text-right' : 'text-left',
-                  column.cellClass || 'text-gray-500 dark:text-gray-400',
-                ]"
+                :class="getCellClasses(column, colIndex)"
               >
                 <slot
                   :name="`cell-${column.key}`"
@@ -153,10 +127,10 @@ export interface DataTableColumn<T = Record<string, unknown>> {
   key: string
   label: string
   hidden?: boolean
-  align?: 'left' | 'right' | 'center'
   headerClass?: string
   cellClass?: string
   skeletonClass?: string
+  breakpoint?: 'sm' | 'md' | 'lg' | 'xl' | '2xl'
   sortable?: boolean
   sortFn?: (a: T, b: T) => number
 }
@@ -207,8 +181,8 @@ const sortedItems = computed((): T[] => {
   } else {
     // Default sort function
     sortedArray.sort((a, b) => {
-      const aValue = getNestedValue(a, sortConfig.value.key!) as unknown
-      const bValue = getNestedValue(b, sortConfig.value.key!) as unknown
+      const aValue = getNestedValue(a, sortConfig.value.key!)
+      const bValue = getNestedValue(b, sortConfig.value.key!)
 
       // Handle null/undefined values
       if (aValue == null && bValue == null) return 0
@@ -229,8 +203,8 @@ const sortedItems = computed((): T[] => {
         return aValue.getTime() - bValue.getTime()
       }
 
-      // Fallback to string comparison
-      return String(aValue).localeCompare(String(bValue))
+      // If other types or mixed types, do not sort
+      return 0
     })
   }
 
@@ -269,6 +243,64 @@ const getNestedValue = (obj: T, path: string): unknown => {
       ? (current as Record<string, unknown>)[key]
       : undefined
   }, obj)
+}
+
+const getVisibilityClasses = (breakpoint?: string): string => {
+  if (!breakpoint) return ''
+  const breakpointMap: Record<string, string> = {
+    sm: 'hidden sm:table-cell',
+    md: 'hidden md:table-cell',
+    lg: 'hidden lg:table-cell',
+    xl: 'hidden xl:table-cell',
+    '2xl': 'hidden 2xl:table-cell',
+  }
+  return breakpointMap[breakpoint] || ''
+}
+
+// Get responsive classes for header columns
+const getHeaderClasses = (
+  column: DataTableColumn<T>,
+  index: number,
+): string => {
+  const baseClasses = 'py-3 text-xs text-gray-500 dark:text-gray-400 uppercase'
+
+  const paddingClasses = index === 0 ? 'pl-4 sm:pl-6 lg:pl-8 pr-3' : 'px-3'
+
+  const headerExtraClasses = column.headerClass || ''
+
+  // Responsive visibility classes - explicit mapping for Tailwind JIT
+  let visibilityClasses = getVisibilityClasses(column.breakpoint)
+
+  let sortClasses = ''
+  if (column.sortable)
+    sortClasses =
+      'cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800/60 hover:text-gray-700 dark:hover:text-gray-200 select-none'
+
+  return [
+    baseClasses,
+    paddingClasses,
+    headerExtraClasses,
+    visibilityClasses,
+    sortClasses,
+  ]
+    .filter(Boolean)
+    .join(' ')
+}
+
+// Get responsive classes for cell columns
+const getCellClasses = (column: DataTableColumn<T>, index: number): string => {
+  const baseClasses = 'py-4 text-sm'
+
+  const paddingClasses = index === 0 ? 'pl-4 sm:pl-6 lg:pl-8 pr-3' : 'px-3'
+
+  const cellClasses = column.cellClass || 'text-gray-500 dark:text-gray-400'
+
+  // Responsive visibility classes - explicit mapping for Tailwind JIT
+  let visibilityClasses = getVisibilityClasses(column.breakpoint)
+
+  return [baseClasses, paddingClasses, cellClasses, visibilityClasses]
+    .filter(Boolean)
+    .join(' ')
 }
 
 // Sort functions

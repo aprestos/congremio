@@ -1,5 +1,5 @@
 import type { Game } from '@/features/external-game/model.ts'
-import type { GameLocation } from '@/features/locations/model.ts'
+import type { LibraryLocation } from '@/features/library/locations/location.model.ts'
 
 export enum LibraryGameStatus {
   available = 'available',
@@ -13,7 +13,7 @@ export interface LibraryGame {
   owner: string
   notes: string
   event_id: number
-  location?: GameLocation
+  location?: LibraryLocation
   game: Game
   status: LibraryGameStatus
   reserved_until?: string

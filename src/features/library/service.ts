@@ -15,7 +15,9 @@ export const libraryService = {
     try {
       const result = await supabase
         .from('library_games')
-        .select('id,owner,notes,game:games(*),edition_id,status,reserved_until')
+        .select(
+          'id,owner,notes,game:games(*),location:locations(id,name),edition_id,status,reserved_until',
+        )
         .eq('tenant_id', tenantStore.value?.id)
         .eq('edition_id', eventStore.value?.id)
       return result.data as unknown as LibraryGame[]
@@ -190,7 +192,10 @@ export const libraryService = {
     }
   },
 
-  async updateGame(id: number, update: Partial<LibraryGame>) {
+  async updateGame(
+    id: number,
+    update: Partial<LibraryGame> & { location_id?: number },
+  ) {
     await supabase.from('library_games').update(update).eq('id', id)
   },
 
