@@ -435,6 +435,11 @@ const currentFilters = computed((): FilterOptions => {
     ),
   )
 
+  // Add selected tag to filters if one is selected
+  if (selectedTag.value) {
+    cleanedFilters.tags = [selectedTag.value]
+  }
+
   return {
     searchQuery: searchQuery.value || undefined,
     selectedFilters:

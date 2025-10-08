@@ -118,7 +118,7 @@ const startCountdown = (): void => {
 }
 
 const redirectToHome = async (): Promise<void> => {
-  await router.push({ name: RouteNames.public.home })
+  await router.push({ name: RouteNames.public.library })
 }
 
 const backToSignIn = async (): Promise<void> => {

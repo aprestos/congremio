@@ -48,7 +48,7 @@
                 <!-- Admin Panel Button (only show if user is staff or admin) -->
                 <RouterLink
                   v-if="isStaffOrAdmin"
-                  :to="{ name: RouteNames.admin.dashboard }"
+                  :to="{ name: RouteNames.admin.library }"
                   class="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                 >
                   <CogIcon class="h-4 w-4" aria-hidden="true" />
@@ -118,11 +118,11 @@
 
 <script setup lang="ts">
 import {
-  PopoverGroup,
   Menu,
   MenuButton,
-  MenuItems,
   MenuItem,
+  MenuItems,
+  PopoverGroup,
 } from '@headlessui/vue'
 import { CogIcon } from '@heroicons/vue/24/outline'
 import { onMounted, ref } from 'vue'
@@ -145,8 +145,7 @@ onMounted(async () => {
       isAuthenticated.value = true
 
       // Check if user has staff or admin role
-      const isStaff = await authService.hasAdminAccess()
-      isStaffOrAdmin.value = isStaff
+      isStaffOrAdmin.value = await authService.isStaffOrHigher()
     } else {
       isAuthenticated.value = false
     }

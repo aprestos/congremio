@@ -10,6 +10,7 @@ import { useFavicon } from '@vueuse/core'
 
 useHead({
   title: tenantStore.value?.name || 'congrem.io',
+  meta: [],
 })
 
 const icon = useFavicon()

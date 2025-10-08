@@ -2,7 +2,6 @@
 import { computed } from 'vue'
 import { tenantStore } from '@/stores/tenant.ts'
 import { useRoute } from 'vue-router'
-import { RouteNames } from '@/router/routeNames.ts'
 import type { User } from '@supabase/supabase-js'
 
 interface NavigationItem {
@@ -21,7 +20,8 @@ interface PublicPage {
 }
 
 const props = defineProps<{
-  navigation: NavigationItem[]
+  topNavigation: NavigationItem[]
+  bottomNavigation: NavigationItem[]
   publicPages: PublicPage[]
   user: User | null
 }>()
@@ -29,19 +29,6 @@ const props = defineProps<{
 defineEmits<{
   close: []
 }>()
-
-// Filter navigation items, separating Settings from main navigation
-const mainNavigation = computed(() =>
-  props.navigation.filter(
-    (item) => item.routeName !== (RouteNames.admin.settings as string),
-  ),
-)
-
-const settingsItem = computed(() =>
-  props.navigation.find(
-    (item) => item.routeName === (RouteNames.admin.settings as string),
-  ),
-)
 
 const userName = computed(() => {
   return (props.user?.user_metadata['display_name'] ||
@@ -73,7 +60,7 @@ const route = useRoute()
         <ul role="list" class="flex flex-1 flex-col gap-y-7">
           <li>
             <ul role="list" class="-mx-2 space-y-1">
-              <li v-for="item in mainNavigation" :key="item.routeName">
+              <li v-for="item in topNavigation" :key="item.routeName">
                 <RouterLink
                   v-if="item.enabled"
                   :to="{ name: item.routeName }"
@@ -123,27 +110,31 @@ const route = useRoute()
             </ul>
           </li>
           <!-- Settings Section -->
-          <li v-if="settingsItem" class="mt-auto">
+          <li
+            v-for="item in bottomNavigation"
+            :key="item.routeName"
+            class="mt-auto"
+          >
             <RouterLink
-              :to="{ name: settingsItem.routeName }"
+              :to="{ name: item.routeName }"
               :class="[
-                route.name === settingsItem.routeName
+                route.name === item.routeName
                   ? 'bg-gray-100 text-indigo-600 dark:bg-white/5 dark:text-white'
                   : 'text-gray-700 hover:bg-gray-100 hover:text-indigo-600 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-white',
                 'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold -mx-2',
               ]"
             >
               <component
-                :is="settingsItem.icon"
+                :is="item.icon"
                 :class="[
-                  route.name === settingsItem.routeName
+                  route.name === item.routeName
                     ? 'text-indigo-600 dark:text-white'
                     : 'text-gray-400 group-hover:text-indigo-600 dark:group-hover:text-white',
                   'size-6 shrink-0',
                 ]"
                 aria-hidden="true"
               />
-              {{ settingsItem.label }}
+              {{ item.label }}
             </RouterLink>
           </li>
 
