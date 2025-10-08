@@ -1,11 +1,11 @@
 <template>
   <div
-    class="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8"
+    class="flex bg-gray-100 min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8"
   >
     <!-- Logo outside the card -->
     <img
       class="mx-auto h-10 w-auto"
-      src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600"
+      src="@/assets/logo-horizontal-color.svg"
       alt="Your Company"
     />
 

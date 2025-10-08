@@ -11,6 +11,12 @@ export interface FilterOptions {
 type GameUpdateCallback = (games: LibraryGame[]) => void
 
 export const libraryService = {
+  async count(): Promise<number> {
+    const result = await supabase
+      .from('library_games')
+      .select('*', { count: 'exact', head: true })
+    return result.count || 0
+  },
   async get(): Promise<Array<LibraryGame>> {
     try {
       const result = await supabase

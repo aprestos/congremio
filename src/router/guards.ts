@@ -19,7 +19,7 @@ export const requiresAuth = async (): Promise<boolean> => {
 // Staff permission check guard
 export const requiresStaff = async (): Promise<boolean> => {
   try {
-    return await authService.hasAdminAccess()
+    return await authService.isStaffOrHigher()
   } catch (error) {
     console.error('Error checking staff permissions:', error)
     return false

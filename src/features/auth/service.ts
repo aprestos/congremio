@@ -77,11 +77,15 @@ export const authService = {
     else return access.permissions || []
   },
 
-  async hasAdminAccess(): Promise<boolean> {
+  async isStaffOrHigher(): Promise<boolean> {
     const role = await this.getRole()
-    console.log('role', role)
 
     return role === 'staff' || role === 'admin' || role === 'super-admin'
+  },
+  async isAdminOrHigher(): Promise<boolean> {
+    const role = await this.getRole()
+
+    return role === 'admin' || role === 'super-admin'
   },
   async setTenant(userId: string): Promise<void> {
     // Call the user-tenant function to set up user-tenant relationship
