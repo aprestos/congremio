@@ -39,19 +39,6 @@ import type { User } from '@supabase/supabase-js'
 const userEmail = ref<string | null>(null)
 const user = ref<User | null>(null)
 
-// Load user email on component mount
-onMounted(async () => {
-  try {
-    const { data } = await authService.getUser()
-    if (data.user) {
-      userEmail.value = data.user?.email || null
-      user.value = data.user
-    }
-  } catch (error) {
-    console.error('Error loading user email:', error)
-  }
-})
-
 const navigation = ref([
   {
     label: 'Dashboard',
@@ -84,7 +71,7 @@ const bottomNavigation = ref([
     label: 'Settings',
     routeName: RouteNames.admin.settings as string,
     icon: IconSettings,
-    enabled: await authService.isAdminOrHigher(),
+    enabled: false, // Will be set in onMounted
   },
 ])
 
@@ -106,4 +93,25 @@ const publicPages = [
 ]
 
 const sidebarOpen = ref(false)
+
+// Load user email on component mount
+onMounted(async () => {
+  try {
+    // Execute both async operations in parallel
+    const [{ data }, isAdmin] = await Promise.all([
+      authService.getUser(),
+      authService.isAdminOrHigher(),
+    ])
+
+    if (data.user) {
+      userEmail.value = data.user?.email || null
+      user.value = data.user
+    }
+
+    // Set bottom navigation enabled state based on user role
+    bottomNavigation.value[0].enabled = isAdmin
+  } catch (error) {
+    console.error('Error loading user email:', error)
+  }
+})
 </script>
