@@ -49,7 +49,7 @@ export const libraryLocationService = {
 
       return undefined
     } catch (error) {
-      console.error('get error:', (error as Error).message)
+      console.error('create error:', (error as Error).message)
       return undefined
     }
   },
