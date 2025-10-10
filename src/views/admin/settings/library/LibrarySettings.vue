@@ -148,7 +148,7 @@ const deleteLocation = async (id: number): Promise<void> => {
           </div>
           <button
             type="button"
-            class="flex-shrink-0 rounded-md p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:text-red-400 dark:hover:bg-red-900/20 transition-colors"
+            class="hidden flex-shrink-0 rounded-md p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:text-red-400 dark:hover:bg-red-900/20 transition-colors"
             @click="deleteLocation(location.id)"
           >
             <span class="sr-only">Delete {{ location.name }}</span>
