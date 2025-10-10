@@ -7,7 +7,7 @@ import { createApp } from 'vue'
 import { createI18n } from 'vue-i18n'
 import VueCountdown from '@chenfengyuan/vue-countdown'
 
-import EditionService from '@/features/events/service.ts'
+import { editionService } from '@/features/events/service.ts'
 import LocalStorageService from '@/features/localstorage/local-storage.service'
 import tenantService from '@/features/tenant/service'
 import type { Tenant } from '@/features/tenant/tenant.model.ts'
@@ -18,7 +18,7 @@ import router from './router'
 import { createHead } from '@unhead/vue/client'
 import { settingsStore } from '@/features/settings/useSettings.store.ts'
 import { settingsService } from '@/features/settings/service.ts'
-import type { Edition } from '@/features/events/model.ts'
+import type { Edition } from '@/features/events/event.model.ts'
 
 async function loadTenant(): Promise<Tenant | null> {
   const tenantId = LocalStorageService.getTenantId()
@@ -36,7 +36,7 @@ async function loadTenant(): Promise<Tenant | null> {
 
 async function loadEdition(tenantId: string): Promise<Edition | null> {
   if (tenantId) {
-    eventStore.value = await EditionService.getCurrentEvent(tenantId)
+    eventStore.value = await editionService.getCurrentEvent(tenantId)
     return eventStore?.value || null
   }
   return null

@@ -8,7 +8,7 @@
           <div class="flex h-16 items-center justify-between">
             <!-- Logo -->
             <div class="flex flex-1">
-              <a href="#">
+              <RouterLink :to="{ name: RouteNames.public.home }">
                 <span class="sr-only">{{
                   tenantStore?.name || 'Your Company'
                 }}</span>
@@ -21,7 +21,7 @@
                   :src="tenantStore.logo || '@/assets/logoipsum-381.svg'"
                   :alt="tenantStore.name + ' logo'"
                 />
-              </a>
+              </RouterLink>
             </div>
 
             <!-- Flyout menus -->

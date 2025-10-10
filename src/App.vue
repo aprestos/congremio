@@ -8,14 +8,21 @@ import { useHead } from '@unhead/vue'
 import { tenantStore } from './stores/tenant'
 import { useFavicon } from '@vueuse/core'
 
+const icon = useFavicon()
+icon.value = tenantStore?.value?.logo || 'assets/logoipsum-381.svg'
+
+// Computed theme color from tenant settings
+const themeColor = '#4f46e5' // Default to indigo-600
+
 useHead({
   title: tenantStore.value?.name || 'congrem.io',
-  meta: [],
+  meta: [
+    {
+      name: 'theme-color',
+      content: themeColor,
+    },
+  ],
 })
-
-const icon = useFavicon()
-
-icon.value = tenantStore?.value?.logo || 'assets/logoipsum-381.svg' // change current icon
 </script>
 
 <template>

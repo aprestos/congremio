@@ -58,6 +58,7 @@ export const libraryService = {
       edition_id: eventStore.value?.id,
       game_id: gameId,
       location_id: locationId,
+      status: 'not-available',
       owner: owner,
       notes: notes || undefined,
     })

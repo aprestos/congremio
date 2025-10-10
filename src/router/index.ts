@@ -22,6 +22,10 @@ const router = createRouter({
     {
       path: '',
       name: RouteNames.public.home,
+      component: () => import('../views/LandingView.vue'),
+    },
+    {
+      path: '',
       component: HomeView,
       children: [
         {
@@ -93,8 +97,25 @@ const router = createRouter({
         },
         {
           path: 'settings',
-          name: RouteNames.admin.settings,
           component: () => import('../views/admin/settings/SettingsView.vue'),
+          children: [
+            {
+              path: '',
+              redirect: { name: RouteNames.admin.settingsGeneral },
+            },
+            {
+              path: 'general',
+              name: RouteNames.admin.settingsGeneral,
+              component: () =>
+                import('../views/admin/settings/GeneralSettings.vue'),
+            },
+            {
+              path: 'library',
+              name: RouteNames.admin.settingsLibrary,
+              component: () =>
+                import('../views/admin/settings/library/LibrarySettings.vue'),
+            },
+          ],
         },
       ],
     },
