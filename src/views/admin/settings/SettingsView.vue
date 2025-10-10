@@ -9,10 +9,14 @@
         class="flex min-w-full flex-none gap-x-6 px-4 text-sm/6 font-semibold text-gray-500 sm:px-6 lg:px-8 dark:text-gray-400"
       >
         <li v-for="item in secondaryNavigation" :key="item.name">
-          <a
-            :href="item.href"
-            :class="item.current ? 'text-indigo-600 dark:text-indigo-400' : ''"
-            >{{ item.name }}</a
+          <RouterLink
+            :to="{ name: item.routeName }"
+            :class="[
+              route.name === item.routeName
+                ? 'text-indigo-600 dark:text-indigo-400'
+                : 'hover:text-gray-700 dark:hover:text-gray-300',
+            ]"
+            >{{ item.name }}</RouterLink
           >
         </li>
       </ul>
@@ -21,20 +25,26 @@
 
   <!-- Settings forms -->
   <div class="divide-y divide-gray-200 dark:divide-white/10">
-    <TenantSettings />
-    <EditionSettings />
-    <FeatureSettings />
+    <RouterView />
   </div>
 </template>
 
 <script setup lang="ts">
-import TenantSettings from './TenantSettings.vue'
-import EditionSettings from './EditionSettings.vue'
-import FeatureSettings from './FeatureSettings.vue'
+import { RouterLink, useRoute } from 'vue-router'
+import { RouteNames } from '@/router/routeNames'
+
+const route = useRoute()
 
 const secondaryNavigation = [
-  { name: 'General', href: '#', current: true },
-  { name: 'Editions', href: '#', current: false },
-  { name: 'Library', href: '#', current: false },
+  {
+    name: 'General',
+    to: { name: RouteNames.admin.settingsGeneral },
+    routeName: RouteNames.admin.settingsGeneral,
+  },
+  {
+    name: 'Library',
+    to: { name: RouteNames.admin.settingsLibrary },
+    routeName: RouteNames.admin.settingsLibrary,
+  },
 ]
 </script>

@@ -89,8 +89,19 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue'
+import { useHead } from '@unhead/vue'
 import { authService } from '@/features/auth/service.ts'
 import router from '@/router'
+
+// Override theme color for auth pages
+useHead({
+  meta: [
+    {
+      name: 'theme-color',
+      content: '#6366f1', // indigo-500 for auth pages
+    },
+  ],
+})
 
 const email = ref('')
 const password = ref('')

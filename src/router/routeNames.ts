@@ -4,10 +4,13 @@ enum Admin {
   events = 'admin.events',
   tournaments = 'admin.tournaments',
   settings = 'admin.settings',
+  settingsGeneral = 'admin.settings.general',
+  settingsLibrary = 'admin.settings.library',
   fleeMarket = 'admin.flee-market',
 }
 
 enum Public {
+  root = 'root',
   home = 'home',
   library = 'library',
   fleeMarket = 'flee-market',

@@ -1,26 +1,38 @@
 import { supabase } from '@/lib/supabase'
-import type { Event } from './event.model.ts'
+import type { Edition } from '@/features/events/event.model.ts'
 
-const EditionService = {
-  async getById(eventId: string): Promise<Event | null> {
+export const editionService = {
+  async getById(eventId: string): Promise<Edition | null> {
     const { data, error } = await supabase
       .from('editions')
       .select('*')
       .eq('id', eventId)
-      .single<Event>()
+      .single<Edition>()
     if (error) throw error
     return data
   },
-  async getCurrentEvent(tenantId: string): Promise<Event | null> {
+  async getCurrentEvent(tenantId: string): Promise<Edition | null> {
     const { data, error } = await supabase
       .from('editions')
       .select('*')
       .eq('tenant_id', tenantId)
       .eq('current', true)
-      .single<Event>()
+      .single<Edition>()
     if (error) throw error
     return data
   },
-}
+  async save(
+    tenantId: string | undefined,
+    editionId: number | undefined,
+    update: unknown,
+  ): Promise<void> {
+    if (!tenantId || !editionId || !update) return
 
-export default EditionService
+    const { error } = await supabase
+      .from('editions')
+      .update(update)
+      .eq('tenant_id', tenantId)
+      .eq('id', editionId)
+    if (error) throw error
+  },
+}

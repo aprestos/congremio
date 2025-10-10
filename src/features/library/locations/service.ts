@@ -33,4 +33,24 @@ export const libraryLocationService = {
       return []
     }
   },
+  async create(name: string): Promise<LibraryLocation | undefined> {
+    try {
+      const result = await supabase
+        .from('locations')
+        .insert({
+          tenant_id: tenantStore.value?.id,
+          edition_id: eventStore.value?.id,
+          name,
+        })
+        .select()
+        .single()
+
+      if (result.data) return result.data as LibraryLocation
+
+      return undefined
+    } catch (error) {
+      console.error('get error:', (error as Error).message)
+      return undefined
+    }
+  },
 } as const

@@ -1,12 +1,11 @@
-export interface Event {
+export interface Edition {
   id: number
-  tenant_id: string
   name: string
+  start_date?: string
+  end_date?: string
   description?: string
-  start_date: string
-  end_date: string
-  location?: string
-  timezone?: string
-  created_at: string
-  updated_at: string
+  location?: {
+    title?: string
+    url?: string
+  }
 }
