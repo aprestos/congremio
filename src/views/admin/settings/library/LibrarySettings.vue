@@ -139,7 +139,6 @@ const importGames = async (): Promise<void> => {
     gamesToImport.value,
   )
   clearImportList()
-  console.log('Importing games:', gamesToImport.value)
   toast.success('Games added to import queue')
 }
 </script>
