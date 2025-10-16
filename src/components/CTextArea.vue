@@ -9,7 +9,7 @@
     <div class="mt-2">
       <textarea
         :id="id"
-        :name="name || id"
+        :name="id"
         :rows="rows"
         :placeholder="placeholder"
         :value="modelValue"
@@ -43,7 +43,6 @@ interface Props {
   modelValue: string
   rows?: number
   placeholder?: string
-  name?: string
   errors?: string[]
   helperText?: string
 }
@@ -51,7 +50,6 @@ interface Props {
 withDefaults(defineProps<Props>(), {
   rows: 4,
   placeholder: '',
-  name: undefined,
   errors: undefined,
   helperText: undefined,
 })

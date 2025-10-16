@@ -164,7 +164,7 @@
         </Dialog>
       </TransitionRoot>
 
-      <main class="">
+      <main>
         <div class="flex items-baseline justify-between pb-6">
           <!-- Search Input -->
           <div class="flex-1 mr-6">

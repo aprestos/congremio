@@ -207,7 +207,12 @@ export const libraryService = {
   },
 
   async deleteGame(libraryGameId: number): Promise<void> {
-    await supabase.from('library_games').delete().eq('id', libraryGameId)
+    const { error } = await supabase
+      .from('library_games')
+      .delete()
+      .eq('id', libraryGameId)
+
+    if (error) throw new Error('Unable to delete game')
   },
 } as const
 

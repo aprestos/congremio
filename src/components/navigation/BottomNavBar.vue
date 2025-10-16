@@ -17,9 +17,9 @@ const route = useRoute()
 
 <template>
   <div
-    class="bg-gray-50 dark:bg-gray-900 bg-opacity-25 sticky bottom-0 flex items-center justify-center border-0 border-t-1 backdrop-blur-sm dark:border-white/5 border-t-indigo-100 lg:hidden"
+    class="bg-gray-50 dark:bg-gray-800/50 px-1 py-1 rounded-full bg-opacity-10 absolute bottom-5 left-5 flex items-center justify-center border-1 backdrop-blur-2xl dark:border-white/5 border-indigo-100 lg:hidden"
   >
-    <div class="w-full">
+    <div class="">
       <div class="opacity-90 shadow-lg">
         <div class="flex">
           <div
@@ -29,13 +29,13 @@ const route = useRoute()
               item.routeName === route.name
                 ? 'bg-gray-100 text-indigo-600 dark:bg-white/5 dark:text-white'
                 : 'text-gray-700 hover:bg-gray-100 hover:text-indigo-600 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-white',
-              'group flex gap-x-3 p-1 text-sm/6 font-semibold flex-1',
+              'group flex gap-x-3 p-1 text-sm/6 font-semibold rounded-full',
             ]"
           >
             <RouterLink
               v-if="item.enabled"
               :to="{ name: item.routeName }"
-              class="flex items-end justify-center text-center mx-auto px-4 pt-1 w-full"
+              class="flex items-end justify-center text-center mx-auto px-3 pt-1 w-full"
             >
               <span class="block px-1 pt-1 pb-1 text-center">
                 <component
@@ -43,7 +43,7 @@ const route = useRoute()
                   class="pt-1 mb-1 block size-7 mx-auto"
                   aria-hidden="true"
                 />
-                <span class="block text-xs font-semibold pb-2">{{
+                <span class="hidden text-xs font-semibold pb-1">{{
                   item.label
                 }}</span>
                 <span
