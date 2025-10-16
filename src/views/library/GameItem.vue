@@ -139,7 +139,7 @@ const isConventionHappening = computed(() => {
     <div v-else-if="game" @vue:before-update="resetImageState">
       <div class="group relative cursor-pointer" @click="handleGameClick">
         <div
-          class="relative h-70 md:h-60 lg:h-50 w-full overflow-hidden rounded-lg text-center"
+          class="relative h-72 md:h-60 lg:h-50 w-full overflow-hidden rounded-lg text-center"
         >
           <!-- Image SkeletonLoader - shown while image is loading -->
           <SkeletonLoader
@@ -196,7 +196,7 @@ const isConventionHappening = computed(() => {
         </div>
         <div
           v-if="getStatus(game) !== 'available' && isConventionHappening"
-          class="absolute inset-x-0 top-0 flex h-70 md:h-60 lg:h-50 items-end justify-end overflow-hidden rounded-lg p-4"
+          class="absolute inset-x-0 top-0 flex h-72 md:h-60 lg:h-50 items-end justify-end overflow-hidden rounded-lg p-4"
         >
           <div
             aria-hidden="true"
