@@ -59,4 +59,13 @@
     --primary-900: 30 58 138;       /* blue-900 */
     --primary-950: 23 37 84;        /* blue-950 */
   }
+
+  /* Set background color for body and html to match theme */
+  html {
+    @apply bg-white dark:bg-gray-950;
+  }
+
+  body {
+    @apply bg-white dark:bg-gray-950;
+  }
 }

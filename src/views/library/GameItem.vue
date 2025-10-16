@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import type { LibraryGame } from '@/features/library/game.model.ts'
 import {
@@ -12,6 +12,7 @@ import { HandRaisedIcon } from '@heroicons/vue/24/outline'
 import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
 import { authService } from '@/features/auth/service.ts'
 import CButton from '@/components/CButton.vue'
+import { eventStore } from '@/stores/edition'
 
 interface Props {
   game?: LibraryGame
@@ -91,6 +92,25 @@ const redirectToSignIn = (): void => {
 const closeAuthDialog = (): void => {
   showAuthDialog.value = false
 }
+
+// Check if convention is currently happening
+const isConventionHappening = computed(() => {
+  const edition = eventStore.value
+  if (!edition?.start_date || !edition?.end_date) {
+    return false
+  }
+
+  const now = new Date()
+  const startDate = new Date(edition.start_date)
+  const endDate = new Date(edition.end_date)
+
+  // Set time to start/end of day for accurate comparison
+  now.setHours(0, 0, 0, 0)
+  startDate.setHours(0, 0, 0, 0)
+  endDate.setHours(23, 59, 59, 999)
+
+  return now >= startDate && now <= endDate
+})
 </script>
 
 <template>
@@ -119,7 +139,7 @@ const closeAuthDialog = (): void => {
     <div v-else-if="game" @vue:before-update="resetImageState">
       <div class="group relative cursor-pointer" @click="handleGameClick">
         <div
-          class="relative size-50 w-full overflow-hidden rounded-lg text-center"
+          class="relative h-70 md:h-60 lg:h-50 w-full overflow-hidden rounded-lg text-center"
         >
           <!-- Image SkeletonLoader - shown while image is loading -->
           <SkeletonLoader
@@ -175,8 +195,8 @@ const closeAuthDialog = (): void => {
           </h3>
         </div>
         <div
-          v-if="getStatus(game) !== 'available'"
-          class="absolute inset-x-0 top-0 flex size-50 items-end justify-end overflow-hidden rounded-lg p-4"
+          v-if="getStatus(game) !== 'available' && isConventionHappening"
+          class="absolute inset-x-0 top-0 flex h-70 md:h-60 lg:h-50 items-end justify-end overflow-hidden rounded-lg p-4"
         >
           <div
             aria-hidden="true"

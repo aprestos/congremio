@@ -104,6 +104,25 @@ export const libraryWithdrawService = {
       return []
     }
   },
+
+  async countByGame(libraryGameId: number): Promise<number> {
+    try {
+      const result = await supabase
+        .from('library_withdraws')
+        .select('*', { count: 'exact', head: true })
+        .eq('library_game_id', libraryGameId)
+        .eq('tenant_id', tenantStore.value?.id)
+        .eq('edition_id', eventStore.value?.id)
+
+      return result.count || 0
+    } catch (error) {
+      console.error(
+        'Error counting withdraws by library game:',
+        (error as Error).message,
+      )
+      return 0
+    }
+  },
 } as const
 
 // Provide proper default export

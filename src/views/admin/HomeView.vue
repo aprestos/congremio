@@ -17,12 +17,12 @@
   </div>
   <!-- component -->
 
-  <BottomNavBar :navigation="navigation" />
+  <BottomNavBar :navigation="enabledNavigation" />
 </template>
 
 <script setup lang="ts">
 import { CalendarDaysIcon } from '@heroicons/vue/24/outline'
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import BottomNavBar from '@/components/navigation/BottomNavBar.vue'
 import SidebarNavigationGrey from '@/components/navigation/SidebarNavigationGrey.vue'
 import { authService } from '@/features/auth/service.ts'
@@ -38,6 +38,10 @@ import type { User } from '@supabase/supabase-js'
 
 const userEmail = ref<string | null>(null)
 const user = ref<User | null>(null)
+
+const enabledNavigation = computed(() => {
+  return navigation.value.filter((item) => item.enabled)
+})
 
 const navigation = ref([
   {

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useHead } from '@unhead/vue'
 import { computed } from 'vue'
 import { eventStore } from '@/stores/edition'
 import { settingsStore } from '@/features/settings/useSettings.store'
@@ -18,14 +17,6 @@ import { RouterLink } from 'vue-router'
 import { RouteNames } from '@/router/routeNames'
 
 // Set page-specific theme color
-useHead({
-  meta: [
-    {
-      name: 'theme-color',
-      content: '#4f46e5', // indigo-600 for landing page
-    },
-  ],
-})
 
 const edition = computed(() => eventStore.value)
 const settings = computed(() => settingsStore.value)
