@@ -211,7 +211,7 @@ const isConventionHappening = computed(() => {
           </p>
         </div>
       </div>
-      <div class="mt-6">
+      <div v-if="isConventionHappening" class="mt-6">
         <CButton
           :full-width="true"
           variant="tertiary"

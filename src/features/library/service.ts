@@ -165,7 +165,12 @@ export const libraryService = {
                 )
               case 'Classics':
                 // Filter classic games (older than 10 years)
-                return parseInt(game.game.year) <= new Date().getFullYear() - 10
+                return parseInt(game.game.year) <= new Date().getFullYear() - 15
+              case '2-player only':
+                // Filter 2-player only games (older than 10 years)
+                return (
+                  game.game.min_players === 2 && game.game.max_players === 2
+                )
               case 'Most played':
                 // This would require play count data - for now return games with good player count range
                 return game.game.min_players <= 4 && game.game.max_players >= 4
