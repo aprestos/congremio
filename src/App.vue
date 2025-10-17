@@ -13,8 +13,8 @@ const icon = useFavicon()
 icon.value = tenantStore?.value?.logo || 'assets/logoipsum-381.svg'
 const isDark = useDark()
 
-// Computed theme color to match Tailwind's bg-white and bg-gray-900
-const themeColor = computed(() => (isDark.value ? '#111827' : '#ffffff'))
+// Computed theme color to match Tailwind's bg-white and bg-gray-950
+const themeColor = computed(() => (isDark.value ? '#030712' : '#ffffff'))
 
 // Update theme color reactively for both desktop and mobile
 watchEffect(() => {
