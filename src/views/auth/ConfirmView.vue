@@ -47,7 +47,8 @@ onMounted(async () => {
       }
 
       // Check if user has display_name in user_metadata
-      const userDisplayName = data.user.user_metadata?.display_name
+      const userDisplayName =
+        (data.user.user_metadata?.display_name as string) || ''
 
       if (!userDisplayName) {
         // User needs to set display name

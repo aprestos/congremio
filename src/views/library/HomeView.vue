@@ -392,6 +392,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { IconPlayCard2Filled } from '@tabler/icons-vue'
 import { MagnifyingGlassIcon } from '@heroicons/vue/24/outline'
 import GameList from '@/views/library/GameList.vue'
 import ReservationList from '@/views/library/ReservationList.vue'
@@ -418,7 +419,6 @@ import {
   SparklesIcon,
   UserGroupIcon,
   TrophyIcon,
-  FireIcon,
 } from '@heroicons/vue/20/solid'
 
 const searchQuery = ref('')
@@ -456,7 +456,7 @@ const subCategories = [
   { name: 'New arrivals', href: '#', icon: SparklesIcon },
   { name: 'Family', href: '#', icon: UserGroupIcon },
   { name: 'Classics', href: '#', icon: TrophyIcon },
-  { name: 'Most played', href: '#', icon: FireIcon },
+  { name: '2-player only', href: '#', icon: IconPlayCard2Filled },
 ]
 const filters = [
   {
