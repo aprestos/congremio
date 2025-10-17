@@ -57,7 +57,7 @@ export const userService = {
     else {
       if (error instanceof FunctionsHttpError) {
         type ErrorMessage = { message?: string }
-        const errorMessage = await error.context.json() as ErrorMessage
+        const errorMessage = (await error.context.json()) as ErrorMessage
         if (typeof errorMessage.message === 'string') {
           throw new Error(errorMessage.message)
         } else {
