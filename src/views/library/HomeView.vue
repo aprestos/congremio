@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white dark:bg-gray-900 pb-32">
+  <div class="pb-64">
     <div>
       <!-- Mobile filter dialog -->
       <TransitionRoot as="template" :show="mobileFiltersOpen">

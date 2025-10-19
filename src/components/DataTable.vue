@@ -1,122 +1,118 @@
 <template>
-  <div class="flex flex-col min-h-0 h-full">
-    <!-- Table container -->
-    <div class="flex-1 min-h-0 overflow-hidden">
-      <div
-        ref="scrollContainer"
-        class="h-full overflow-auto"
-        @scroll="handleScroll"
-      >
-        <slot name="header"> </slot>
-        <table class="w-full divide-y divide-gray-200 dark:divide-white/5">
-          <!-- Table header -->
-          <thead>
-            <tr>
-              <th
-                v-for="(column, index) in columns"
-                :key="column.key"
-                scope="col"
-                :class="getHeaderClasses(column, index)"
-                @click="
-                  column.sortable !== false ? handleSort(column.key) : null
-                "
-              >
-                <div class="flex items-center justify-between w-full">
-                  <span>{{ column.label }}</span>
-                  <div
-                    v-if="column.sortable !== false"
-                    class="flex flex-col ml-1"
-                  >
-                    <IconSortAscending
-                      v-if="
-                        sortConfig.key === column.key &&
-                        sortConfig.direction === 'asc'
-                      "
-                      class="h-3 w-3 text-gray-700 dark:text-gray-300"
-                    />
-                    <IconSortDescending
-                      v-else-if="
-                        sortConfig.key === column.key &&
-                        sortConfig.direction === 'desc'
-                      "
-                      class="h-3 w-3 text-gray-700 dark:text-gray-300"
-                    />
-                    <IconArrowsSort
-                      v-else
-                      class="h-3 w-3 text-gray-400 dark:text-gray-500"
-                    />
-                  </div>
-                </div>
-              </th>
-              <!-- Actions column if actions slot is provided -->
-              <th
-                v-if="$slots.actions"
-                scope="col"
-                class="relative py-4 pr-4 sm:pr-6 lg:pr-8 pl-3"
-              >
-                <span class="sr-only">Actions</span>
-              </th>
-            </tr>
-          </thead>
+  <div class="flex flex-col">
+    <slot name="header"> </slot>
+    <table class="w-full divide-y divide-gray-200 dark:divide-white/5">
+      <!-- Table header -->
+      <thead>
+        <tr>
+          <th
+            v-for="(column, index) in columns"
+            :key="column.key"
+            scope="col"
+            :class="getHeaderClasses(column, index)"
+            @click="column.sortable !== false ? handleSort(column.key) : null"
+          >
+            <div class="flex items-center justify-between w-full">
+              <span>{{ column.label }}</span>
+              <div v-if="column.sortable !== false" class="flex flex-col ml-1">
+                <IconSortAscending
+                  v-if="
+                    sortConfig.key === column.key &&
+                    sortConfig.direction === 'asc'
+                  "
+                  class="h-3 w-3 text-gray-700 dark:text-gray-300"
+                />
+                <IconSortDescending
+                  v-else-if="
+                    sortConfig.key === column.key &&
+                    sortConfig.direction === 'desc'
+                  "
+                  class="h-3 w-3 text-gray-700 dark:text-gray-300"
+                />
+                <IconArrowsSort
+                  v-else
+                  class="h-3 w-3 text-gray-400 dark:text-gray-500"
+                />
+              </div>
+            </div>
+          </th>
+          <!-- Actions column if actions slot is provided -->
+          <th
+            v-if="$slots.actions"
+            scope="col"
+            class="relative py-4 pr-4 sm:pr-6 lg:pr-8 pl-3"
+          >
+            <span class="sr-only">Actions</span>
+          </th>
+        </tr>
+      </thead>
 
-          <!-- Table body -->
-          <tbody class="divide-y divide-gray-200 dark:divide-white/5">
-            <!-- Data rows -->
-            <tr
-              v-for="(item, rowIndex) in displayedItems"
-              :key="getRowKey(item, rowIndex)"
+      <!-- Table body -->
+      <tbody class="divide-y divide-gray-200 dark:divide-white/5">
+        <!-- Data rows -->
+        <tr
+          v-for="(item, rowIndex) in displayedItems"
+          :key="getRowKey(item, rowIndex)"
+        >
+          <td
+            v-for="(column, colIndex) in columns"
+            :key="column.key"
+            :class="getCellClasses(column, colIndex)"
+          >
+            <slot
+              :name="`cell-${column.key}`"
+              :item="item"
+              :value="getNestedValue(item, column.key)"
+              :column="column"
+              :index="rowIndex"
             >
-              <td
-                v-for="(column, colIndex) in columns"
-                :key="column.key"
-                :class="getCellClasses(column, colIndex)"
-              >
-                <slot
-                  :name="`cell-${column.key}`"
-                  :item="item"
-                  :value="getNestedValue(item, column.key)"
-                  :column="column"
-                  :index="rowIndex"
-                >
-                  <!-- Default cell content -->
-                  {{ getNestedValue(item, column.key) }}
-                </slot>
-              </td>
-              <!-- Actions column -->
-              <td
-                v-if="$slots.actions"
-                class="py-4 pr-4 sm:pr-6 lg:pr-8 pl-3 text-right text-sm font-medium"
-              >
-                <slot name="actions" :item="item" :index="rowIndex" />
-              </td>
-            </tr>
-          </tbody>
-        </table>
+              <!-- Default cell content -->
+              {{ getNestedValue(item, column.key) }}
+            </slot>
+          </td>
+          <!-- Actions column -->
+          <td
+            v-if="$slots.actions"
+            class="py-4 pr-4 sm:pr-6 lg:pr-8 pl-3 text-right text-sm font-medium"
+          >
+            <slot name="actions" :item="item" :index="rowIndex" />
+          </td>
+        </tr>
+      </tbody>
+    </table>
 
-        <!-- Loading indicator -->
-        <div
-          v-if="isLoading && hasMoreItems"
-          class="flex justify-center items-center py-8"
-        >
-          <div
-            class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"
-          ></div>
-        </div>
+    <!-- Loading indicator -->
+    <div
+      v-if="isLoading && hasMoreItems"
+      class="flex justify-center items-center py-8"
+    >
+      <div
+        class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"
+      ></div>
+    </div>
 
-        <!-- End of results indicator -->
-        <div
-          v-if="!hasMoreItems && displayedItems.length > 0"
-          class="flex justify-center items-center py-4 text-sm text-gray-500 dark:text-gray-400"
-        >
-          {{ displayedItems.length }} of {{ totalItems }} items loaded
-        </div>
-      </div>
+    <!-- Scroll trigger element for infinite scroll -->
+    <div v-if="hasMoreItems" ref="scrollTrigger" class="h-px w-full"></div>
+
+    <!-- End of results indicator -->
+    <div
+      v-if="!hasMoreItems && displayedItems.length > 0"
+      class="flex justify-center items-center py-4 text-sm text-gray-500 dark:text-gray-400"
+    >
+      {{ displayedItems.length }} of {{ totalItems }} items loaded
     </div>
   </div>
 </template>
 
 <script setup lang="ts" generic="T">
-import { ref, computed, type PropType, watch } from 'vue'
+import {
+  ref,
+  computed,
+  type PropType,
+  watch,
+  onMounted,
+  onUnmounted,
+} from 'vue'
 import {
   IconArrowsSort,
   IconSortAscending,
@@ -161,10 +157,11 @@ const props = defineProps({
   },
 })
 
-const scrollContainer = ref<HTMLElement>()
+const scrollTrigger = ref<HTMLElement>()
 const currentLoadedCount = ref(props.itemsPerPage)
 const isLoading = ref(false)
 const sortConfig = ref<SortConfig>({ key: null, direction: null })
+let observer: IntersectionObserver | null = null
 
 // Computed properties for sorting and infinite scroll
 const sortedItems = computed((): T[] => {
@@ -323,7 +320,30 @@ const handleSort = (columnKey: string): void => {
   resetInfiniteScroll()
 }
 
-// Infinite scroll functions
+// Infinite scroll functions using IntersectionObserver
+const setupIntersectionObserver = (): void => {
+  if (observer) {
+    observer.disconnect()
+  }
+
+  observer = new IntersectionObserver(
+    (entries) => {
+      const [entry] = entries
+      if (entry.isIntersecting && hasMoreItems.value && !isLoading.value) {
+        void loadMoreItems()
+      }
+    },
+    {
+      rootMargin: '200px', // Start loading before reaching the bottom
+      threshold: 0,
+    },
+  )
+
+  if (scrollTrigger.value) {
+    observer.observe(scrollTrigger.value)
+  }
+}
+
 const loadMoreItems = async (): Promise<void> => {
   if (isLoading.value || !hasMoreItems.value) return
 
@@ -340,26 +360,11 @@ const loadMoreItems = async (): Promise<void> => {
   isLoading.value = false
 }
 
-const handleScroll = (): void => {
-  if (!scrollContainer.value || isLoading.value || !hasMoreItems.value) return
-
-  const { scrollTop, scrollHeight, clientHeight } = scrollContainer.value
-  const threshold = 100 // pixels from bottom to trigger load
-
-  if (scrollTop + clientHeight >= scrollHeight - threshold) {
-    loadMoreItems().catch((err) => {
-      console.error('Error loading more items:', err)
-    })
-  }
-}
-
 // Reset when items change (e.g., after search)
 const resetInfiniteScroll = (): void => {
   currentLoadedCount.value = props.itemsPerPage
   isLoading.value = false
-  if (scrollContainer.value) {
-    scrollContainer.value.scrollTop = 0
-  }
+  window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
 // Watch for items changes to reset scroll
@@ -370,7 +375,7 @@ watch(
   },
 )
 
-// Also watch for items reference change (important for search)
+// Watch for items reference change (important for search)
 watch(
   () => props.items,
   () => {
@@ -379,14 +384,25 @@ watch(
   { deep: false },
 )
 
-// Also watch for items reference change (important for search)
-watch(
-  () => props.items,
-  () => {
-    resetInfiniteScroll()
-  },
-  { deep: false },
-)
+// Watch for scroll trigger element to setup observer
+watch(scrollTrigger, (newVal) => {
+  if (newVal) {
+    setupIntersectionObserver()
+  }
+})
+
+// Lifecycle hooks
+onMounted(() => {
+  if (scrollTrigger.value) {
+    setupIntersectionObserver()
+  }
+})
+
+onUnmounted(() => {
+  if (observer) {
+    observer.disconnect()
+  }
+})
 
 // Expose methods for parent component
 defineExpose({

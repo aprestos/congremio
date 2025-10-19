@@ -21,7 +21,7 @@ const route = useRoute()
     class="fixed bottom-0 z-50 lg:hidden px-2 pb-2 pointer-events-none safe-area-inset-bottom"
   >
     <div
-      class="bg-black/10 dark:bg-gray-900 rounded-full shadow-lg border border-gray-300/70 dark:border-gray-800 pointer-events-auto backdrop-blur-lg bg-opacity-50 dark:bg-opacity-50"
+      class="bg-black/10 dark:bg-white/10 rounded-full shadow-lg border border-gray-300/70 dark:border-white/5 pointer-events-auto backdrop-blur-lg bg-opacity-50 dark:bg-opacity-50"
     >
       <div class="flex items-center py-1 px-1">
         <RouterLink
