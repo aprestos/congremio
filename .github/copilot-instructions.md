@@ -88,50 +88,50 @@ src/
 
 ### Installation
 ```bash
-npm install
+pnpm install
 ```
 
 ### Development Server
 ```bash
-npm run dev
+pnpm run dev
 ```
 
 ### Type Checking
 ```bash
-npm run type-check
+pnpm run type-check
 ```
 
 ### Building
 ```bash
-npm run build
+pnpm run build
 ```
 
 ### Linting
 ```bash
-npm run lint              # Runs both oxlint and eslint with auto-fix
-npm run lint:oxlint       # Fast correctness checks
-npm run lint:eslint       # Full ESLint with all rules
+pnpm run lint              # Runs both oxlint and eslint with auto-fix
+pnpm run lint:oxlint       # Fast correctness checks
+pnpm run lint:eslint       # Full ESLint with all rules
 ```
 
 ### Formatting
 ```bash
-npm run format            # Format code with Prettier
+pnpm run format            # Format code with Prettier
 ```
 
 ### Testing
 ```bash
-npm run test:unit         # Run unit tests with Vitest
-npm run test:e2e          # Run E2E tests with Playwright
+pnpm run test:unit         # Run unit tests with Vitest
+pnpm run test:e2e          # Run E2E tests with Playwright
 ```
 
 ## Code Quality Requirements
 
 ### Before Committing
 
-1. **Type check** must pass: `npm run type-check`
-2. **Linting** must pass: `npm run lint`
-3. **Tests** should pass: `npm run test:unit`
-4. Code should be **formatted**: `npm run format`
+1. **Type check** must pass: `pnpm run type-check`
+2. **Linting** must pass: `pnpm run lint`
+3. **Tests** should pass: `pnpm run test:unit`
+4. Code should be **formatted**: `pnpm run format`
 
 ### ESLint Rules
 
@@ -155,7 +155,7 @@ This project uses **strict ESLint rules**:
 ### Dependencies Management
 
 - Use **npm** for package management
-- Run `npm install` to add new dependencies
+- Run `pnpm install` to add new dependencies
 - Update `package.json` with exact versions when needed
 
 ### Git Workflow
