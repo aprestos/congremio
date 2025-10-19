@@ -1,6 +1,5 @@
 import type { Tenant } from '@/features/tenant/tenant.model.ts'
 import { supabase } from '@/lib/supabase.ts'
-import { matchDomain } from './domain-matcher'
 
 export const tenantService = {
   async get(): Promise<Array<Tenant>> {
@@ -14,55 +13,30 @@ export const tenantService = {
   },
   async getByDomain(domain: string): Promise<Tenant> {
     try {
-      // First, try exact match for better performance
-      const { data, error } = await supabase
+      const normalizedDomain = domain.toLowerCase()
+
+      // Try exact match for the domain or in other_domains array
+      const { data } = await supabase
         .from('tenants')
         .select()
-        .or(`domain.eq.${domain},other_domains.cs.{${domain}}`)
-        .single()
+        .or(
+          `domain.eq.${normalizedDomain},other_domains.cs.{${normalizedDomain}}`,
+        )
+        .single<Tenant>()
 
-      // If exact match found, return it
-      if (!error && data) {
-        return data as Tenant
+      if (data) {
+        return data
       }
 
-      // If no exact match, fetch all tenants and check for wildcard matches
-      const { data: allTenants, error: allError } = await supabase
-        .from('tenants')
-        .select()
-
-      if (allError) {
-        console.error('Error fetching all tenants:', allError.message)
-        throw allError
+      // If not found and dev tenant ID is configured, use that as fallback
+      if (import.meta.env.VITE_DEV_TENANT_ID) {
+        const devTenant = await this.getById(import.meta.env.VITE_DEV_TENANT_ID)
+        if (devTenant) {
+          return devTenant
+        }
       }
 
-      // Type for tenant record from database that may have other_domains
-      interface TenantRecord extends Tenant {
-        other_domains?: string[]
-      }
-
-      // Check domain field for wildcard match
-      const matchedTenant = (allTenants as TenantRecord[] | null)?.find(
-        (tenant) => {
-          // Check if domain matches with wildcard
-          if (tenant.domain && matchDomain(tenant.domain, domain)) {
-            return true
-          }
-          // Check if any other_domains match with wildcard
-          if (tenant.other_domains && Array.isArray(tenant.other_domains)) {
-            return tenant.other_domains.some((otherDomain: string) =>
-              matchDomain(otherDomain, domain),
-            )
-          }
-          return false
-        },
-      )
-
-      if (!matchedTenant) {
-        throw new Error(`No tenant found for domain: ${domain}`)
-      }
-
-      return matchedTenant as Tenant
+      throw new Error(`No tenant found for domain: ${domain}`)
     } catch (error) {
       console.error((error as Error).message)
       throw error
