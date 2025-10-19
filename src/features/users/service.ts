@@ -1,5 +1,4 @@
 import { supabase } from '@/lib/supabase'
-import { FunctionsHttpError } from '@supabase/supabase-js'
 
 export interface User {
   id: string
@@ -33,7 +32,6 @@ export const userService = {
     const result = (await response.json()) as {
       results: User[]
     }
-    console.log('RESULT', result)
     return result?.results
   },
 
@@ -55,18 +53,8 @@ export const userService = {
 
     if (data) return data as User
     else {
-      if (error instanceof FunctionsHttpError) {
-        type ErrorMessage = { message?: string }
-        const errorMessage = (await error.context.json()) as ErrorMessage
-        if (typeof errorMessage.message === 'string') {
-          throw new Error(errorMessage.message)
-        } else {
-          throw new Error('Unknown error occurred while creating user')
-        }
-      } else {
-        console.log('Unknown error:', JSON.stringify(error))
-        throw new Error('Unable to create user')
-      }
+      console.log(error)
+      throw new Error('Unable to create user')
     }
   },
 }

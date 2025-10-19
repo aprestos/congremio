@@ -172,7 +172,7 @@ const updateStatus = (status: LibraryGameStatus): void => {
               </MenuItem>
             </div>
             <div class="py-1">
-              <MenuItem v-slot="{ active }" class="cursor-not-allowed">
+              <MenuItem v-slot="{ active }">
                 <a
                   :class="[
                     active

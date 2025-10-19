@@ -13,18 +13,30 @@ export const tenantService = {
   },
   async getByDomain(domain: string): Promise<Tenant> {
     try {
-      const { data, error } = await supabase
+      const normalizedDomain = domain.toLowerCase()
+
+      // Try exact match for the domain or in other_domains array
+      const { data } = await supabase
         .from('tenants')
         .select()
-        .or(`domain.eq.${domain},other_domains.cs.{${domain}}`)
-        .single()
+        .or(
+          `domain.eq.${normalizedDomain},other_domains.cs.{${normalizedDomain}}`,
+        )
+        .single<Tenant>()
 
-      if (error) {
-        console.error('Error fetching tenant by domain:', error.message)
-        throw error
+      if (data) {
+        return data
       }
 
-      return data as Tenant
+      // If not found and dev tenant ID is configured, use that as fallback
+      if (import.meta.env.VITE_DEV_TENANT_ID) {
+        const devTenant = await this.getById(import.meta.env.VITE_DEV_TENANT_ID)
+        if (devTenant) {
+          return devTenant
+        }
+      }
+
+      throw new Error(`No tenant found for domain: ${domain}`)
     } catch (error) {
       console.error((error as Error).message)
       throw error

@@ -11,17 +11,22 @@
     <div v-if="!linkSent" key="form">
       <!-- Lock icon -->
       <div
-        class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100"
+        class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-900/30"
       >
-        <LockClosedIcon class="h-6 w-6 text-indigo-600" aria-hidden="true" />
+        <LockClosedIcon
+          class="h-6 w-6 text-indigo-600 dark:text-indigo-400"
+          aria-hidden="true"
+        />
       </div>
 
       <!-- Header -->
       <div class="mt-6 text-center">
-        <h2 class="text-2xl font-bold leading-9 tracking-tight text-gray-900">
+        <h2
+          class="text-2xl font-bold leading-9 tracking-tight text-gray-900 dark:text-white"
+        >
           Sign in to your account
         </h2>
-        <p class="mt-2 text-sm text-gray-600">
+        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
           Enter your email address and we'll send you a secure magic link to
           sign in
         </p>
@@ -32,7 +37,7 @@
         <div>
           <label
             for="email"
-            class="block text-sm font-medium leading-6 text-gray-900"
+            class="block text-sm font-medium leading-6 text-gray-900 dark:text-white"
           >
             Email address
           </label>
@@ -45,12 +50,15 @@
               autocomplete="email"
               required
               placeholder="Enter your email address"
-              class="block w-full rounded-md border-0 py-2.5 pl-3 pr-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              class="block w-full rounded-md border-0 py-2.5 pl-3 pr-10 text-gray-900 dark:text-white dark:bg-white/5 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-white/10 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:focus:ring-indigo-500 sm:text-sm sm:leading-6"
             />
             <div
               class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3"
             >
-              <AtSymbolIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
+              <AtSymbolIcon
+                class="h-5 w-5 text-gray-400 dark:text-gray-500"
+                aria-hidden="true"
+              />
             </div>
           </div>
         </div>
@@ -59,7 +67,7 @@
           <button
             type="submit"
             :disabled="isLoading || !email"
-            class="flex w-full justify-center items-center gap-2 rounded-md bg-indigo-600 px-3 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            class="flex w-full justify-center items-center gap-2 rounded-md bg-indigo-600 dark:bg-indigo-500 px-3 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 dark:hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:focus-visible:outline-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <span v-if="!isLoading">
               <PaperAirplaneIcon class="h-4 w-4" aria-hidden="true" />
@@ -93,17 +101,20 @@
       <div class="mt-6">
         <div class="relative">
           <div class="absolute inset-0 flex items-center">
-            <div class="w-full border-t border-gray-300" />
+            <div class="w-full border-t border-gray-300 dark:border-gray-700" />
           </div>
           <div class="relative flex justify-center text-sm">
-            <span class="bg-white px-2 text-gray-500">Or continue with</span>
+            <span
+              class="bg-white dark:bg-gray-900 px-2 text-gray-500 dark:text-gray-400"
+              >Or continue with</span
+            >
           </div>
         </div>
 
         <div class="mt-6 grid grid-cols-2 gap-3">
           <button
             disabled
-            class="flex w-full items-center justify-center gap-3 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:ring-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+            class="flex w-full items-center justify-center gap-3 rounded-md bg-white dark:bg-white/5 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-white/10 hover:bg-gray-50 dark:hover:bg-white/10 focus-visible:ring-transparent disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <svg class="h-5 w-5" viewBox="0 0 24 24">
               <path
@@ -128,7 +139,7 @@
 
           <button
             disabled
-            class="flex w-full items-center justify-center gap-3 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:ring-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+            class="flex w-full items-center justify-center gap-3 rounded-md bg-white dark:bg-white/5 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-white/10 hover:bg-gray-50 dark:hover:bg-white/10 focus-visible:ring-transparent disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
               <path
@@ -145,27 +156,34 @@
     <div v-else key="success">
       <!-- Inbox icon -->
       <div
-        class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-blue-100"
+        class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30"
       >
-        <InboxIcon class="h-8 w-8 text-blue-600" aria-hidden="true" />
+        <InboxIcon
+          class="h-8 w-8 text-blue-600 dark:text-blue-400"
+          aria-hidden="true"
+        />
       </div>
 
       <!-- Main content -->
       <div class="mt-6 text-center">
-        <h3 class="text-lg font-semibold text-gray-900">Check your inbox!</h3>
-        <p class="mt-3 text-sm text-gray-600">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+          Check your inbox!
+        </h3>
+        <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">
           We've sent a secure login link to
-          <span class="font-medium">{{ email }}</span
+          <span class="font-medium text-gray-900 dark:text-white">{{
+            email
+          }}</span
           >. Click the link in the email to sign in to your account.
         </p>
       </div>
 
       <!-- Additional help -->
       <div class="mt-6 text-center">
-        <p class="text-xs text-gray-500">
+        <p class="text-xs text-gray-500 dark:text-gray-400">
           Didn't receive the email? Check your spam folder or
           <button
-            class="font-medium text-indigo-600 hover:text-indigo-500"
+            class="font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300"
             @click="goBack"
           >
             try again
@@ -174,13 +192,16 @@
       </div>
 
       <!-- Security note -->
-      <div class="mt-6 rounded-md bg-gray-50 p-4">
+      <div class="mt-6 rounded-md bg-gray-50 dark:bg-white/5 p-4">
         <div class="flex">
           <div class="flex-shrink-0">
-            <LockClosedIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
+            <LockClosedIcon
+              class="h-5 w-5 text-gray-400 dark:text-gray-500"
+              aria-hidden="true"
+            />
           </div>
           <div class="ml-3">
-            <p class="text-xs text-gray-600">
+            <p class="text-xs text-gray-600 dark:text-gray-400">
               This link will expire in 20 minutes for security purposes. If you
               don't use it within that time, you'll need to request a new one.
             </p>
@@ -191,7 +212,7 @@
       <!-- Back to form -->
       <div class="mt-8">
         <button
-          class="flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline-offset-0"
+          class="flex w-full justify-center rounded-md bg-white dark:bg-white/5 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-white/10 hover:bg-gray-50 dark:hover:bg-white/10 focus-visible:outline-offset-0"
           @click="goBack"
         >
           <ArrowLeftIcon class="mr-2 h-4 w-4" aria-hidden="true" />

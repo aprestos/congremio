@@ -62,10 +62,10 @@
 
   /* Set background color for body and html to match theme */
   html {
-    @apply bg-white dark:bg-gray-950;
+    @apply bg-white dark:bg-gray-900;
   }
 
   body {
-    @apply bg-white dark:bg-gray-950;
+    @apply bg-white dark:bg-gray-900;
   }
 }

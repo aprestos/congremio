@@ -89,7 +89,7 @@ const sponsors: Array<Record<string, string>> = []
 </script>
 
 <template>
-  <div class="bg-white dark:bg-gray-900">
+  <div class="min-h-screen">
     <!-- Hero section -->
     <div class="relative isolate overflow-hidden">
       <svg
