@@ -1,17 +1,24 @@
 <template>
   <div
-    class="flex bg-gray-100 min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8"
+    class="min-h-screen flex flex-col justify-center px-6 py-12 lg:px-8 bg-white dark:bg-gray-900"
   >
+    <div class="mb-10">
+      <img
+        class="dark:hidden mx-auto h-10 w-auto"
+        src="@/assets/logo-horizontal-color.svg"
+        alt="congrem.io"
+      />
+      <img
+        class="hidden dark:block mx-auto h-10 w-auto"
+        src="@/assets/logo-horizontal-white.svg"
+        alt="congrem.io"
+      />
+    </div>
     <!-- Logo outside the card -->
-    <img
-      class="mx-auto h-10 w-auto"
-      src="@/assets/logo-horizontal-color.svg"
-      alt="Your Company"
-    />
 
-    <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-md">
+    <div class="sm:mx-auto sm:w-full sm:max-w-md">
       <div
-        class="bg-white px-6 py-8 shadow-sm ring-1 ring-gray-900/5 sm:rounded-lg sm:px-8"
+        class="md:px-6 py-8 md:shadow-sm md:ring-1 md:ring-gray-900/5 dark:ring-white/10 sm:rounded-lg sm:px-8"
       >
         <!-- Content Slot -->
         <router-view />

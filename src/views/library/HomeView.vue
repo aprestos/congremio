@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white dark:bg-gray-900">
+  <div class="bg-white dark:bg-gray-900 pb-32">
     <div>
       <!-- Mobile filter dialog -->
       <TransitionRoot as="template" :show="mobileFiltersOpen">
@@ -186,7 +186,7 @@
             </div>
           </div>
 
-          <div class="flex items-center">
+          <div class="hidden flex items-center">
             <Listbox v-model="selectedSort">
               <div class="relative">
                 <ListboxButton
@@ -383,7 +383,7 @@
 
     <!-- Sticky bottom container -->
     <div
-      class="sticky bottom-0 left-0 right-0 p-4 flex items-center justify-center"
+      class="fixed bottom-0 left-0 right-0 p-4 flex items-center justify-center"
     >
       <ReservationList />
     </div>

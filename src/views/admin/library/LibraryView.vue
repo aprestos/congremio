@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col h-full">
+  <div class="flex flex-col min-h-screen">
     <DataTable
       :items="filteredGames"
       :columns="tableColumns"
@@ -127,14 +127,13 @@
 
   <!-- Floating Add Button -->
   <div
-    class="group fixed bottom-5 lg:bottom-0 right-0 flex items-end justify-end w-24 h-24"
+    class="group fixed bottom-0 right-0 flex items-end justify-end w-24 h-24 p-1"
   >
     <button
-      class="z-50 bg-opacity-10 backdrop-blur-2xl rounded-full text-nowrap absolute shadow-xl mr-4 mb-4 py-4 px-6 font-semibold bg-slate-500/10 dark:bg-slate-600 text-slate-50 hover:bg-slate-700 dark:hover:bg-slate-700 transition-colors"
+      class="z-50 bg-black/10 backdrop-blur-lg rounded-full text-nowrap absolute shadow-xl mr-4 mb-4 py-4 px-4 font-semibold dark:bg-slate-600 text-gray-600 hover:bg-slate-700 dark:hover:bg-slate-700 transition-colors"
       @click="open = true"
     >
-      <PlusIcon class="size-6 inline-block" />
-      Add
+      <IconPlus stroke="2.5" class="size-6 inline-block" />
     </button>
   </div>
 
@@ -236,7 +235,7 @@
 </template>
 
 <script setup lang="ts">
-import { PlusIcon } from '@heroicons/vue/24/outline'
+import { IconPlus } from '@tabler/icons-vue'
 import { onMounted, onUnmounted, ref, computed, watch } from 'vue'
 import { useDebounceFn } from '@vueuse/core'
 import { toast } from 'vue-sonner'

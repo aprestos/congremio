@@ -8,7 +8,7 @@
         @scroll="handleScroll"
       >
         <slot name="header"> </slot>
-        <table class="w-full divide-y divide-gray-200 dark:divide-white/15">
+        <table class="w-full divide-y divide-gray-200 dark:divide-white/5">
           <!-- Table header -->
           <thead>
             <tr>
@@ -60,7 +60,7 @@
           </thead>
 
           <!-- Table body -->
-          <tbody class="divide-y divide-gray-200 dark:divide-white/10">
+          <tbody class="divide-y divide-gray-200 dark:divide-white/5">
             <!-- Data rows -->
             <tr
               v-for="(item, rowIndex) in displayedItems"

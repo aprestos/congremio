@@ -131,10 +131,10 @@ const backToSignIn = async (): Promise<void> => {
   <div v-if="isValidating" class="mt-6 text-center">
     <!-- Loading state -->
     <div
-      class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-indigo-100"
+      class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-900/30"
     >
       <svg
-        class="h-8 w-8 animate-spin text-indigo-600"
+        class="h-8 w-8 animate-spin text-indigo-600 dark:text-indigo-400"
         fill="none"
         viewBox="0 0 24 24"
       >
@@ -153,10 +153,10 @@ const backToSignIn = async (): Promise<void> => {
         />
       </svg>
     </div>
-    <h2 class="mt-6 text-lg font-semibold text-gray-900">
+    <h2 class="mt-6 text-lg font-semibold text-gray-900 dark:text-white">
       Confirming your sign-in...
     </h2>
-    <p class="mt-2 text-md text-gray-600">
+    <p class="mt-2 text-md text-gray-600 dark:text-gray-400">
       Please wait while we verify your authentication.
     </p>
   </div>
@@ -164,27 +164,32 @@ const backToSignIn = async (): Promise<void> => {
   <div v-else-if="isSuccess" class="mt-6 text-center">
     <!-- Success state -->
     <div
-      class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100"
+      class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30"
     >
-      <CheckIcon class="h-8 w-8 text-green-600" aria-hidden="true" />
+      <CheckIcon
+        class="h-8 w-8 text-green-600 dark:text-green-400"
+        aria-hidden="true"
+      />
     </div>
 
-    <h2 class="mt-6 text-lg font-semibold text-gray-900">Welcome back!</h2>
-    <p class="mt-2 text-md text-gray-600">
+    <h2 class="mt-6 text-lg font-semibold text-gray-900 dark:text-white">
+      Welcome back!
+    </h2>
+    <p class="mt-2 text-md text-gray-600 dark:text-gray-400">
       You have been successfully signed in to your account.
     </p>
 
     <!-- Countdown and redirect info -->
-    <div class="mt-8 rounded-md bg-green-50 p-4">
+    <div class="mt-8 rounded-md bg-green-50 dark:bg-green-900/20 p-4">
       <div class="flex">
         <div class="flex-shrink-0">
           <InformationCircleIcon
-            class="h-5 w-5 text-green-400"
+            class="h-5 w-5 text-green-400 dark:text-green-500"
             aria-hidden="true"
           />
         </div>
         <div class="ml-3">
-          <p class="text-sm text-green-800">
+          <p class="text-sm text-green-800 dark:text-green-300">
             Redirecting you to the home page in {{ countdown }} seconds...
           </p>
         </div>
@@ -194,7 +199,7 @@ const backToSignIn = async (): Promise<void> => {
     <!-- Manual redirect button -->
     <div class="mt-6">
       <button
-        class="flex w-full justify-center items-center gap-2 rounded-md bg-indigo-600 px-3 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+        class="flex w-full justify-center items-center gap-2 rounded-md bg-indigo-600 dark:bg-indigo-500 px-3 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 dark:hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:focus-visible:outline-indigo-500"
         @click="redirectToHome"
       >
         <ArrowRightIcon class="h-4 w-4" aria-hidden="true" />
@@ -206,13 +211,18 @@ const backToSignIn = async (): Promise<void> => {
   <div v-else-if="needsDisplayName" class="mt-6 text-center">
     <!-- Display Name required state -->
     <div
-      class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-yellow-100"
+      class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-yellow-100 dark:bg-yellow-900/30"
     >
-      <UserIcon class="h-8 w-8 text-yellow-600" aria-hidden="true" />
+      <UserIcon
+        class="h-8 w-8 text-yellow-600 dark:text-yellow-400"
+        aria-hidden="true"
+      />
     </div>
 
-    <h2 class="mt-6 text-lg font-semibold text-gray-900">Almost there!</h2>
-    <p class="mt-2 text-md text-gray-600">
+    <h2 class="mt-6 text-lg font-semibold text-gray-900 dark:text-white">
+      Almost there!
+    </h2>
+    <p class="mt-2 text-md text-gray-600 dark:text-gray-400">
       Please provide a display name to complete your profile.
     </p>
 
@@ -230,7 +240,7 @@ const backToSignIn = async (): Promise<void> => {
 
     <div class="mt-6">
       <button
-        class="flex w-full justify-center items-center gap-2 rounded-md bg-indigo-600 px-3 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+        class="flex w-full justify-center items-center gap-2 rounded-md bg-indigo-600 dark:bg-indigo-500 px-3 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 dark:hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:focus-visible:outline-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
         :disabled="isUpdatingDisplayName"
         @click="updateDisplayName"
       >
@@ -244,27 +254,33 @@ const backToSignIn = async (): Promise<void> => {
   <div v-else class="mt-6 text-center">
     <!-- Error state -->
     <div
-      class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-100"
+      class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30"
     >
-      <XMarkIcon class="h-8 w-8 text-red-600" aria-hidden="true" />
+      <XMarkIcon
+        class="h-8 w-8 text-red-600 dark:text-red-400"
+        aria-hidden="true"
+      />
     </div>
 
-    <h2 class="mt-6 text-lg font-semibold text-gray-900">
+    <h2 class="mt-6 text-lg font-semibold text-gray-900 dark:text-white">
       Authentication failed
     </h2>
-    <p class="mt-2 text-sm text-gray-600">
+    <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
       We couldn't verify your sign-in. The link may have expired or been used
       already.
     </p>
 
     <!-- Error details -->
-    <div class="mt-8 rounded-md bg-red-50 p-4">
+    <div class="mt-8 rounded-md bg-red-50 dark:bg-red-900/20 p-4">
       <div class="flex">
         <div class="flex-shrink-0">
-          <XMarkIcon class="h-5 w-5 text-red-400" aria-hidden="true" />
+          <XMarkIcon
+            class="h-5 w-5 text-red-400 dark:text-red-500"
+            aria-hidden="true"
+          />
         </div>
         <div class="ml-3">
-          <p class="text-sm text-red-800">
+          <p class="text-sm text-red-800 dark:text-red-300">
             {{ errorMessage }}
           </p>
         </div>
@@ -274,7 +290,7 @@ const backToSignIn = async (): Promise<void> => {
     <!-- Back to sign in button -->
     <div class="mt-6">
       <button
-        class="flex w-full justify-center items-center gap-2 rounded-md bg-white px-3 py-2.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus-visible:outline-offset-0"
+        class="flex w-full justify-center items-center gap-2 rounded-md bg-white dark:bg-white/5 px-3 py-2.5 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-white/10 hover:bg-gray-50 dark:hover:bg-white/10 focus-visible:outline-offset-0"
         @click="backToSignIn"
       >
         <ArrowLeftIcon class="h-4 w-4" aria-hidden="true" />

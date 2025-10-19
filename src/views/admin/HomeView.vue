@@ -8,9 +8,7 @@
     @close="sidebarOpen = false"
   />
 
-  <div
-    class="lg:pl-72 bg-white dark:bg-gray-900 dark:border-white/5 h-screen flex flex-col"
-  >
+  <div class="lg:pl-72 dark:border-white/5 min-h-screen flex flex-col">
     <div class="flex-1 overflow-auto min-h-0">
       <router-view />
     </div>
