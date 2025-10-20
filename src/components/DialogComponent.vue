@@ -18,19 +18,19 @@
 
         <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
           <div
-            class="flex min-h-full justify-center text-center items-center sm:p-0 p-0"
+            class="flex min-h-full justify-center text-center items-end sm:items-center sm:p-0"
           >
             <TransitionChild
               as="template"
               enter="ease-out duration-300"
-              enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+              enter-from="opacity-0 translate-y-full sm:translate-y-0 sm:scale-95"
               enter-to="opacity-100 translate-y-0 sm:scale-100"
               leave="ease-in duration-200"
               leave-from="opacity-100 translate-y-0 sm:scale-100"
-              leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+              leave-to="opacity-0 translate-y-full sm:translate-y-0 sm:scale-95"
             >
               <DialogPanel
-                class="relative transform overflow-visible rounded-none sm:rounded-lg bg-white dark:bg-gray-800 text-left shadow-2xl transition-all w-full h-full sm:h-auto sm:my-8 sm:max-w-lg"
+                class="relative transform overflow-y-auto max-h-full w-full sm:h-auto sm:w-auto sm:rounded-lg bg-white dark:bg-gray-800 text-left shadow-2xl transition-all sm:my-8 sm:max-w-lg sm:overflow-visible"
               >
                 <div class="px-4 py-5 sm:px-6">
                   <div
