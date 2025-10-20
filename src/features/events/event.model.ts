@@ -8,4 +8,5 @@ export interface Edition {
     title?: string
     url?: string
   }
+  poster_url?: string
 }

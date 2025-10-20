@@ -8,8 +8,10 @@ import { useHead } from '@unhead/vue'
 import { tenantStore } from './stores/tenant'
 import { useFavicon } from '@vueuse/core'
 
-const icon = useFavicon()
-icon.value = tenantStore?.value?.logo || 'assets/logoipsum-381.svg'
+if (tenantStore?.value?.logo) {
+  const icon = useFavicon()
+  icon.value = tenantStore?.value?.logo
+}
 
 useHead({
   title: tenantStore.value?.name || 'congrem.io',

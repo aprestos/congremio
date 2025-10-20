@@ -25,7 +25,6 @@ const settings = computed(() => settingsStore.value)
 const formatDate = (dateString: string | undefined) => {
   if (!dateString) return 'TBA'
   return new Date(dateString).toLocaleDateString('en-US', {
-    year: 'numeric',
     month: 'long',
     day: 'numeric',
   })
@@ -309,6 +308,26 @@ const sponsors: Array<Record<string, string>> = []
           >
             {{ stat.value }}
           </dd>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edition Poster Section -->
+    <div
+      v-if="edition?.poster_url"
+      class="mx-auto mt-16 max-w-7xl px-6 lg:px-8"
+    >
+      <div
+        class="relative overflow-hidden rounded-2xl bg-gray-50 dark:bg-gray-800/50 p-8 shadow-lg"
+      >
+        <div
+          class="aspect-[3/4] max-w-2xl mx-auto w-full overflow-hidden rounded-xl"
+        >
+          <img
+            :src="edition?.poster_url"
+            :alt="`${edition?.name} poster`"
+            class="size-full object-cover object-center"
+          />
         </div>
       </div>
     </div>
