@@ -67,6 +67,67 @@
           :rows="6"
           class="sm:col-span-6"
         />
+
+        <!-- Poster Upload -->
+        <div class="sm:col-span-6">
+          <label
+            class="block text-sm font-medium text-gray-900 dark:text-white mb-2"
+          >
+            Poster
+          </label>
+          <div class="flex items-center gap-x-8">
+            <img
+              v-if="posterPreview"
+              :src="posterPreview"
+              alt="Edition poster"
+              class="h-32 w-24 flex-none rounded-lg bg-gray-100 object-cover outline -outline-offset-1 outline-black/5 dark:bg-gray-800 dark:outline-white/10"
+            />
+            <div
+              v-else
+              class="h-32 w-24 flex-none rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center outline -outline-offset-1 outline-black/5 dark:outline-white/10"
+            >
+              <span class="text-gray-400 dark:text-gray-600 text-sm"
+                >No poster</span
+              >
+            </div>
+            <div>
+              <CButton
+                variant="secondary"
+                @click="showPosterUploadDialog = true"
+              >
+                Change poster
+              </CButton>
+              <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                JPG, PNG, GIF or WebP. Recommended size: 800x600px. Max file
+                size: 10MB.
+              </p>
+              <FilePondUploadDialog
+                :open="showPosterUploadDialog"
+                title="Upload Poster"
+                description="Select a poster image for your edition (max 10MB)"
+                :allow-multiple="false"
+                :accepted-file-types="[
+                  'image/jpeg',
+                  'image/png',
+                  'image/gif',
+                  'image/webp',
+                ]"
+                max-file-size="10MB"
+                :max-files="1"
+                supabase-bucket="images"
+                :supabase-path="posterFolder"
+                file-naming-strategy="uuid"
+                :supabase-options="{
+                  cacheControl: '31536000',
+                  upsert: false,
+                }"
+                @close="showPosterUploadDialog = false"
+                @upload-success="handlePosterUploadSuccess"
+                @upload-error="handlePosterUploadError"
+              />
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Schedule Configuration -->
@@ -178,12 +239,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted, computed } from 'vue'
 import { toast } from 'vue-sonner'
 import CButton from '@/components/CButton.vue'
 import CInput from '@/components/CInput.vue'
 import CTextArea from '@/components/CTextArea.vue'
 import SettingsSection from '@/components/SettingsSection.vue'
+import FilePondUploadDialog from '@/components/FilePondUploadDialog.vue'
 import { editionService } from '@/features/events/service.ts'
 import { tenantStore } from '@/stores/tenant.ts'
 import { eventStore } from '@/stores/edition.ts'
@@ -205,6 +267,7 @@ const formData = ref({
   locationUrl: '',
   description: '',
   longDescription: '',
+  poster: '',
   useSpecificSchedule: false,
   generalSchedule: {
     opening: '09:00',
@@ -214,6 +277,59 @@ const formData = ref({
 
 // Generate daily schedules based on date range
 const dailySchedules = ref<DailySchedule[]>([])
+const posterPreview = ref<string | null>(null)
+const showPosterUploadDialog = ref(false)
+
+// Computed folder path for poster uploads
+const posterFolder = computed((): string => {
+  const tenantId = tenantStore.value?.id
+  return tenantId ? `tenants/${tenantId}/posters` : 'tenants/default/posters'
+})
+
+// Handle poster upload success
+const handlePosterUploadSuccess = (urls: string | string[]): void => {
+  showPosterUploadDialog.value = false
+  const url = Array.isArray(urls) ? urls[0] : urls
+  posterPreview.value = url
+  formData.value.poster = url
+  console.log('Poster uploaded successfully:', url)
+  toast.success('Poster uploaded successfully!')
+}
+
+// Handle poster upload error
+const handlePosterUploadError = (error: any): void => {
+  console.error('Poster upload failed:', error)
+  toast.error('Failed to upload poster. Please try again.')
+}
+
+// Load initial data from eventStore
+onMounted(() => {
+  if (eventStore.value) {
+    // Format dates to YYYY-MM-DD for input type="date"
+    if (eventStore.value.start_date) {
+      formData.value.startDate = eventStore.value.start_date.split('T')[0]
+    }
+    if (eventStore.value.end_date) {
+      formData.value.endDate = eventStore.value.end_date.split('T')[0]
+    }
+    if (eventStore.value.name) {
+      formData.value.name = eventStore.value.name
+    }
+    if (eventStore.value.location?.title) {
+      formData.value.locationTitle = eventStore.value.location.title
+    }
+    if (eventStore.value.location?.url) {
+      formData.value.locationUrl = eventStore.value.location.url
+    }
+    if (eventStore.value.description) {
+      formData.value.description = eventStore.value.description
+    }
+    if (eventStore.value.poster_url) {
+      formData.value.poster = eventStore.value.poster_url
+      posterPreview.value = eventStore.value.poster_url
+    }
+  }
+})
 
 // Watch for date changes to regenerate daily schedules
 watch(
@@ -273,11 +389,39 @@ const saveEdition = async (): Promise<void> => {
     await editionService.save(tenantStore.value?.id, eventStore.value?.id, {
       ...(editionData.startDate && { start_date: editionData.startDate }),
       ...(editionData.endDate && { end_date: editionData.endDate }),
+      ...(editionData.name && { name: editionData.name }),
+      ...(editionData.description && { description: editionData.description }),
+      ...(editionData.longDescription && {
+        long_description: editionData.longDescription,
+      }),
+      ...(editionData.poster && { poster_url: editionData.poster }),
       location: {
         title: editionData.locationTitle,
         url: editionData.locationUrl,
       },
     })
+
+    // Update eventStore with new values
+    if (eventStore.value) {
+      eventStore.value = {
+        ...eventStore.value,
+        ...(editionData.startDate && { start_date: editionData.startDate }),
+        ...(editionData.endDate && { end_date: editionData.endDate }),
+        ...(editionData.name && { name: editionData.name }),
+        ...(editionData.description && {
+          description: editionData.description,
+        }),
+        ...(editionData.longDescription && {
+          long_description: editionData.longDescription,
+        }),
+        ...(editionData.poster && { poster: editionData.poster }),
+        location: {
+          title: editionData.locationTitle,
+          url: editionData.locationUrl,
+        },
+      }
+    }
+
     console.log('Edition settings saved successfully:', editionData)
     toast.success('Edition settings saved successfully!')
   } catch (error) {
