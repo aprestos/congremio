@@ -210,7 +210,7 @@ const submit = async (): Promise<void> => {
 
   try {
     // Call the withdraw service
-    await libraryWithdrawService.post(
+    await libraryWithdrawService.create(
       props.game?.id as number,
       data.selectedUser,
     )

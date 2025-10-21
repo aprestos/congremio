@@ -128,7 +128,6 @@ watch(
               class="size-12 rounded-full bg-gray-200 dark:bg-gray-700 shrink-0"
             ></div>
             <div class="flex-1 space-y-2">
-              <div class="h-3 bg-gray-200 dark:bg-gray-700 rounded w-20"></div>
               <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-32"></div>
               <div class="h-3 bg-gray-200 dark:bg-gray-700 rounded w-28"></div>
             </div>

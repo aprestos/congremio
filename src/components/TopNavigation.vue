@@ -66,11 +66,11 @@
                   <MenuButton
                     class="flex items-center rounded-full hover:ring-2 hover:ring-gray-300 dark:hover:ring-gray-600 transition-all"
                   >
-                    <img
-                      class="h-8 w-8 rounded-full bg-gray-300 object-cover"
-                      src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                      alt="Profile picture"
-                    />
+                    <div
+                      class="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-600 text-white text-sm font-semibold"
+                    >
+                      {{ userInitial }}
+                    </div>
                   </MenuButton>
 
                   <transition
@@ -125,7 +125,7 @@ import {
   PopoverGroup,
 } from '@headlessui/vue'
 import { CogIcon } from '@heroicons/vue/24/outline'
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 
 import { authService } from '@/features/auth/service.ts'
 import { tenantStore } from '@/stores/tenant.ts'
@@ -135,6 +135,11 @@ import { RouteNames } from '@/router/routeNames'
 const userEmail = ref<string | null>(null)
 const isStaffOrAdmin = ref(false)
 const isAuthenticated = ref(false)
+
+const userInitial = computed(() => {
+  if (!userEmail.value) return '?'
+  return userEmail.value.charAt(0).toUpperCase()
+})
 
 // Load user email and check admin role on component mount
 onMounted(async () => {

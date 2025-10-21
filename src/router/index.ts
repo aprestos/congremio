@@ -5,7 +5,7 @@ import {
   requiresStaff,
 } from '@/router/guards'
 import { RouteNames } from '@/router/routeNames.ts'
-import HomeView from '../views/HomeView.vue'
+import HomeView from '../views/public/HomeView.vue'
 
 // Extend Vue Router's RouteMeta interface
 declare module 'vue-router' {
@@ -22,7 +22,7 @@ const router = createRouter({
     {
       path: '',
       name: RouteNames.public.home,
-      component: () => import('../views/LandingView.vue'),
+      component: () => import('../views/public/LandingView.vue'),
     },
     {
       path: '',
@@ -31,17 +31,17 @@ const router = createRouter({
         {
           path: 'library',
           name: RouteNames.public.library,
-          component: () => import('../views/library/HomeView.vue'),
+          component: () => import('@/views/public/library/HomeView.vue'),
         },
         {
           path: 'flee-market',
           name: RouteNames.public.fleeMarket,
-          component: () => import('../views/flee-market/HomeView.vue'),
+          component: () => import('@/views/public/flee-market/HomeView.vue'),
         },
         {
           path: 'tournaments',
           name: RouteNames.public.tournaments,
-          component: () => import('../views/flee-market/HomeView.vue'),
+          component: () => import('@/views/public/flee-market/HomeView.vue'),
         },
       ],
     },

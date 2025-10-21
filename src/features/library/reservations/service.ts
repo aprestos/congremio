@@ -2,12 +2,13 @@ import { authService } from '@/features/auth/service'
 import { supabase } from '@/lib/supabase.ts'
 import { eventStore } from '@/stores/edition'
 import { tenantStore } from '@/stores/tenant.ts'
+import type { LibraryGame } from '@/features/library/game.model.ts'
 
 export interface LibraryReservation {
   tenant_id: string
   edition_id: string
   id: number
-  library_game: unknown
+  library_game: Partial<LibraryGame>
   display_id: number
   user_id: string
   expires_at: string
@@ -24,7 +25,7 @@ export const libraryReservationService = {
       const result = await supabase
         .from('library_reservations')
         .select(
-          'id,display_id,expires_at,library_game:library_games(game:games(name))',
+          'id,display_id,user_id,expires_at,library_game:library_games(id,game:games(name))',
         )
         .eq('tenant_id', tenantStore.value?.id)
         .eq('edition_id', eventStore.value?.id)
@@ -33,7 +34,7 @@ export const libraryReservationService = {
         .single()
 
       console.log(result.data)
-      return result.data as LibraryReservation
+      return result.data as unknown as LibraryReservation
     } catch (error) {
       console.error((error as Error).message)
       return undefined
@@ -48,7 +49,7 @@ export const libraryReservationService = {
       const result = await supabase
         .from('library_reservations')
         .select(
-          'id,display_id,expires_at,library_game:library_games(game:games(name))',
+          'id,display_id,expires_at,user_id,library_game:library_games(game:games(name,year,image))',
         )
         .eq('tenant_id', tenantStore.value?.id)
         .eq('edition_id', eventStore.value?.id)
@@ -56,7 +57,7 @@ export const libraryReservationService = {
         .gt('expires_at', now)
 
       console.log(result.data)
-      return result.data as LibraryReservation[]
+      return result.data as unknown as LibraryReservation[]
     } catch (error) {
       console.error((error as Error).message)
       return []

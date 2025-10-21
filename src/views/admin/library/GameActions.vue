@@ -15,6 +15,7 @@ import {
   IconDotsVertical,
 } from '@tabler/icons-vue'
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue'
+import { computed } from 'vue'
 // Use function overload signatures for defineEmits so we can have optional userId for withdraw-game
 const emit = defineEmits<{
   (e: 'update-game', id: number, game: Partial<LibraryGame>): void
@@ -32,13 +33,17 @@ const updateStatus = (status: LibraryGameStatus): void => {
   const updatedGame: Partial<LibraryGame> = { status }
   emit('update-game', props.data.id, updatedGame)
 }
+
+const gameStatus = computed(() => {
+  return getStatus(props.data)
+})
 </script>
 
 <template>
   <div class="text-right">
     <span class="inline-flex rounded-md shadow-xs dark:shadow-none">
       <button
-        v-show="getStatus(props.data) === 'withdrawn'"
+        v-show="gameStatus === 'withdrawn' || gameStatus === 'reserved'"
         type="button"
         class="relative inline-flex items-center gap-x-1.5 rounded-l-md bg-gray-100 px-4 py-3 md:px-3 md:py-2 text-sm font-semibold shadow-xs text-gray-600 dark:text-gray-200 ring-1 ring-gray-300 ring-inset hover:bg-gray-200 dark:bg-white/10 dark:ring-gray-700 dark:hover:bg-white/20"
         @click="emit('return-game', props.data)"
@@ -47,7 +52,7 @@ const updateStatus = (status: LibraryGameStatus): void => {
         <span class="hidden md:inline">Return</span>
       </button>
       <button
-        v-show="getStatus(props.data) === 'available'"
+        v-show="gameStatus === 'available'"
         type="button"
         class="relative inline-flex items-center gap-x-1.5 rounded-l-md bg-gray-100 px-4 py-3 md:px-3 md:py-2 text-sm font-semibold shadow-xs text-gray-600 dark:text-gray-200 ring-1 ring-gray-300 ring-inset hover:bg-gray-200 dark:bg-white/10 dark:ring-gray-700 dark:hover:bg-white/20"
         @click="emit('withdraw-game', props.data)"
@@ -57,7 +62,10 @@ const updateStatus = (status: LibraryGameStatus): void => {
       </button>
       <Menu as="div" class="relative inline-block">
         <MenuButton
-          class="inline-flex w-full justify-center -ml-px gap-x-1.5 rounded-r-md ring-1 ring-gray-300 ring-inset bg-gray-100 px-4 py-3 md:px-3 md:py-2 text-sm font-semibold text-gray-900 shadow-xs inset-ring-1 inset-ring-gray-300 hover:bg-gray-50 dark:bg-white/10 dark:ring-gray-700 dark:text-white dark:shadow-none dark:inset-ring-white/5 dark:hover:bg-white/20"
+          :class="[
+            gameStatus === 'not-available' ? 'rounded-md ' : 'rounded-r-md',
+            'inline-flex ring-1 w-full justify-center -ml-px gap-x-1.5 bg-gray-100 px-4 py-3 md:px-3 md:py-2 text-sm font-semibold text-gray-900 shadow-xs  hover:bg-gray-50 dark:bg-white/10  dark:text-white dark:shadow-none  dark:hover:bg-white/20 ring-gray-300 ring-inset inset-ring-1 inset-ring-gray-300 dark:ring-gray-700 dark:inset-ring-white/5',
+          ]"
         >
           <IconDotsVertical class="size-5" />
         </MenuButton>

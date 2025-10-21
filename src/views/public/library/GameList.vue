@@ -8,7 +8,7 @@ import {
 import GameDetail from './GameDetail.vue'
 import GameItem from './GameItem.vue'
 import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
-import libraryReservationService from '@/features/library/reservations/service'
+import libraryReservationService from '@/features/library/reservations/service.ts'
 import { toast } from 'vue-sonner'
 
 const allGames = ref<LibraryGame[]>([])

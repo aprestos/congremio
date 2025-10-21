@@ -30,7 +30,7 @@ export const libraryWithdrawService = {
     }
   },
 
-  async post(libraryGameId: number, userId: string): Promise<void> {
+  async create(libraryGameId: number, userId: string): Promise<void> {
     const { error } = await supabase.from('library_withdraws').insert({
       tenant_id: tenantStore.value?.id,
       edition_id: eventStore.value?.id,

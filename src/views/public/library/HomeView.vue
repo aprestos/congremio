@@ -1,5 +1,5 @@
 <template>
-  <div class="pb-64">
+  <div class="pb-32">
     <div>
       <!-- Mobile filter dialog -->
       <TransitionRoot as="template" :show="mobileFiltersOpen">
@@ -383,7 +383,7 @@
 
     <!-- Sticky bottom container -->
     <div
-      class="fixed bottom-0 left-0 right-0 p-4 flex items-center justify-center"
+      class="fixed bottom-0 left-0 right-0 p-2 flex items-center justify-center"
     >
       <ReservationList />
     </div>
@@ -394,8 +394,8 @@
 import { ref, computed } from 'vue'
 import { IconPlayCard2Filled } from '@tabler/icons-vue'
 import { MagnifyingGlassIcon } from '@heroicons/vue/24/outline'
-import GameList from '@/views/library/GameList.vue'
-import ReservationList from '@/views/library/ReservationList.vue'
+import GameList from '@/views/public/library/GameList.vue'
+import ReservationList from '@/views/public/library/ReservationList.vue'
 import type { FilterOptions } from '@/features/library/service.ts'
 import {
   Dialog,
