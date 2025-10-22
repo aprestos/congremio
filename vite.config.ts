@@ -13,8 +13,10 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  css: {
+    lightningcss: false, // ⛔ prevent Vite/Tailwind from trying to use lightningcss
+  },
   build: {
-    // Use esbuild for faster builds
     minify: 'esbuild',
   },
 })
