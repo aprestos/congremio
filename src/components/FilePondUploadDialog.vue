@@ -158,16 +158,14 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 // Emits interface
-interface Emits {
-  (e: 'close'): void
-  (e: 'upload-success', urls: string | string[]): void
-  (e: 'upload-error', error: unknown): void
-  (e: 'file-added', file: unknown): void
-  (e: 'file-removed', file: unknown): void
-  (e: 'file-error', error: unknown): void
-}
-
-const emit = defineEmits<Emits>()
+const emit = defineEmits<{
+  close: []
+  'upload-success': [urls: string[]]
+  'upload-error': [error: unknown]
+  'file-added': [file: unknown]
+  'file-removed': [file: unknown]
+  'file-error': [error: unknown]
+}>()
 
 // Reactive data
 const hasFiles = ref(false)
@@ -248,12 +246,7 @@ const uploadFiles = async (files: File[]): Promise<void> => {
         .map((r) => r.publicUrl)
         .filter(Boolean) as string[]
 
-      if (props.allowMultiple) {
-        emit('upload-success', urls)
-      } else {
-        // For single file uploads, emit just the URL string
-        emit('upload-success', urls[0])
-      }
+      emit('upload-success', urls)
 
       // Close dialog after successful upload
       handleClose()

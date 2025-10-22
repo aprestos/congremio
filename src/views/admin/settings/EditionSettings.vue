@@ -287,13 +287,15 @@ const posterFolder = computed((): string => {
 })
 
 // Handle poster upload success
-const handlePosterUploadSuccess = (urls: string | string[]): void => {
+const handlePosterUploadSuccess = (urls: string[]): void => {
   showPosterUploadDialog.value = false
-  const url = Array.isArray(urls) ? urls[0] : urls
-  posterPreview.value = url
-  formData.value.poster = url
-  console.log('Poster uploaded successfully:', url)
-  toast.success('Poster uploaded successfully!')
+  const url = urls[0]
+  if (url) {
+    posterPreview.value = url
+    formData.value.poster = url
+    console.log('Poster uploaded successfully:', url)
+    toast.success('Poster uploaded successfully!')
+  }
 }
 
 // Handle poster upload error
@@ -307,10 +309,10 @@ onMounted(() => {
   if (eventStore.value) {
     // Format dates to YYYY-MM-DD for input type="date"
     if (eventStore.value.start_date) {
-      formData.value.startDate = eventStore.value.start_date.split('T')[0]
+      formData.value.startDate = eventStore.value.start_date.split('T')[0] ?? ''
     }
     if (eventStore.value.end_date) {
-      formData.value.endDate = eventStore.value.end_date.split('T')[0]
+      formData.value.endDate = eventStore.value.end_date.split('T')[0] ?? ''
     }
     if (eventStore.value.name) {
       formData.value.name = eventStore.value.name
@@ -350,7 +352,7 @@ const generateDailySchedules = (startDate: string, endDate: string): void => {
 
   const currentDate = new Date(start)
   while (currentDate <= end) {
-    const dateStr = currentDate.toISOString().split('T')[0]
+    const dateStr = currentDate.toISOString().split('T')[0] ?? ''
     const dayName = currentDate.toLocaleDateString('en-US', { weekday: 'long' })
     const dateLabel = currentDate.toLocaleDateString('en-US', {
       month: 'short',
