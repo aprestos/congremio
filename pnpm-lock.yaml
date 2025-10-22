@@ -210,6 +210,16 @@ importers:
       vue-tsc:
         specifier: ^2.2.12
         version: 2.2.12(typescript@5.9.3)
+    optionalDependencies:
+      lightningcss-linux-arm64-musl:
+        specifier: ^1.30.2
+        version: 1.30.2
+      lightningcss-linux-x64-gnu:
+        specifier: ^1.30.2
+        version: 1.30.2
+      lightningcss-linux-x64-musl:
+        specifier: ^1.30.2
+        version: 1.30.2
 
 packages:
 
