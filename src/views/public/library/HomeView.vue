@@ -172,10 +172,7 @@
               <div
                 class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
               >
-                <MagnifyingGlassIcon
-                  class="h-6 w-6 text-gray-400"
-                  aria-hidden="true"
-                />
+                <IconSearch class="h-6 w-6 text-gray-400" aria-hidden="true" />
               </div>
               <input
                 v-model="searchQuery"
@@ -392,8 +389,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { IconPlayCard2Filled } from '@tabler/icons-vue'
-import { MagnifyingGlassIcon } from '@heroicons/vue/24/outline'
+import { IconPlayCard2Filled, IconSearch } from '@tabler/icons-vue'
 import GameList from '@/views/public/library/GameList.vue'
 import ReservationList from '@/views/public/library/ReservationList.vue'
 import type { FilterOptions } from '@/features/library/service.ts'

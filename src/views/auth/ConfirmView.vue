@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import {
-  ArrowLeftIcon,
-  ArrowRightIcon,
-  CheckIcon,
   InformationCircleIcon,
   XMarkIcon,
   UserIcon,
 } from '@heroicons/vue/24/outline'
+import {
+  IconArrowNarrowLeft,
+  IconArrowNarrowRight,
+  IconCheck,
+} from '@tabler/icons-vue'
 import { onMounted, ref } from 'vue'
 import { authService } from '@/features/auth/service.ts'
 import router from '@/router'
@@ -166,7 +168,7 @@ const backToSignIn = async (): Promise<void> => {
     <div
       class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30"
     >
-      <CheckIcon
+      <IconCheck
         class="h-8 w-8 text-green-600 dark:text-green-400"
         aria-hidden="true"
       />
@@ -202,7 +204,7 @@ const backToSignIn = async (): Promise<void> => {
         class="flex w-full justify-center items-center gap-2 rounded-md bg-indigo-600 dark:bg-indigo-500 px-3 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 dark:hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:focus-visible:outline-indigo-500"
         @click="redirectToHome"
       >
-        <ArrowRightIcon class="h-4 w-4" aria-hidden="true" />
+        <IconArrowNarrowRight class="h-4 w-4" aria-hidden="true" />
         Continue to Home
       </button>
     </div>
@@ -244,7 +246,7 @@ const backToSignIn = async (): Promise<void> => {
         :disabled="isUpdatingDisplayName"
         @click="updateDisplayName"
       >
-        <CheckIcon class="h-4 w-4" aria-hidden="true" />
+        <IconCheck class="h-4 w-4" aria-hidden="true" />
         <span v-if="isUpdatingDisplayName">Updating...</span>
         <span v-else>Update Display Name</span>
       </button>
@@ -293,7 +295,7 @@ const backToSignIn = async (): Promise<void> => {
         class="flex w-full justify-center items-center gap-2 rounded-md bg-white dark:bg-white/5 px-3 py-2.5 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-white/10 hover:bg-gray-50 dark:hover:bg-white/10 focus-visible:outline-offset-0"
         @click="backToSignIn"
       >
-        <ArrowLeftIcon class="h-4 w-4" aria-hidden="true" />
+        <IconArrowNarrowLeft class="h-4 w-4" aria-hidden="true" />
         Back to Sign In
       </button>
     </div>

@@ -58,7 +58,7 @@
                     @click="closeDialog"
                   >
                     <span class="sr-only">Close</span>
-                    <XMarkIcon class="h-6 w-6" aria-hidden="true" />
+                    <IconX class="h-6 w-6" aria-hidden="true" />
                   </button>
                 </div>
 
@@ -81,7 +81,7 @@ import {
   TransitionChild,
   TransitionRoot,
 } from '@headlessui/vue'
-import { XMarkIcon } from '@heroicons/vue/24/outline'
+import { IconX } from '@tabler/icons-vue'
 
 interface Props {
   open: boolean
