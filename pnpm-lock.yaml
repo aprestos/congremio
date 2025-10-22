@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  lightningcss-linux-x64-gnu: npm:lightningcss-linux-x64-musl
+
 importers:
 
   .:
@@ -209,8 +212,8 @@ importers:
         specifier: ^1.30.2
         version: 1.30.2
       lightningcss-linux-x64-gnu:
-        specifier: ^1.30.2
-        version: 1.30.2
+        specifier: npm:lightningcss-linux-x64-musl
+        version: lightningcss-linux-x64-musl@1.30.2
 
 packages:
 
@@ -3984,12 +3987,6 @@ packages:
     resolution: {integrity: sha512-5Vh9dGeblpTxWHpOx8iauV02popZDsCYMPIgiuw97OJ5uaDsL86cnqSFs5LZkG3ghHoX5isLgWzMs+eD1YzrnA==}
     engines: {node: '>= 12.0.0'}
     cpu: [arm64]
-    os: [linux]
-
-  lightningcss-linux-x64-gnu@1.30.2:
-    resolution: {integrity: sha512-Cfd46gdmj1vQ+lR6VRTTadNHu6ALuw2pKR9lYq4FnhvgBc4zWY1EtZcAc6EffShbb1MFrIPfLDXD6Xprbnni4w==}
-    engines: {node: '>= 12.0.0'}
-    cpu: [x64]
     os: [linux]
 
   lightningcss-linux-x64-musl@1.30.2:
@@ -10228,9 +10225,6 @@ snapshots:
   lightningcss-linux-arm64-musl@1.30.2:
     optional: true
 
-  lightningcss-linux-x64-gnu@1.30.2:
-    optional: true
-
   lightningcss-linux-x64-musl@1.30.2: {}
 
   lightningcss-win32-arm64-msvc@1.30.2:
@@ -10250,7 +10244,7 @@ snapshots:
       lightningcss-linux-arm-gnueabihf: 1.30.2
       lightningcss-linux-arm64-gnu: 1.30.2
       lightningcss-linux-arm64-musl: 1.30.2
-      lightningcss-linux-x64-gnu: 1.30.2
+      lightningcss-linux-x64-gnu: lightningcss-linux-x64-musl@1.30.2
       lightningcss-linux-x64-musl: 1.30.2
       lightningcss-win32-arm64-msvc: 1.30.2
       lightningcss-win32-x64-msvc: 1.30.2
