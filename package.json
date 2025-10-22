@@ -1,6 +1,6 @@
 {
   "name": "congremio-app",
-  "version": "0.0.0",
+  "version": "0.1.2",
   "private": true,
   "type": "module",
   "scripts": {
@@ -71,6 +71,7 @@
     "jiti": "^2.6.1",
     "jsdom": "^27.0.1",
     "lightningcss": "^1.30.2",
+    "lightningcss-linux-x64-musl": "^1.30.2",
     "lint-staged": "^16.2.5",
     "npm-run-all2": "^8.0.4",
     "oxlint": "^1.23.0",
@@ -90,9 +91,11 @@
       "eslint --fix"
     ]
   },
+  "resolutions": {
+    "lightningcss-linux-x64-gnu": "npm:lightningcss-linux-x64-musl"
+  },
   "optionalDependencies": {
     "lightningcss-linux-arm64-musl": "^1.30.2",
-    "lightningcss-linux-x64-gnu": "^1.30.2",
-    "lightningcss-linux-x64-musl": "^1.30.2"
+    "lightningcss-linux-x64-gnu": "^1.30.2"
   }
 }
