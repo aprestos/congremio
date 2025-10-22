@@ -3,7 +3,6 @@
 @tailwind components;
 @tailwind utilities;
 @import "tailwindcss";
-@import "tailwindcss-primeui";
 
 /* Surface color tokens for Volt components */
 @layer base {
