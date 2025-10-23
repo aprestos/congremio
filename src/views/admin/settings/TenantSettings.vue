@@ -66,7 +66,9 @@
           type="email"
           name="email"
           :errors="
-            r$.$errors.email.length > 0 ? [r$.$errors.email[0]] : undefined
+            r$.$errors.email.length > 0
+              ? [r$.$errors.email[0] ?? '']
+              : undefined
           "
         />
       </div>
@@ -123,12 +125,14 @@ const handleImageLoad = (event: Event): void => {
 }
 
 // Handle logo upload success
-const handleLogoUploadSuccess = (urls: string | string[]): void => {
+const handleLogoUploadSuccess = (urls: string[]): void => {
   showUploadDialog.value = false
-  const url = Array.isArray(urls) ? urls[0] : urls
-  logoUrl.value = url
-  console.log('Logo uploaded successfully:', url)
-  toast.success('Logo uploaded successfully!')
+  const url = urls[0]
+  if (url) {
+    logoUrl.value = url
+    console.log('Logo uploaded successfully:', url)
+    toast.success('Logo uploaded successfully!')
+  }
 }
 
 // Handle logo upload error

@@ -105,7 +105,7 @@ const processBulkImport = (): void => {
     if (!line.trim()) continue
 
     const parts = line.split(',').map((p) => p.trim())
-    if (parts.length >= 1) {
+    if (parts.length >= 1 && parts[0]) {
       newGames.push({
         bggId: parts[0],
         owner: parts[1] || '',

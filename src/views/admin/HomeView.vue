@@ -111,7 +111,9 @@ onMounted(async () => {
     }
 
     // Set bottom navigation enabled state based on user role
-    bottomNavigation.value[0].enabled = isAdmin
+    if (bottomNavigation.value[0]) {
+      bottomNavigation.value[0].enabled = isAdmin
+    }
   } catch (error) {
     console.error('Error loading user email:', error)
   }
