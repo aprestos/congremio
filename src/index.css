@@ -2,7 +2,6 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import "tailwindcss";
 
 /* Surface color tokens for Volt components */
 @layer base {
