@@ -73,7 +73,12 @@ const setupIntersectionObserver = (): void => {
   observer = new IntersectionObserver(
     (entries) => {
       const [entry] = entries
-      if (entry.isIntersecting && hasMoreGames.value && !loading.value) {
+      if (
+        entry &&
+        entry.isIntersecting &&
+        hasMoreGames.value &&
+        !loading.value
+      ) {
         loadMoreGames()
       }
     },

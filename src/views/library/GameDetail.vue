@@ -280,20 +280,6 @@ const closeModal = (): void => {
 // Generate a random description for the game
 const gameDescription = ref('')
 
-const generateRandomDescription = (): string => {
-  const descriptions = [
-    'An exciting strategic board game that combines skill, luck, and social interaction. Perfect for game nights with friends and family.',
-    'Immerse yourself in a world of adventure and strategy. This game offers endless replayability with its dynamic gameplay mechanics.',
-    'A thrilling experience that challenges players to think strategically while having fun. Great for both casual and serious gamers.',
-    'Discover the perfect blend of strategy and entertainment in this captivating board game that will keep you coming back for more.',
-    'An engaging game that brings people together through exciting gameplay and memorable moments. Suitable for all skill levels.',
-    'Experience the joy of tactical thinking and social gaming in this well-designed board game that offers hours of entertainment.',
-    'A fantastic addition to any game collection, featuring innovative mechanics and beautiful artwork that enhances the gaming experience.',
-    'Challenge yourself and your friends with this compelling game that combines strategy, luck, and social interaction in perfect harmony.',
-  ]
-  return descriptions[Math.floor(Math.random() * descriptions.length)]
-}
-
 // Player count visualization helpers
 const getPlayerCountRange = (): number[] => {
   if (!game.value?.game) return []
@@ -351,6 +337,7 @@ const parseRecommendedAt = (recommendedAt?: string): number[] => {
   if ((hasHyphen || hasEmDash) && !recommendedAt.includes(',')) {
     const separator = hasEmDash ? '–' : '-'
     const [startStr, endStr] = recommendedAt.split(separator)
+    if (!startStr || !endStr) return result
     const start = parseInt(startStr.trim())
     const end = parseInt(endStr.trim())
 
@@ -371,6 +358,7 @@ const parseRecommendedAt = (recommendedAt?: string): number[] => {
       // Handle range like "3-4" or "3–4"
       const separator = trimmed.includes('–') ? '–' : '-'
       const [startStr, endStr] = trimmed.split(separator)
+      if (!startStr || !endStr) continue
       const start = parseInt(startStr.trim())
       const end = parseInt(endStr.trim())
 
@@ -392,9 +380,5 @@ const parseRecommendedAt = (recommendedAt?: string): number[] => {
 }
 
 // Generate description when game data is loaded
-watch(game, (newGame) => {
-  if (newGame) {
-    gameDescription.value = generateRandomDescription()
-  }
-})
+watch(game, () => {})
 </script>

@@ -2,7 +2,6 @@ import './assets/main.css'
 import './index.css'
 
 import { createPinia } from 'pinia'
-import PrimeVue from 'primevue/config'
 import { createApp } from 'vue'
 import { createI18n } from 'vue-i18n'
 import VueCountdown from '@chenfengyuan/vue-countdown'
@@ -70,9 +69,6 @@ async function initializeApp(): Promise<void> {
 
   app.use(createPinia())
   app.use(router)
-  app.use(PrimeVue, {
-    unstyled: true,
-  })
   app.use(i18n as any)
   app.component(VueCountdown.name as string, VueCountdown)
 
