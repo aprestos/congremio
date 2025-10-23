@@ -45,7 +45,6 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.56.1",
-    "@tailwindcss/vite": "^4.1.15",
     "@tsconfig/node22": "^22.0.2",
     "@types/jsdom": "^27.0.0",
     "@types/node": "^24.9.1",
@@ -70,8 +69,6 @@
     "husky": "^9.1.7",
     "jiti": "^2.6.1",
     "jsdom": "^27.0.1",
-    "lightningcss": "^1.30.2",
-    "lightningcss-linux-x64-musl": "^1.30.2",
     "lint-staged": "^16.2.6",
     "npm-run-all2": "^8.0.4",
     "oxlint": "^1.24.0",
@@ -90,12 +87,5 @@
     "*.{js,ts,vue}": [
       "eslint --fix"
     ]
-  },
-  "resolutions": {
-    "lightningcss-linux-x64-gnu": "npm:lightningcss-linux-x64-musl"
-  },
-  "optionalDependencies": {
-    "lightningcss-linux-arm64-musl": "^1.30.2",
-    "lightningcss-linux-x64-gnu": "npm:lightningcss-linux-x64-musl@^1.30.2"
   }
 }
