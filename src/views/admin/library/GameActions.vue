@@ -63,8 +63,8 @@ const gameStatus = computed(() => {
       <Menu as="div" class="relative inline-block">
         <MenuButton
           :class="[
-            gameStatus === 'not-available' ? 'rounded-md ' : 'rounded-r-md',
-            'inline-flex ring-1 w-full justify-center -ml-px gap-x-1.5 bg-gray-100 px-4 py-3 md:px-3 md:py-2 text-sm font-semibold text-gray-900 shadow-xs  hover:bg-gray-50 dark:bg-white/10  dark:text-white dark:shadow-none  dark:hover:bg-white/20 ring-gray-300 ring-inset inset-ring-1 inset-ring-gray-300 dark:ring-gray-700 dark:inset-ring-white/5',
+            gameStatus === 'not-available' ? 'rounded-md' : 'rounded-r-md',
+            'inline-flex ring-1 w-full justify-center -ml-px gap-x-1.5 bg-gray-100 px-4 py-3 md:px-3 md:py-2 text-sm font-semibold text-gray-900 shadow-xs hover:bg-gray-50 dark:bg-white/10 dark:text-white dark:shadow-none dark:hover:bg-white/20 ring-gray-300 ring-inset inset-ring-1 inset-ring-gray-300 dark:ring-gray-700 dark:inset-ring-white/5',
           ]"
         >
           <IconDotsVertical class="size-5" />
