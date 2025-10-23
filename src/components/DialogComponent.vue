@@ -12,7 +12,7 @@
           leave-to="opacity-0"
         >
           <div
-            class="fixed inset-0 bg-gray-800/40 dark:bg-gray-900/80 transition-opacity backdrop-blur-xs"
+            class="fixed inset-0 bg-black/70 dark:bg-gray-900/80 transition-opacity backdrop-blur-xs"
           />
         </TransitionChild>
 
@@ -30,7 +30,7 @@
               leave-to="opacity-0 translate-y-full sm:translate-y-0 sm:scale-95"
             >
               <DialogPanel
-                class="relative transform overflow-y-auto max-h-full w-full sm:h-auto sm:w-auto sm:rounded-lg bg-white dark:bg-gray-800 text-left shadow-2xl transition-all sm:my-8 sm:max-w-lg sm:overflow-visible"
+                class="relative transform overflow-y-auto max-h-full w-full sm:h-auto sm:w-auto sm:rounded-lg bg-white dark:bg-gray-800 text-left shadow-2xl transition-all sm:my-8 sm:max-w-lg md:min-w-[500px] sm:overflow-visible"
               >
                 <div class="px-4 py-5 sm:px-6">
                   <div
@@ -58,7 +58,7 @@
                     @click="closeDialog"
                   >
                     <span class="sr-only">Close</span>
-                    <XMarkIcon class="h-6 w-6" aria-hidden="true" />
+                    <IconX class="h-6 w-6" aria-hidden="true" />
                   </button>
                 </div>
 
@@ -81,7 +81,7 @@ import {
   TransitionChild,
   TransitionRoot,
 } from '@headlessui/vue'
-import { XMarkIcon } from '@heroicons/vue/24/outline'
+import { IconX } from '@tabler/icons-vue'
 
 interface Props {
   open: boolean

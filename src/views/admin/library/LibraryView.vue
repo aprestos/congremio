@@ -6,36 +6,38 @@
       :items-per-page="25"
     >
       <template #header>
-        <div class="flex flex-row px-4 py-3 gap-4">
-          <div class="flex-1 mt-2 grid grid-cols-1">
-            <input
+        <div class="grid grid-cols-6 px-4 py-3 gap-4">
+          <div class="col-span-5">
+            <CInput
               id="search"
               v-model="searchInput"
-              aria-label="Search"
               placeholder="Search"
               type="text"
               name="search"
-              class="col-start-1 row-start-1 block rounded-md bg-white py-3 pr-3 pl-10 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:pl-9 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
-            />
-            <IconSearch
-              class="pointer-events-none col-start-1 row-start-1 ml-3 size-4 self-center text-gray-400 sm:size-5 dark:text-gray-500"
-              aria-hidden="true"
-            />
+            >
+              <template #icon-left>
+                <IconSearch
+                  class="size-5 text-gray-400 dark:text-gray-500"
+                  aria-hidden="true"
+                />
+              </template>
+            </CInput>
           </div>
-          <div class="mt-2 grid grid-cols-1">
-            <input
+          <div class="col-span-1">
+            <CInput
               id="reservation"
               v-model="reservationInput"
               type="text"
               name="reservation"
-              class="col-start-1 row-start-1 block rounded-md bg-white py-3 pr-3 pl-10 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:pl-9 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
               placeholder="Reservation"
-              aria-label="Reservation"
-            />
-            <IconNumber
-              class="pointer-events-none col-start-1 row-start-1 ml-3 size-5 self-center text-gray-400 sm:size-5 dark:text-gray-500"
-              aria-hidden="true"
-            />
+            >
+              <template #icon-left>
+                <IconNumber
+                  class="size-5 text-gray-400 dark:text-gray-500"
+                  aria-hidden="true"
+                />
+              </template>
+            </CInput>
           </div>
         </div>
       </template>
@@ -174,64 +176,20 @@
     @confirm="deleteGame"
   />
 
-  <DialogComponent
+  <MoveGameDialog
     :open="moveDialogOpen"
-    title="Move Game"
+    :selected-game="selectedGame"
+    :locations="locations"
     @close="cancelMoveGame"
-  >
-    <div v-if="selectedGame" class="space-y-6">
-      <!-- Game Info -->
-      <div class="flex items-center space-x-4">
-        <div class="shrink-0">
-          <img
-            class="size-16 rounded-lg object-cover shadow-sm"
-            :src="selectedGame.game.image"
-            :alt="selectedGame.game.name"
-            @error="handleImageError"
-          />
-        </div>
-        <div class="flex-1 min-w-0">
-          <h3
-            class="text-lg font-semibold text-gray-900 dark:text-white truncate"
-          >
-            {{ selectedGame.game.name }}
-          </h3>
-          <p class="text-sm text-gray-500 dark:text-gray-400">
-            Current location: {{ getLocationName(selectedGame) }}
-          </p>
-        </div>
-      </div>
+    @moved="onGameMoved"
+  />
 
-      <!-- Location Selection -->
-      <CSelect
-        id="location"
-        v-model="selectedLocationId"
-        label="New Location"
-        :options="locationOptions"
-        placeholder="Select a location"
-      />
-
-      <!-- Actions -->
-      <div class="flex gap-3 justify-end">
-        <button
-          type="button"
-          class="rounded-md bg-white dark:bg-gray-700 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600"
-          @click="cancelMoveGame"
-        >
-          Cancel
-        </button>
-        <button
-          type="button"
-          class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed"
-          :disabled="isMovingGame || selectedLocationId === null"
-          @click="moveGame"
-        >
-          <span v-if="isMovingGame">Moving...</span>
-          <span v-else>Move Game</span>
-        </button>
-      </div>
-    </div>
-  </DialogComponent>
+  <ReservationGameDialog
+    :open="reservationDialogOpen"
+    :reservation="selectedReservation"
+    @close="closeReservationDialog"
+    @withdraw="handleReservationWithdraw"
+  />
 </template>
 
 <script setup lang="ts">
@@ -243,7 +201,7 @@ import { IconSearch, IconNumber } from '@tabler/icons-vue'
 
 import DataTable from '@/components/DataTable.vue'
 import DialogComponent from '@/components/DialogComponent.vue'
-import CSelect from '@/components/CSelect.vue'
+import CInput from '@/components/CInput.vue'
 import { getStatus, type LibraryGame } from '@/features/library/game.model.ts'
 import type { DataTableColumn } from '@/components/DataTable.vue'
 import Service, { libraryService } from '@/features/library/service.ts'
@@ -255,8 +213,11 @@ import GameActions from '@/views/admin/library/GameActions.vue'
 import GameStatus from '@/views/admin/library/GameStatus.vue'
 import DeleteGameDialog from '@/views/admin/library/DeleteGameDialog.vue'
 import ReturnGameDialog from '@/views/admin/library/ReturnGameDialog.vue'
+import MoveGameDialog from '@/views/admin/library/MoveGameDialog.vue'
+import ReservationGameDialog from '@/views/admin/library/ReservationGameDialog.vue'
 import { libraryLocationService } from '@/features/library/locations/service.ts'
 import type { LibraryLocation } from '@/features/library/locations/location.model.ts'
+import type { LibraryReservation } from '@/features/library/reservations/service'
 
 // Data
 const allGames = ref<LibraryGame[]>([])
@@ -270,13 +231,13 @@ const reservationInput = ref('')
 const loadingReservation = ref(false)
 const searchQuery = ref('')
 const moveDialogOpen = ref(false)
-const selectedLocationId = ref<number | null>(null)
 const locations = ref<LibraryLocation[]>([])
-const isMovingGame = ref(false)
 const deleteConfirmDialogOpen = ref(false)
 const isDeletingGame = ref(false)
 const withdrawCount = ref<number | null>(null)
 const isLoadingWithdrawCount = ref(false)
+const reservationDialogOpen = ref(false)
+const selectedReservation = ref<LibraryReservation | null>(null)
 let unsubscribe: (() => void) | null = null
 
 // Table column definitions
@@ -304,23 +265,32 @@ const tableColumns: DataTableColumn<LibraryGame>[] = [
     breakpoint: 'md',
     sortable: true,
     cellClass: 'whitespace-nowrap',
+    sortFn: (a: LibraryGame, b: LibraryGame): number => {
+      const aName = a.location?.name ?? null
+      const bName = b.location?.name ?? null
+
+      if (!aName && !bName) return 0
+      if (!aName) return 1
+      if (!bName) return -1
+      return aName.localeCompare(bName)
+    },
   },
   {
     key: 'players',
     label: 'Players',
-    breakpoint: 'xl',
+    breakpoint: '2xl',
     cellClass: 'whitespace-nowrap',
   },
   {
     key: 'playtime',
     label: 'Playtime',
-    breakpoint: 'xl',
+    breakpoint: '2xl',
     cellClass: 'whitespace-nowrap',
   },
   {
     key: 'age',
     label: 'Age',
-    breakpoint: 'xl',
+    breakpoint: '2xl',
     cellClass: 'whitespace-nowrap',
   },
   {
@@ -361,7 +331,8 @@ const handleReservationChange = useDebounceFn(
       const result =
         await libraryReservationService.getByDisplayId(reservationNumber)
       if (result) {
-        toast.success('Reservation found')
+        selectedReservation.value = result
+        reservationDialogOpen.value = true
       } else {
         toast.error('Reservation not found')
       }
@@ -465,7 +436,6 @@ const updateGame = async (
 
 const openMoveGameDialog = async (game: LibraryGame): Promise<void> => {
   selectedGame.value = game
-  selectedLocationId.value = game.location?.id || null
 
   // Load locations
   try {
@@ -477,33 +447,41 @@ const openMoveGameDialog = async (game: LibraryGame): Promise<void> => {
   }
 }
 
-const moveGame = async (): Promise<void> => {
-  if (!selectedGame.value || selectedLocationId.value === null) return
-
-  isMovingGame.value = true
-  try {
-    // Update with raw database column name since we're updating directly
-    await libraryService.updateGame(selectedGame.value.id, {
-      location_id: selectedLocationId.value,
-    } as Partial<LibraryGame>)
-    toast.success(
-      `${selectedGame.value.game.name} has been moved to a new location.`,
-    )
-    moveDialogOpen.value = false
-    selectedGame.value = null
-    selectedLocationId.value = null
-  } catch (error) {
-    console.error('Failed to move game:', error)
-    toast.error('Failed to move the game. Please try again.')
-  } finally {
-    isMovingGame.value = false
-  }
-}
-
 const cancelMoveGame = (): void => {
   moveDialogOpen.value = false
   selectedGame.value = null
-  selectedLocationId.value = null
+}
+
+const onGameMoved = (): void => {
+  moveDialogOpen.value = false
+  selectedGame.value = null
+}
+
+// Reservation handlers
+const closeReservationDialog = (): void => {
+  reservationDialogOpen.value = false
+  selectedReservation.value = null
+  reservationInput.value = ''
+}
+
+const handleReservationWithdraw = async (): Promise<void> => {
+  // Find the game associated with this reservation
+  const reservation = selectedReservation.value
+  if (!reservation) return
+
+  try {
+    await libraryWithdrawService.create(
+      selectedReservation.value?.library_game.id as number,
+      selectedReservation.value?.user_id as string,
+    )
+
+    toast.success('Game withdrawn successfully')
+
+    closeReservationDialog()
+  } catch (error) {
+    console.error('Failed to withdraw game: ', error)
+    toast.error('Failed to withdraw the game. Please try again.')
+  }
 }
 
 // Delete game handlers
@@ -573,12 +551,4 @@ const getRange = (min: number, max: number): string => {
   if (min === max) return String(min)
   else return `${min} - ${max}`
 }
-
-// Computed options for location select
-const locationOptions = computed(() => {
-  return locations.value?.map((loc: LibraryLocation) => ({
-    value: loc.id,
-    label: loc.name,
-  }))
-})
 </script>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { eventStore } from '@/stores/edition'
-import { settingsStore } from '@/features/settings/useSettings.store'
+import { eventStore } from '@/stores/edition.ts'
+import { settingsStore } from '@/features/settings/useSettings.store.ts'
 import {
   IconCalendar,
   IconMapPin,
@@ -14,7 +14,7 @@ import {
   IconCalendarEvent,
 } from '@tabler/icons-vue'
 import { RouterLink } from 'vue-router'
-import { RouteNames } from '@/router/routeNames'
+import { RouteNames } from '@/router/routeNames.ts'
 
 // Set page-specific theme color
 

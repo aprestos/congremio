@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import type { LibraryGame } from '@/features/library/game.model.ts'
 import {
@@ -12,7 +12,7 @@ import { HandRaisedIcon } from '@heroicons/vue/24/outline'
 import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
 import { authService } from '@/features/auth/service.ts'
 import CButton from '@/components/CButton.vue'
-import { eventStore } from '@/stores/edition'
+import { eventStore } from '@/stores/edition.ts'
 
 interface Props {
   game?: LibraryGame
@@ -45,11 +45,14 @@ onMounted(async () => {
   }
 })
 
-// Reset image loading state when game changes
-const resetImageState = (): void => {
-  imageLoaded.value = false
-  imageError.value = false
-}
+// Watch for game changes and reset image state
+watch(
+  () => props.game?.id,
+  () => {
+    imageLoaded.value = false
+    imageError.value = false
+  },
+)
 
 // Handle image load success
 const handleImageLoad = (): void => {
@@ -136,7 +139,7 @@ const isConventionHappening = computed(() => {
     </div>
 
     <!-- Game Content -->
-    <div v-else-if="game" @vue:before-update="resetImageState">
+    <div v-else-if="game">
       <div class="group relative cursor-pointer" @click="handleGameClick">
         <div
           class="relative h-72 md:h-60 lg:h-50 w-full overflow-hidden rounded-lg text-center"

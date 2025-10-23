@@ -1,12 +1,21 @@
 <template>
   <div class="col-span-full">
     <label
+      v-if="label"
       :for="id"
       class="block text-sm/6 font-medium text-gray-900 dark:text-gray-100"
     >
       {{ label }}
     </label>
-    <div class="mt-2">
+    <div class="mt-2 relative">
+      <!-- Left Icon Slot -->
+      <div
+        v-if="$slots['icon-left']"
+        class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"
+      >
+        <slot name="icon-left" />
+      </div>
+
       <input
         :id="id"
         :name="name || id"
@@ -15,6 +24,8 @@
         :value="modelValue"
         :class="[
           'block w-full rounded-md bg-white px-3 py-1.5 text-base dark:bg-white/5 dark:text-white dark:placeholder:text-gray-500 text-gray-900 outline-1 -outline-offset-1 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 sm:text-sm/6',
+          $slots['icon-left'] ? 'pl-10' : '',
+          $slots['icon-right'] ? 'pr-10' : '',
           errors && errors.length > 0
             ? 'outline-red-300 focus:outline-red-600 dark:outline-red-400 dark:focus:outline-red-500'
             : 'outline-gray-300 focus:outline-indigo-600 dark:outline-white/10 dark:focus:outline-indigo-500',
@@ -23,6 +34,14 @@
           $emit('update:modelValue', ($event.target as HTMLInputElement).value)
         "
       />
+
+      <!-- Right Icon Slot -->
+      <div
+        v-if="$slots['icon-right']"
+        class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3"
+      >
+        <slot name="icon-right" />
+      </div>
     </div>
     <ValidationErrors v-if="errors" :errors="errors" />
   </div>
@@ -33,7 +52,7 @@ import ValidationErrors from '@/components/ValidationErrors.vue'
 
 interface Props {
   id: string
-  label: string
+  label?: string
   modelValue: string
   type?: string
   placeholder?: string
@@ -42,6 +61,7 @@ interface Props {
 }
 
 withDefaults(defineProps<Props>(), {
+  label: undefined,
   type: 'text',
   placeholder: '',
   name: undefined,

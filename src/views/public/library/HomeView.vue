@@ -1,5 +1,5 @@
 <template>
-  <div class="pb-64">
+  <div class="pb-32">
     <div>
       <!-- Mobile filter dialog -->
       <TransitionRoot as="template" :show="mobileFiltersOpen">
@@ -172,10 +172,7 @@
               <div
                 class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
               >
-                <MagnifyingGlassIcon
-                  class="h-6 w-6 text-gray-400"
-                  aria-hidden="true"
-                />
+                <IconSearch class="h-6 w-6 text-gray-400" aria-hidden="true" />
               </div>
               <input
                 v-model="searchQuery"
@@ -383,7 +380,7 @@
 
     <!-- Sticky bottom container -->
     <div
-      class="fixed bottom-0 left-0 right-0 p-4 flex items-center justify-center"
+      class="fixed bottom-0 left-0 right-0 p-2 flex items-center justify-center"
     >
       <ReservationList />
     </div>
@@ -392,10 +389,9 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { IconPlayCard2Filled } from '@tabler/icons-vue'
-import { MagnifyingGlassIcon } from '@heroicons/vue/24/outline'
-import GameList from '@/views/library/GameList.vue'
-import ReservationList from '@/views/library/ReservationList.vue'
+import { IconPlayCard2Filled, IconSearch } from '@tabler/icons-vue'
+import GameList from '@/views/public/library/GameList.vue'
+import ReservationList from '@/views/public/library/ReservationList.vue'
 import type { FilterOptions } from '@/features/library/service.ts'
 import {
   Dialog,
