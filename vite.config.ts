@@ -14,6 +14,7 @@ export default defineConfig({
     },
   },
   build: {
+    // Use esbuild for faster builds
     minify: 'esbuild',
   },
 })
