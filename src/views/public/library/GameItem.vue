@@ -38,8 +38,8 @@ const imageError = ref(false)
 // Check authentication status on mount
 onMounted(async () => {
   try {
-    const { data } = await authService.getUser()
-    isAuthenticated.value = !!data.user
+    const user = await authService.getUser()
+    isAuthenticated.value = !!user
   } catch {
     isAuthenticated.value = false
   }

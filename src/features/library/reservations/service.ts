@@ -53,7 +53,7 @@ export const libraryReservationService = {
         )
         .eq('tenant_id', tenantStore.value?.id)
         .eq('edition_id', eventStore.value?.id)
-        .eq('user_id', user.data.user?.id)
+        .eq('user_id', user?.id)
         .gt('expires_at', now)
 
       console.log(result.data)

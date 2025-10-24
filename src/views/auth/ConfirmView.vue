@@ -13,7 +13,6 @@ import { onMounted, ref } from 'vue'
 import { authService } from '@/features/auth/service.ts'
 import router from '@/router'
 import { RouteNames } from '@/router/routeNames.ts'
-import { tenantStore } from '@/stores/tenant.ts'
 import CInput from '@/components/CInput.vue'
 
 const isValidating = ref(true)
@@ -28,44 +27,31 @@ const displayNameErrors = ref<string[]>([])
 onMounted(async () => {
   try {
     // Check if user is authenticated
-    const { data } = await authService.getUser()
+    const user = await authService.getUser()
 
-    if (data?.user) {
-      // Check if user already has roles for this tenant
-      const tenantId = tenantStore.value?.id
-      const userRoles = data.user.app_metadata?.roles as
-        | Record<string, any>
-        | undefined
-      const hasRoleForTenant = tenantId && userRoles && userRoles[tenantId]
-
-      if (!hasRoleForTenant) {
-        // User doesn't have roles for this tenant, set up the relationship
-        await authService.setTenant(data.user.id)
-      } else {
-        console.log(
-          'User already has role for this tenant:',
-          userRoles[tenantId],
-        )
-      }
-
-      // Check if user has display_name in user_metadata
-      const userDisplayName =
-        (data.user.user_metadata?.display_name as string) || ''
-
-      if (!userDisplayName) {
-        // User needs to set display name
-        isValidating.value = false
-        needsDisplayName.value = true
-      } else {
-        // Show success state
-        isValidating.value = false
-        isSuccess.value = true
-
-        // Start countdown timer
-        startCountdown()
-      }
-    } else {
+    if (!user) {
       throw new Error('No authenticated user found')
+    }
+
+    if (!user.access) {
+      // User doesn't have roles for this tenant, set up the relationship
+      await authService.setTenant(user.id)
+    } else {
+      console.log('User already has role for this tenant:', user.access)
+    }
+
+    // Check if user has name defined
+    if (!user.name) {
+      // User needs to set display name
+      isValidating.value = false
+      needsDisplayName.value = true
+    } else {
+      // Show success state
+      isValidating.value = false
+      isSuccess.value = true
+
+      // Start countdown timer
+      startCountdown()
     }
   } catch (error) {
     console.error('Authentication confirmation failed:', error)

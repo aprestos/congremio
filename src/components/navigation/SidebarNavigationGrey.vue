@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { tenantStore } from '@/stores/tenant.ts'
 import { useRoute } from 'vue-router'
-import type { User } from '@supabase/supabase-js'
+import type { User } from '@/features/auth/user.model.ts'
 
 interface NavigationItem {
   label: string
@@ -31,9 +31,7 @@ defineEmits<{
 }>()
 
 const userName = computed(() => {
-  return (props.user?.user_metadata['display_name'] ||
-    props.user?.email?.split('@')[0] ||
-    'User') as string
+  return props.user?.name || props.user?.email?.split('@')[0] || 'User'
 })
 const route = useRoute()
 </script>

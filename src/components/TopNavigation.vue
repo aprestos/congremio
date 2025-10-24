@@ -144,13 +144,16 @@ const userInitial = computed(() => {
 // Load user email and check admin role on component mount
 onMounted(async () => {
   try {
-    const { data } = await authService.getUser()
-    if (data.user?.email) {
-      userEmail.value = data.user.email
+    const user = await authService.getUser()
+    if (user?.email) {
+      userEmail.value = user.email
       isAuthenticated.value = true
 
       // Check if user has staff or admin role
-      isStaffOrAdmin.value = await authService.isStaffOrHigher()
+      isStaffOrAdmin.value = authService.hasAnyOfTheRoles(user, [
+        'staff',
+        'admin',
+      ])
     } else {
       isAuthenticated.value = false
     }

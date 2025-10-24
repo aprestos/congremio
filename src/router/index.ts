@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import {
   navigationGuard,
   type RouteGuard,
-  requiresStaff,
+  hasAnyOfRoles,
 } from '@/router/guards'
 import { RouteNames } from '@/router/routeNames.ts'
 import HomeView from '../views/public/HomeView.vue'
@@ -67,7 +67,7 @@ const router = createRouter({
       meta: {
         requiresAuth: true,
         permission: 'admin',
-        guard: requiresStaff,
+        guard: () => hasAnyOfRoles(['admin', 'staff']),
       },
       children: [
         {
