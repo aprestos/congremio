@@ -272,7 +272,7 @@ const tableColumns: DataTableColumn<LibraryGame>[] = [
       if (!aName && !bName) return 0
       if (!aName) return 1
       if (!bName) return -1
-      return aName?.localeCompare(bName)
+      return aName.localeCompare(bName)
     },
   },
   {

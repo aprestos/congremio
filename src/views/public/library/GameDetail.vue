@@ -294,7 +294,7 @@ const parseRecommendedAt = (recommendedAt?: string): number[] => {
       // Handle range like "3-4" or "3–4"
       const separator = trimmed.includes('–') ? '–' : '-'
       const [startStr, endStr] = trimmed.split(separator)
-      if (!startStr || !endStr) return []
+      if (!startStr || !endStr) continue
       const start = parseInt(startStr.trim())
       const end = parseInt(endStr.trim())
 
