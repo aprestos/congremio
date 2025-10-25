@@ -48,12 +48,12 @@ export const tenantService = {
         .from('tenants')
         .select()
         .eq('id', id)
-        .single()
+        .single<Tenant>()
       if (error) {
         console.error((error as Error).message)
         return null
       }
-      return data as Tenant
+      return data
     } catch (error) {
       console.error((error as Error).message)
       return null
@@ -61,7 +61,12 @@ export const tenantService = {
   },
   async updateTenant(
     tenantId: string,
-    updates: { email?: string; name?: string; logo?: string },
+    updates: {
+      email?: string
+      name?: string
+      logo?: string
+      images?: string[]
+    },
   ): Promise<Tenant | null> {
     try {
       // Filter out undefined values to only update defined fields
@@ -80,6 +85,7 @@ export const tenantService = {
         .update(filteredUpdates)
         .eq('id', tenantId)
         .select()
+        .single<Tenant>()
 
       if (error) {
         console.error('Error updating tenant:', error.message)
@@ -87,7 +93,7 @@ export const tenantService = {
       }
 
       console.log(data)
-      return null
+      return data
       //return data as unknown as Tenant;
     } catch (error) {
       console.error('Failed to update tenant:', (error as Error).message)

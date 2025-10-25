@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { eventStore } from '@/stores/edition.ts'
 import { settingsStore } from '@/features/settings/useSettings.store.ts'
 import {
@@ -15,11 +15,45 @@ import {
 } from '@tabler/icons-vue'
 import { RouterLink } from 'vue-router'
 import { RouteNames } from '@/router/routeNames.ts'
+import { tenantStore } from '@/stores/tenant.ts'
 
 // Set page-specific theme color
-
 const edition = computed(() => eventStore.value)
+const tenant = computed(() => tenantStore.value)
 const settings = computed(() => settingsStore.value)
+
+const imagesToShow = ref<string[]>([])
+
+onMounted(() => {
+  const images = [
+    'https://images.unsplash.com/photo-1632501641765-e568d28b0015?q=80&w=800&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1547638375-ebf04735d792?q=80&w=800&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1719494206741-79831f9f4d51?q=80&w=800&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?q=80&w=800&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1509228627152-4b2b6f0b3f36?q=80&w=800&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1549056572-75914d5d5fd4?q=80&w=800&auto=format&fit=crop',
+    ...(tenant.value?.images ?? []),
+  ]
+
+  imagesToShow.value = getRandomImages(images, 5)
+})
+
+// Generate random images without repetition using Fisher-Yates shuffle
+const getRandomImages = (images: string[], count: number): string[] => {
+  const itemsToShuffle = [...images]
+  const shuffled: string[] = []
+
+  for (let i = 0; i < Math.min(count, itemsToShuffle.length); i++) {
+    const randomIndex = Math.floor(Math.random() * itemsToShuffle.length)
+    const item = itemsToShuffle[randomIndex]
+    if (item !== undefined) {
+      shuffled.push(item)
+      itemsToShuffle.splice(randomIndex, 1)
+    }
+  }
+
+  return shuffled
+}
 
 // Format dates
 const formatDate = (dateString: string | undefined) => {
@@ -222,7 +256,7 @@ const sponsors: Array<Record<string, string>> = []
               >
                 <div class="relative">
                   <img
-                    src="https://images.unsplash.com/photo-1547638375-ebf04735d792?q=80&w=800&auto=format&fit=crop"
+                    :src="imagesToShow[0]"
                     alt="Modern board game components"
                     class="aspect-2/3 w-full rounded-xl bg-gray-900/5 object-cover shadow-lg dark:bg-gray-100/5"
                   />
@@ -236,7 +270,7 @@ const sponsors: Array<Record<string, string>> = []
               >
                 <div class="relative">
                   <img
-                    src="https://images.unsplash.com/photo-1719494206741-79831f9f4d51?q=80&w=800&auto=format&fit=crop"
+                    :src="imagesToShow[1]"
                     alt="People playing modern board games"
                     class="aspect-2/3 w-full rounded-xl bg-gray-900/5 object-cover shadow-lg dark:bg-gray-100/5"
                   />
@@ -246,7 +280,7 @@ const sponsors: Array<Record<string, string>> = []
                 </div>
                 <div class="relative">
                   <img
-                    src="https://images.unsplash.com/photo-1566694271453-390536dd1f0d?q=80&w=800&auto=format&fit=crop"
+                    :src="imagesToShow[2]"
                     alt="Board game collection shelf"
                     class="aspect-2/3 w-full rounded-xl bg-gray-900/5 object-cover shadow-lg dark:bg-gray-100/5"
                   />
@@ -258,7 +292,7 @@ const sponsors: Array<Record<string, string>> = []
               <div class="w-44 flex-none space-y-8 pt-32 sm:pt-0">
                 <div class="relative">
                   <img
-                    src="https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?q=80&w=800&auto=format&fit=crop"
+                    :src="imagesToShow[3]"
                     alt="Board game tournament"
                     class="aspect-2/3 w-full rounded-xl bg-gray-900/5 object-cover shadow-lg dark:bg-gray-100/5"
                   />
@@ -268,7 +302,7 @@ const sponsors: Array<Record<string, string>> = []
                 </div>
                 <div class="relative">
                   <img
-                    src="https://images.unsplash.com/photo-1632501641765-e568d28b0015?q=80&w=800&auto=format&fit=crop"
+                    :src="imagesToShow[4]"
                     alt="Group enjoying board games"
                     class="aspect-2/3 w-full rounded-xl bg-gray-900/5 object-cover shadow-lg dark:bg-gray-100/5"
                   />
