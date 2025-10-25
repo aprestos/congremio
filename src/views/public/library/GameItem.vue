@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import type { LibraryGame } from '@/features/library/game.model.ts'
 import {
@@ -10,18 +10,19 @@ import {
 import SkeletonLoader from '@/components/SkeletonLoader.vue'
 import { HandRaisedIcon } from '@heroicons/vue/24/outline'
 import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
-import { authService } from '@/features/auth/service.ts'
 import CButton from '@/components/CButton.vue'
 import { eventStore } from '@/stores/edition.ts'
 
 interface Props {
   game?: LibraryGame
   loading?: boolean
+  isAuthenticated?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   loading: false,
   game: undefined,
+  isAuthenticated: false,
 })
 
 const emit = defineEmits<{
@@ -30,20 +31,9 @@ const emit = defineEmits<{
 }>()
 
 const router = useRouter()
-const isAuthenticated = ref(false)
 const showAuthDialog = ref(false)
 const imageLoaded = ref(false)
 const imageError = ref(false)
-
-// Check authentication status on mount
-onMounted(async () => {
-  try {
-    const { data } = await authService.getUser()
-    isAuthenticated.value = !!data.user
-  } catch {
-    isAuthenticated.value = false
-  }
-})
 
 // Watch for game changes and reset image state
 watch(
@@ -78,7 +68,7 @@ const handleAddToBagClick = (event: Event): void => {
   if (!props.game) return
 
   // Check if user is authenticated
-  if (!isAuthenticated.value) {
+  if (!props.isAuthenticated) {
     showAuthDialog.value = true
     return
   }

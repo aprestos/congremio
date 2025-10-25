@@ -9,7 +9,7 @@ export type RouteGuard = () => Promise<boolean>
 export const requiresAuth = async (): Promise<boolean> => {
   try {
     const user = await authService.getUser()
-    return !!user.data.user
+    return !!user
   } catch (error) {
     console.error('Error checking authentication:', error)
     return false
@@ -17,38 +17,15 @@ export const requiresAuth = async (): Promise<boolean> => {
 }
 
 // Staff permission check guard
-export const requiresStaff = async (): Promise<boolean> => {
+export const hasAnyOfRoles = async (roles: string[]): Promise<boolean> => {
+  if (!roles || roles.length === 0) return false
   try {
-    return await authService.isStaffOrHigher()
+    const user = await authService.getUser()
+    if (!user?.access?.role) return false
+    if (user.access.role === 'super-admin') return true
+    return roles.includes(user.access.role)
   } catch (error) {
     console.error('Error checking staff permissions:', error)
-    return false
-  }
-}
-
-// Admin permission check guard
-export const requiresAdmin = async (): Promise<boolean> => {
-  try {
-    // Assuming there's an isAdmin method in AuthService
-    // If not, you can implement this logic based on your user model
-    const user = await authService.getUser()
-    return user.data.user?.user_metadata?.role === 'admin'
-  } catch (error) {
-    console.error('Error checking admin permissions:', error)
-    return false
-  }
-}
-
-// Combined staff or admin guard
-export const requiresStaffOrAdmin = async (): Promise<boolean> => {
-  try {
-    const [isStaff, isAdmin] = await Promise.all([
-      requiresStaff(),
-      requiresAdmin(),
-    ])
-    return isStaff || isAdmin
-  } catch (error) {
-    console.error('Error checking staff or admin permissions:', error)
     return false
   }
 }

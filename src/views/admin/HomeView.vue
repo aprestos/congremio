@@ -32,7 +32,7 @@ import {
   IconTrophy,
   IconSettings,
 } from '@tabler/icons-vue'
-import type { User } from '@supabase/supabase-js'
+import type { User } from '@/features/auth/user.model.ts'
 
 const userEmail = ref<string | null>(null)
 const user = ref<User | null>(null)
@@ -99,20 +99,19 @@ const sidebarOpen = ref(false)
 // Load user email on component mount
 onMounted(async () => {
   try {
-    // Execute both async operations in parallel
-    const [{ data }, isAdmin] = await Promise.all([
-      authService.getUser(),
-      authService.isAdminOrHigher(),
-    ])
+    const userResponse = await authService.getUser()
 
-    if (data.user) {
-      userEmail.value = data.user?.email || null
-      user.value = data.user
-    }
+    if (userResponse) {
+      userEmail.value = userResponse.email || ''
+      user.value = userResponse
 
-    // Set bottom navigation enabled state based on user role
-    if (bottomNavigation.value[0]) {
-      bottomNavigation.value[0].enabled = isAdmin
+      // Set bottom navigation enabled state based on user role
+      if (bottomNavigation.value[0]) {
+        bottomNavigation.value[0].enabled = authService.hasAnyOfTheRoles(
+          userResponse,
+          ['admin'],
+        )
+      }
     }
   } catch (error) {
     console.error('Error loading user email:', error)

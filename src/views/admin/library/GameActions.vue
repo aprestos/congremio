@@ -54,7 +54,7 @@ const gameStatus = computed(() => {
       <button
         v-show="gameStatus === 'available'"
         type="button"
-        class="relative inline-flex items-center gap-x-1.5 rounded-l-md bg-gray-100 px-4 py-3 md:px-3 md:py-2 text-sm font-semibold shadow-xs text-gray-600 dark:text-gray-200 ring-1 ring-gray-300 ring-inset hover:bg-gray-200 dark:bg-white/10 dark:ring-gray-700 dark:hover:bg-white/20"
+        class="relative cursor-pointer inline-flex items-center gap-x-1.5 rounded-l-md bg-gray-100 px-4 py-3 md:px-3 md:py-2 text-sm font-semibold shadow-xs text-gray-600 dark:text-gray-200 ring-1 ring-gray-300 ring-inset hover:bg-gray-200 dark:bg-white/10 dark:ring-gray-700 dark:hover:bg-white/20"
         @click="emit('withdraw-game', props.data)"
       >
         <IconArrowBarUp class="-ml-0.5 size-5" aria-hidden="true" />
@@ -64,7 +64,7 @@ const gameStatus = computed(() => {
         <MenuButton
           :class="[
             gameStatus === 'not-available' ? 'rounded-md' : 'rounded-r-md',
-            'inline-flex ring-1 w-full justify-center -ml-px gap-x-1.5 bg-gray-100 px-4 py-3 md:px-3 md:py-2 text-sm font-semibold text-gray-900 shadow-xs hover:bg-gray-50 dark:bg-white/10 dark:text-white dark:shadow-none dark:hover:bg-white/20 ring-gray-300 ring-inset inset-ring-1 inset-ring-gray-300 dark:ring-gray-700 dark:inset-ring-white/5',
+            'inline-flex cursor-pointer ring-1 w-full justify-center -ml-px gap-x-1.5 bg-gray-100 px-4 py-3 md:px-3 md:py-2 text-sm font-semibold text-gray-900 shadow-xs hover:bg-gray-50 dark:bg-white/10 dark:text-white dark:shadow-none dark:hover:bg-white/20 ring-gray-300 ring-inset inset-ring-1 inset-ring-gray-300 dark:ring-gray-700 dark:inset-ring-white/5',
           ]"
         >
           <IconDotsVertical class="size-5" />
@@ -88,7 +88,7 @@ const gameStatus = computed(() => {
                     active
                       ? 'bg-gray-100 text-gray-900 outline-hidden dark:bg-white/5 dark:text-white'
                       : 'text-gray-700 dark:text-gray-300',
-                    'flex items-center px-4 py-2 text-sm',
+                    'flex items-center px-4 py-2 text-sm cursor-pointer',
                   ]"
                   @click="emit('open-update-dialog', props.data)"
                 >
@@ -115,7 +115,7 @@ const gameStatus = computed(() => {
                     active
                       ? 'bg-gray-100 text-gray-900 outline-hidden dark:bg-white/5 dark:text-white'
                       : 'text-gray-700 dark:text-gray-300',
-                    'flex items-center px-4 py-2 text-sm',
+                    'flex items-center px-4 py-2 text-sm cursor-pointer',
                   ]"
                   @click="updateStatus('available' as LibraryGameStatus)"
                 >
@@ -140,7 +140,7 @@ const gameStatus = computed(() => {
                     active
                       ? 'bg-gray-100 text-gray-900 outline-hidden dark:bg-white/5 dark:text-white'
                       : 'text-gray-700 dark:text-gray-300',
-                    'flex items-center px-4 py-2 text-sm',
+                    'flex items-center px-4 py-2 text-sm cursor-pointer',
                   ]"
                   @click="updateStatus('not-available' as LibraryGameStatus)"
                 >
@@ -162,7 +162,7 @@ const gameStatus = computed(() => {
                     active
                       ? 'bg-gray-100 text-gray-900 outline-hidden dark:bg-white/5 dark:text-white'
                       : 'text-gray-700 dark:text-gray-300',
-                    'flex items-center px-4 py-2 text-sm',
+                    'flex items-center px-4 py-2 text-sm cursor-pointer',
                   ]"
                   @click="emit('move', props.data)"
                 >
@@ -186,7 +186,7 @@ const gameStatus = computed(() => {
                     active
                       ? 'bg-gray-100 text-gray-900 outline-hidden dark:bg-white/5 dark:text-white'
                       : 'text-gray-700 dark:text-gray-300',
-                    'flex items-center px-4 py-2 text-sm',
+                    'flex items-center px-4 py-2 text-sm cursor-pointer',
                   ]"
                   @click="emit('delete-game', props.data.id)"
                 >

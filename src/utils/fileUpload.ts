@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase'
+import { authService } from '@/features/auth/service.ts'
 
 export interface FileUploadOptions {
   bucket: string
@@ -80,11 +81,8 @@ export async function uploadFileToSupabase(
 
   try {
     // Check authentication first
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser()
-    if (authError || !user) {
+    const user = await authService.getUser()
+    if (!user) {
       return {
         originalFile: file,
         supabaseData: null,

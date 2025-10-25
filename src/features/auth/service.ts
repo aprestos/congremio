@@ -1,9 +1,10 @@
-import type { UserResponse } from '@supabase/supabase-js'
 import type { Access, TenantAccess } from '@/features/auth/access.model.ts'
 import { supabase } from '@/lib/supabase.ts'
 import { tenantStore } from '@/stores/tenant.ts'
+import type { User } from '@/features/auth/user.model.ts'
 
 export const authService = {
+  // Authentication methods
   async signUp(
     name: string,
     email: string,
@@ -31,72 +32,76 @@ export const authService = {
 
     return data
   },
-  async signIn(email: string, password: string): Promise<void> {
-    await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
-  },
-  async signInWithOTP(email: string): Promise<void> {
+
+  async signInWithEmail(email: string): Promise<void> {
     await supabase.auth.signInWithOtp({
       email,
       options: {
-        // set this to false if you do not want the user to be automatically signed up
         shouldCreateUser: true,
         emailRedirectTo: `${window.location.origin}/auth/confirm`,
+        data: {
+          tenant_name: tenantStore.value?.name,
+        },
       },
     })
   },
-  async getUser(): Promise<UserResponse> {
-    return supabase.auth.getUser()
+
+  async validateOTP(email: string, token: string): Promise<void> {
+    const { data, error } = await supabase.auth.verifyOtp({
+      email,
+      token,
+      type: 'email',
+    })
+
+    if (!data && error) {
+      console.error(error)
+      throw new Error('This code is invalid or expired')
+    }
   },
 
-  async getAccess(): Promise<TenantAccess> {
+  async signOut(): Promise<void> {
+    await supabase.auth.signOut()
+  },
+
+  // User data methods (using getClaims)
+  async getUser(): Promise<User | null> {
     const { data } = await supabase.auth.getClaims()
 
-    const tenant_id = tenantStore.value?.id
-    const access: Access = data?.claims?.access
+    if (!data?.claims?.sub) {
+      return null
+    }
 
-    console.log('access', access)
-    if (!tenant_id || !access || !access[tenant_id]) {
-      return { role: '', permissions: [] }
-    } else return access[tenant_id]
+    const tenantId: string = tenantStore.value?.id as string
+    let access: TenantAccess | undefined = undefined
+    if (data.claims?.access) {
+      access = (data.claims.access as Access)[tenantId]
+    }
+
+    return {
+      email: data.claims.email,
+      name: data.claims.user_metadata?.display_name, // eslint-disable-line @typescript-eslint/no-unsafe-member-access -- user_metadata is a dynamic object from auth provider
+      id: data.claims.sub,
+      access,
+    }
   },
 
-  async getRole(): Promise<string | undefined> {
-    const access = await this.getAccess()
-
-    if (!access) return undefined
-    else return access.role
+  async isAuthenticated(): Promise<boolean> {
+    const { data } = await supabase.auth.getClaims()
+    return !!data?.claims?.sub
   },
 
-  async getPermissions(): Promise<string[]> {
-    const access: TenantAccess = await this.getAccess()
-
-    if (!access) return []
-    else return access.permissions || []
-  },
-
-  async isStaffOrHigher(): Promise<boolean> {
-    const role = await this.getRole()
-
-    return role === 'staff' || role === 'admin' || role === 'super-admin'
-  },
-  async isAdminOrHigher(): Promise<boolean> {
-    const role = await this.getRole()
-
-    return role === 'admin' || role === 'super-admin'
-  },
+  // Utility methods
   async setTenant(userId: string): Promise<void> {
-    // Call the user-tenant function to set up user-tenant relationship
     await supabase.functions.invoke('user-tenant', {
       body: {
         user_id: userId,
+        tenant_id: tenantStore.value?.id,
       },
       method: 'POST',
     })
   },
-  async updateUserMetadata(metadata: Record<string, any>): Promise<void> {
+
+  async updateUserMetadata(metadata: Record<string, unknown>): Promise<void> {
     const { error } = await supabase.auth.updateUser({
       data: metadata,
     })
@@ -104,7 +109,12 @@ export const authService = {
       throw error
     }
   },
-  async signOut(): Promise<void> {
-    await supabase.auth.signOut()
+
+  hasAnyOfTheRoles(user: User, roles: string[]): boolean {
+    if (!roles || !user?.access?.role) return false
+
+    if (user.access.role === 'super-admin') return true
+
+    return roles.includes(user.access.role)
   },
 }

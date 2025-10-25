@@ -11,11 +11,11 @@ enum Admin {
 
 enum Public {
   root = 'root',
-  home = 'home',
-  library = 'library',
-  fleeMarket = 'flee-market',
-  tournaments = 'tournaments',
-  prototypes = 'prototypes',
+  home = 'public.home',
+  library = 'public.library',
+  fleeMarket = 'public.flee-market',
+  tournaments = 'public.tournaments',
+  prototypes = 'public.prototypes',
 }
 
 enum Auth {
