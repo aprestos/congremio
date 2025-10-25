@@ -61,7 +61,7 @@ interface Props {
 }
 
 withDefaults(defineProps<Props>(), {
-  label: '',
+  label: undefined,
   type: 'text',
   placeholder: '',
   name: undefined,
