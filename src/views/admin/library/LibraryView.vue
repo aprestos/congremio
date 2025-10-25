@@ -354,10 +354,6 @@ watch(reservationInput, (newVal) => {
 onMounted(() => {
   // subscribe to service updates
   unsubscribe = Service.subscribeToUpdates((updatedGames) => {
-    console.log(
-      'LibraryView: Received games update:',
-      updatedGames?.length || 0,
-    )
     allGames.value = updatedGames || []
   })
 })
@@ -365,27 +361,6 @@ onMounted(() => {
 onUnmounted(() => {
   if (unsubscribe) unsubscribe()
 })
-
-// Add watchers for debugging
-watch(
-  allGames,
-  (newGames) => {
-    console.log('LibraryView: allGames updated to', newGames.length, 'items')
-  },
-  { immediate: true },
-)
-
-watch(
-  filteredGames,
-  (newFilteredGames) => {
-    console.log(
-      'LibraryView: filteredGames updated to',
-      newFilteredGames.length,
-      'items',
-    )
-  },
-  { immediate: true },
-)
 
 // Event handlers
 const onGameAdded = (): void => {

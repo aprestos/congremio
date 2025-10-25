@@ -1,5 +1,6 @@
 import type { Tenant } from '@/features/tenant/tenant.model.ts'
 import { supabase } from '@/lib/supabase.ts'
+import { log } from '@/lib/logger.ts'
 
 export const tenantService = {
   async get(): Promise<Array<Tenant>> {
@@ -7,7 +8,7 @@ export const tenantService = {
       const result = await supabase.from('tenants').select('id,name,domain')
       return result.data as Tenant[]
     } catch (error) {
-      console.error((error as Error).message)
+      log.error('Error on tenantService.get()', { error })
       return []
     }
   },
@@ -38,7 +39,7 @@ export const tenantService = {
 
       throw new Error(`No tenant found for domain: ${domain}`)
     } catch (error) {
-      console.error((error as Error).message)
+      log.error('Error on tenantService.getByDomain()', { error })
       throw error
     }
   },

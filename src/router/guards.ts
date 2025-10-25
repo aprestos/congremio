@@ -1,6 +1,7 @@
 import type { NavigationGuardNext, RouteLocationNormalized } from 'vue-router'
 import { authService } from '@/features/auth/service.ts'
 import { RouteNames } from '@/router/routeNames'
+import { log } from '@/lib/logger'
 
 // Guard function type
 export type RouteGuard = () => Promise<boolean>
@@ -39,9 +40,9 @@ export const navigationGuard = async (
   try {
     // Check custom guard function
     if (to.meta.guard) {
-      console.log('calling guard', to.meta.guard)
+      log.debug('calling guard', to.meta)
       const hasPermission = await to.meta.guard()
-      console.log('hasPermission', hasPermission)
+      log.debug('hasPermission', { hasPermission })
 
       if (hasPermission) {
         next()
