@@ -138,7 +138,9 @@ const importGames = async (): Promise<void> => {
     'library-games',
     gamesToImport.value,
   )
+  void queueService.process()
   clearImportList()
+
   toast.success('Games added to import queue')
 }
 </script>
