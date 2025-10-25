@@ -52,11 +52,11 @@ const router = createRouter({
         {
           path: 'sign-in',
           name: RouteNames.auth.signIn,
-          component: () => import('../views/auth/SignInView-MagicLink.vue'),
+          component: () => import('../views/auth/SignInView.vue'),
         },
         {
           path: 'confirm',
-          name: 'confirm',
+          name: RouteNames.auth.confirm,
           component: () => import('../views/auth/ConfirmView.vue'),
         },
       ],

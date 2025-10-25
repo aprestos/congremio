@@ -1,4 +1,4 @@
-import type { Access } from '@/features/auth/access.model.ts'
+import type { Access, TenantAccess } from '@/features/auth/access.model.ts'
 import { supabase } from '@/lib/supabase.ts'
 import { tenantStore } from '@/stores/tenant.ts'
 import type { User } from '@/features/auth/user.model.ts'
@@ -33,21 +33,30 @@ export const authService = {
     return data
   },
 
-  async signIn(email: string, password: string): Promise<void> {
-    await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
-  },
-
-  async signInWithOTP(email: string): Promise<void> {
+  async signInWithEmail(email: string): Promise<void> {
     await supabase.auth.signInWithOtp({
       email,
       options: {
         shouldCreateUser: true,
         emailRedirectTo: `${window.location.origin}/auth/confirm`,
+        data: {
+          tenant_name: tenantStore.value?.name,
+        },
       },
     })
+  },
+
+  async validateOTP(email: string, token: string): Promise<void> {
+    const { data, error } = await supabase.auth.verifyOtp({
+      email,
+      token,
+      type: 'email',
+    })
+
+    if (!data && error) {
+      console.error(error)
+      throw new Error('This code is invalid or expired')
+    }
   },
 
   async signOut(): Promise<void> {
@@ -62,15 +71,17 @@ export const authService = {
       return null
     }
 
-    const tenantId: string | undefined = tenantStore.value?.id
+    const tenantId: string = tenantStore.value?.id as string
+    let access: TenantAccess | undefined = undefined
+    if (data.claims?.access) {
+      access = (data.claims.access as Access)[tenantId]
+    }
 
     return {
       email: data.claims.email,
       name: data.claims.user_metadata?.display_name, //eslint-disable-line
       id: data.claims.sub,
-      access: tenantId
-        ? (data.claims?.access as Access)[tenantId] || undefined
-        : undefined,
+      access,
     }
   },
 
@@ -101,6 +112,8 @@ export const authService = {
 
   hasAnyOfTheRoles(user: User, roles: string[]): boolean {
     if (!roles || !user?.access?.role) return false
+
+    if (user.access.role === 'super-admin') return true
 
     return roles.includes(user.access.role)
   },

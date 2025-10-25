@@ -10,6 +10,7 @@ import GameItem from './GameItem.vue'
 import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
 import libraryReservationService from '@/features/library/reservations/service.ts'
 import { toast } from 'vue-sonner'
+import { authService } from '@/features/auth/service.ts'
 
 const allGames = ref<LibraryGame[]>([])
 const loading = ref(true)
@@ -25,6 +26,7 @@ const loadMoreTrigger = ref<HTMLElement>()
 const showReservationDialog = ref(false)
 const selectedGameForReservation = ref<LibraryGame | null>(null)
 const loadingReservation = ref(false)
+const isAuthenticated = ref(false)
 
 interface Props {
   filters?: FilterOptions | undefined
@@ -141,7 +143,9 @@ const cancelReservation = (): void => {
   selectedGameForReservation.value = null
 }
 
-onMounted(() => {
+onMounted(async () => {
+  isAuthenticated.value = !!(await authService.getUser())
+
   // Subscribe to realtime updates without filters - filters are applied reactively
   unsubscribe = libraryService.subscribeToUpdates((updatedGames) => {
     allGames.value = updatedGames
@@ -182,6 +186,7 @@ onUnmounted(() => {
         v-for="game in games"
         :key="game.id"
         :game="game"
+        :is-authenticated="isAuthenticated"
         @game-click="openGameDetail"
         @add-to-bag-click="handleReserveClick"
       />
