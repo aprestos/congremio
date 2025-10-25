@@ -18,7 +18,7 @@ export const requiresAuth = async (): Promise<boolean> => {
 
 // Staff permission check guard
 export const hasAnyOfRoles = async (roles: string[]): Promise<boolean> => {
-  if (!roles) return false
+  if (!roles || roles.length === 0) return false
   try {
     const user = await authService.getUser()
     if (!user?.access?.role) return false
