@@ -72,14 +72,18 @@ let intervalId: number | null = null
 // Current time for reactivity
 const now = ref(Date.now())
 
-let timer: number
+let timer: number | undefined
 
 onMounted(() => {
   timer = window.setInterval(() => {
     now.value = Date.now()
   }, 1000) // update once per second
 })
-onUnmounted(() => clearInterval(timer))
+onUnmounted(() => {
+  if (timer !== undefined) {
+    clearInterval(timer)
+  }
+})
 
 // Filter out expired reservations
 const activeReservations = computed(() => {
