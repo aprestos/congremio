@@ -159,6 +159,7 @@ import CInput from '@/components/CInput.vue'
 import type { LibraryGame } from '@/features/library/game.model.ts'
 import libraryWithdrawService from '@/features/library/withdraws/service.ts'
 import { userService } from '@/features/users/service.ts'
+import logger from '@/lib/logger.ts'
 
 interface Props {
   game: LibraryGame | null
@@ -202,7 +203,7 @@ const submit = async (): Promise<void> => {
   const { valid, data } = await r$.$validate()
 
   if (!valid) {
-    console.log('Form has validation errors')
+    logger.debug('Form has validation errors')
     return
   }
 
@@ -234,7 +235,7 @@ const createUser = async (): Promise<void> => {
   const { valid, data } = await newUserR$.$validate()
 
   if (!valid) {
-    console.log('New user form has validation errors')
+    logger.debug('New user form has validation errors')
     return
   }
 

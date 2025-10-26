@@ -157,6 +157,7 @@ import {
   settingsStore,
 } from '@/features/settings/useSettings.store.ts'
 import type { Setting } from '@/features/settings/setting.model.ts'
+import logger from '@/lib/logger.ts'
 
 // Features state
 const features = ref(
@@ -186,10 +187,12 @@ const saveFeatures = async (): Promise<void> => {
 
     await saveEnabledFeatures(features.value)
 
-    console.log('Feature settings saved successfully:', features.value)
+    logger.debug('Feature settings saved successfully:', {
+      value: features.value,
+    })
     toast.success('Feature settings saved successfully!')
   } catch (error) {
-    console.error('Error saving feature settings:', error)
+    logger.error('Error saving feature settings:', { error })
     toast.error('Failed to save feature settings. Please try again.')
   } finally {
     isSaving.value = false

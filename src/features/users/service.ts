@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase'
-import { log } from '@/lib/logger.ts'
+import logger from '@/lib/logger.ts'
 
 export interface User {
   id: string
@@ -54,7 +54,7 @@ export const userService = {
 
     if (data) return data as User
     else {
-      log.error('Unable to create user', { error })
+      logger.error('Unable to create user', { error })
       throw new Error('Unable to create user')
     }
   },

@@ -29,8 +29,6 @@ function onUpdate(value: unknown): void {
 }
 
 const handleSearch = useDebounceFn(async (value) => {
-  console.log('calling onSearch with value:', value)
-  console.log('onSearch', props.onSearch)
   if (!props.onSearch) return
 
   isLoading.value = true
@@ -39,7 +37,6 @@ const handleSearch = useDebounceFn(async (value) => {
     if (value?.length > 1) {
       const result = await props.onSearch(value)
       if (!Array.isArray(result)) {
-        console.log('Result is not an array:', result)
         return
       }
       options.value = result.map((item) => {

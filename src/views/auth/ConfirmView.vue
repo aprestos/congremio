@@ -14,6 +14,7 @@ import { authService } from '@/features/auth/service.ts'
 import router from '@/router'
 import { RouteNames } from '@/router/routeNames.ts'
 import CInput from '@/components/CInput.vue'
+import logger from '@/lib/logger.ts'
 
 const isValidating = ref(true)
 const isSuccess = ref(false)
@@ -37,7 +38,9 @@ onMounted(async () => {
       // User doesn't have roles for this tenant, set up the relationship
       await authService.setTenant(user.id)
     } else {
-      console.log('User already has role for this tenant:', user.access)
+      logger.debug('User already has role for this tenant:', {
+        access: user.access,
+      })
     }
 
     // Check if user has name defined

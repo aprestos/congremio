@@ -18,6 +18,7 @@ import { libraryLocationService } from '@/features/library/locations/service.ts'
 import { queueService } from '@/features/queues/queue.service.ts'
 import { tenantStore } from '@/stores/tenant.ts'
 import { eventStore } from '@/stores/edition.ts'
+import logger from '@/lib/logger.ts'
 
 const locations = ref<LibraryLocation[]>([])
 const isLoading = ref(false)
@@ -73,18 +74,13 @@ const addLocation = async (): Promise<void> => {
 }
 
 const deleteLocation = async (id: number): Promise<void> => {
-  if (!confirm('Are you sure you want to delete this location?')) {
-    return
-  }
-
   try {
-    console.log(id)
-    //await libraryLocationService.delete(id)
+    await libraryLocationService.delete(id)
     toast.success('Location deleted successfully')
     await loadLocations()
   } catch (error) {
-    console.error('Error deleting location:', error)
-    toast.error('Failed to delete location')
+    logger.error('Error deleting location.', { error })
+    toast.error('Failed to delete location.')
   }
 }
 
@@ -225,7 +221,7 @@ const importGames = async (): Promise<void> => {
           </div>
           <button
             type="button"
-            class="hidden flex-shrink-0 rounded-md p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:text-red-400 dark:hover:bg-red-900/20 transition-colors"
+            class="flex-shrink-0 rounded-md p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:text-red-400 dark:hover:bg-red-900/20 transition-colors"
             @click="deleteLocation(location.id)"
           >
             <span class="sr-only">Delete {{ location.name }}</span>

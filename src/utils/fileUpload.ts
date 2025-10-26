@@ -95,7 +95,6 @@ export async function uploadFileToSupabase(
       }
     }
 
-    console.log('Authenticated user:', user.id)
     // Upload to Supabase Storage
     const { data, error } = await supabase.storage
       .from(options.bucket)

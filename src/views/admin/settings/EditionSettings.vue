@@ -249,6 +249,7 @@ import FilePondUploadDialog from '@/components/FilePondUploadDialog.vue'
 import { editionService } from '@/features/events/service.ts'
 import { tenantStore } from '@/stores/tenant.ts'
 import { eventStore } from '@/stores/edition.ts'
+import logger from '@/lib/logger.ts'
 
 interface DailySchedule {
   date: string
@@ -293,7 +294,7 @@ const handlePosterUploadSuccess = (urls: string[]): void => {
   if (url) {
     posterPreview.value = url
     formData.value.poster = url
-    console.log('Poster uploaded successfully:', url)
+    logger.debug('Poster uploaded successfully:', { url })
     toast.success('Poster uploaded successfully!')
   }
 }
@@ -424,10 +425,10 @@ const saveEdition = async (): Promise<void> => {
       }
     }
 
-    console.log('Edition settings saved successfully:', editionData)
+    logger.debug('Edition settings saved successfully:', { editionData })
     toast.success('Edition settings saved successfully!')
   } catch (error) {
-    console.error('Error saving edition settings:', error)
+    logger.error('Error saving edition settings:', { error })
     toast.error('Failed to save edition settings. Please try again.')
   } finally {
     isSaving.value = false

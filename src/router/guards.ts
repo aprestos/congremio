@@ -1,7 +1,7 @@
 import type { NavigationGuardNext, RouteLocationNormalized } from 'vue-router'
 import { authService } from '@/features/auth/service.ts'
 import { RouteNames } from '@/router/routeNames'
-import { log } from '@/lib/logger'
+import logger from '@/lib/logger'
 
 // Guard function type
 export type RouteGuard = () => Promise<boolean>
@@ -12,7 +12,7 @@ export const requiresAuth = async (): Promise<boolean> => {
     const user = await authService.getUser()
     return !!user
   } catch (error) {
-    console.error('Error checking authentication:', error)
+    logger.error('Error on guards.requiresAuth()', { error })
     return false
   }
 }
@@ -26,7 +26,7 @@ export const hasAnyOfRoles = async (roles: string[]): Promise<boolean> => {
     if (user.access.role === 'super-admin') return true
     return roles.includes(user.access.role)
   } catch (error) {
-    console.error('Error checking staff permissions:', error)
+    logger.error('Error checking staff permissions:', { error })
     return false
   }
 }
@@ -40,9 +40,9 @@ export const navigationGuard = async (
   try {
     // Check custom guard function
     if (to.meta.guard) {
-      log.debug('calling guard', to.meta)
+      logger.debug('calling guard', to.meta)
       const hasPermission = await to.meta.guard()
-      log.debug('hasPermission', { hasPermission })
+      logger.debug('hasPermission', { hasPermission })
 
       if (hasPermission) {
         next()

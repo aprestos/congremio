@@ -83,6 +83,7 @@ import type { Game } from '@/features/external-game/model.ts'
 import gameService from '@/features/external-game/service.ts'
 import { libraryService } from '@/features/library/service.ts'
 import { libraryLocationService } from '@/features/library/locations/service.ts'
+import logger from '@/lib/logger.ts'
 
 const formData = ref<{
   selectedGame: number | undefined
@@ -115,7 +116,7 @@ const submit = async (): Promise<void> => {
   const { valid, data } = await r$.$validate()
 
   if (!valid) {
-    console.log('Form has validation errors')
+    logger.debug('Form has validation errors')
     return
   }
 

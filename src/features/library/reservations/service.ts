@@ -3,6 +3,7 @@ import { supabase } from '@/lib/supabase.ts'
 import { eventStore } from '@/stores/edition'
 import { tenantStore } from '@/stores/tenant.ts'
 import type { LibraryGame } from '@/features/library/game.model.ts'
+import logger from '@/lib/logger.ts'
 
 export interface LibraryReservation {
   tenant_id: string
@@ -33,7 +34,6 @@ export const libraryReservationService = {
         .gt('expires_at', now)
         .single()
 
-      console.log(result.data)
       return result.data as unknown as LibraryReservation
     } catch (error) {
       console.error((error as Error).message)
@@ -56,10 +56,9 @@ export const libraryReservationService = {
         .eq('user_id', user?.id)
         .gt('expires_at', now)
 
-      console.log(result.data)
       return result.data as unknown as LibraryReservation[]
     } catch (error) {
-      console.error((error as Error).message)
+      logger.error('Error fetching reservations', { error })
       return []
     }
   },
@@ -80,7 +79,7 @@ export const libraryReservationService = {
     if (data) {
       return
     } else {
-      console.log(error)
+      logger.error('Error creating reservation', error)
       throw new Error('Failed to reserve game')
     }
   },
