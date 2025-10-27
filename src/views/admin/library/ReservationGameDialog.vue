@@ -15,14 +15,14 @@
         </p>
       </div>
 
+      <h2 class="text-2xl font-light text-gray-900 dark:text-white mb-4">
+        Reserved Game
+      </h2>
       <!-- Game Details -->
-      <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-6">
-        <h4 class="text-sm font-semibold text-gray-900 dark:text-white mb-4">
-          Game Information
-        </h4>
+      <div class="p-6 rounded-lg bg-gray-100">
         <div class="flex items-center gap-4">
           <img
-            v-if="gameImage"
+            v-if="props.reservation?.library_game?.game?.image"
             :src="gameImage"
             :alt="gameName"
             class="w-20 h-20 rounded-lg object-cover shadow-sm flex-shrink-0"
@@ -50,42 +50,26 @@
         </div>
       </div>
 
+      <h2 class="text-2xl font-light text-gray-900 dark:text-white mb-4">
+        Person
+      </h2>
       <!-- User Details -->
-      <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-6">
-        <h4 class="text-sm font-semibold text-gray-900 dark:text-white mb-4">
-          Reserved By
-        </h4>
-        <div class="space-y-2">
-          <div class="flex items-center justify-between">
-            <span class="text-sm text-gray-600 dark:text-gray-400">
-              User ID:
-            </span>
-            <span class="text-sm font-medium text-gray-900 dark:text-white">
-              {{ props.reservation.user_id }}
-            </span>
+      <div class="p-6 rounded-lg bg-gray-100">
+        <div class="flex items-center gap-4">
+          <div
+            class="flex text-4xl w-20 h-20 items-center justify-center rounded-full bg-indigo-600 text-white font-semibold"
+          >
+            F
           </div>
-          <div class="flex items-center justify-between">
-            <span class="text-sm text-gray-600 dark:text-gray-400">
-              Expires At:
-            </span>
-            <span class="text-sm font-medium text-gray-900 dark:text-white">
-              {{ formattedExpiryTime }}
-            </span>
-          </div>
-          <div class="flex items-center justify-between">
-            <span class="text-sm text-gray-600 dark:text-gray-400">
-              Time Remaining:
-            </span>
-            <span
-              :class="[
-                'text-sm font-medium',
-                timeRemaining > 0
-                  ? 'text-green-600 dark:text-green-400'
-                  : 'text-red-600 dark:text-red-400',
-              ]"
+          <div class="flex-1 p-4 bg-gray-100">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+              {{ user?.name || 'User' }}
+            </h3>
+            <p
+              class="text-sm flex flex-row text-gray-600 dark:text-gray-300 mt-1"
             >
-              {{ timeRemainingFormatted }}
-            </span>
+              <IconMail class="size-4 mr-2" /> {{ user?.email }}
+            </p>
           </div>
         </div>
       </div>
@@ -116,10 +100,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { toast } from 'vue-sonner'
 import DialogComponent from '@/components/DialogComponent.vue'
 import type { LibraryReservation } from '@/features/library/reservations/service'
+import { type User, userService } from '@/features/users/service.ts'
+import { IconMail } from '@tabler/icons-vue'
 
 interface LibraryGameWithDetails {
   game?: {
@@ -147,7 +133,29 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<Emits>()
 
+const isLoadingUser = ref(false)
 const isWithdrawing = ref(false)
+
+const user = ref<User | null>(null)
+
+onMounted(async () => {
+  if (!props.reservation?.user_id) return
+
+  isLoadingUser.value = true
+
+  try {
+    user.value = await userService.getById(props.reservation?.user_id)
+  } catch (error) {
+    console.error('Failed to fetch user data:', error)
+    toast.error('Failed to fetch user data. Please try again.')
+  } finally {
+    isLoadingUser.value = false
+  }
+})
+onUnmounted(() => {
+  isLoadingUser.value = false
+  user.value = null
+})
 
 // Computed properties
 const gameName = computed(() => {
@@ -184,27 +192,6 @@ const gameImage = computed(() => {
     return libraryGame.game?.image_url || libraryGame.game?.image
   }
   return undefined
-})
-
-const formattedExpiryTime = computed(() => {
-  if (!props.reservation?.expires_at) return '-'
-  return new Date(props.reservation.expires_at).toLocaleString()
-})
-
-const timeRemaining = computed(() => {
-  if (!props.reservation?.expires_at) return 0
-  const now = new Date().getTime()
-  const expiryTime = new Date(props.reservation.expires_at).getTime()
-  return expiryTime - now
-})
-
-const timeRemainingFormatted = computed(() => {
-  const remaining = timeRemaining.value
-  if (remaining <= 0) return 'Expired'
-
-  const minutes = Math.floor(remaining / 60000)
-  const seconds = Math.floor((remaining % 60000) / 1000)
-  return `${minutes}m ${seconds}s`
 })
 
 // Event handlers

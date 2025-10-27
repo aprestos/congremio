@@ -33,16 +33,6 @@ const router = createRouter({
           name: RouteNames.public.library,
           component: () => import('@/views/public/library/HomeView.vue'),
         },
-        {
-          path: 'flee-market',
-          name: RouteNames.public.fleeMarket,
-          component: () => import('@/views/public/flee-market/HomeView.vue'),
-        },
-        {
-          path: 'tournaments',
-          name: RouteNames.public.tournaments,
-          component: () => import('@/views/public/flee-market/HomeView.vue'),
-        },
       ],
     },
     {
@@ -73,17 +63,17 @@ const router = createRouter({
         {
           path: '',
           name: RouteNames.admin.dashboard,
-          component: () => import('../views/admin/dashboard/HomeView.vue'),
+          component: () => import('../views/admin/dashboard/DashboardHome.vue'),
         },
         {
           path: 'library',
           name: RouteNames.admin.library,
-          component: () => import('../views/admin/library/LibraryView.vue'),
+          component: () => import('../views/admin/library/LibraryHome.vue'),
         },
         {
           path: 'events',
           name: RouteNames.admin.events,
-          component: () => import('../views/admin/events/HomeView.vue'),
+          component: () => import('../views/admin/events/EventsHome.vue'),
         },
         {
           path: 'tournaments',
@@ -102,7 +92,7 @@ const router = createRouter({
               path: 'general',
               name: RouteNames.admin.settingsGeneral,
               component: () =>
-                import('../views/admin/settings/GeneralSettings.vue'),
+                import('../views/admin/settings/general/GeneralSettings.vue'),
             },
             {
               path: 'library',

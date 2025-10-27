@@ -57,22 +57,20 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { toast } from 'vue-sonner'
 import DialogComponent from '@/components/DialogComponent.vue'
 import CSelect from '@/components/CSelect.vue'
 import type { LibraryGame } from '@/features/library/game.model.ts'
 import type { LibraryLocation } from '@/features/library/locations/location.model.ts'
-import { libraryService } from '@/features/library/service.ts'
 
 interface Props {
   open?: boolean
   selectedGame?: LibraryGame | null
   locations?: LibraryLocation[]
+  onMove: (locationId: number) => Promise<void>
 }
 
 interface Emits {
   (e: 'close'): void
-  (e: 'moved'): void
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -117,25 +115,13 @@ const handleClose = (): void => {
 }
 
 const handleMove = async (): Promise<void> => {
-  if (!props.selectedGame || selectedLocationId.value === null) return
+  if (selectedLocationId.value === null) return
 
   isMoving.value = true
   try {
-    // Update with raw database column name since we're updating directly
-    await libraryService.updateGame(props.selectedGame.id, {
-      location_id: selectedLocationId.value,
-    } as Partial<LibraryGame>)
-
-    toast.success(
-      `${props.selectedGame.game.name} has been moved to a new location.`,
-    )
-
+    await props.onMove(selectedLocationId.value)
     selectedLocationId.value = null
-    emit('moved')
     emit('close')
-  } catch (error) {
-    console.error('Failed to move game:', error)
-    toast.error('Failed to move the game. Please try again.')
   } finally {
     isMoving.value = false
   }

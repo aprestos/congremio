@@ -13,20 +13,20 @@ import { IconHourglassHigh } from '@tabler/icons-vue'
 interface Props {
   open: boolean
   selectedGame: LibraryGame | null
-  isReturningGame: boolean
+  onConfirm: () => Promise<void>
 }
 
 const props = defineProps<Props>()
 
 const emit = defineEmits<{
   close: []
-  confirm: []
   cancel: []
 }>()
 
 const activeWithdraw = ref<LibraryWithdraw | null>(null)
 const withdrawUser = ref<User | null>(null)
 const isLoadingWithdraw = ref(false)
+const isReturningGame = ref(false)
 
 const withdrawDate = computed(() => {
   if (!activeWithdraw.value?.started_at) return null
@@ -60,6 +60,16 @@ watch(
   },
   { immediate: true },
 )
+
+async function handleConfirm(): Promise<void> {
+  isReturningGame.value = true
+  try {
+    await props.onConfirm()
+    emit('close')
+  } finally {
+    isReturningGame.value = false
+  }
+}
 </script>
 
 <template>
@@ -69,7 +79,7 @@ watch(
     confirm-text="Yes, return it"
     cancel-text="Cancel"
     :loading="isReturningGame"
-    @confirm="emit('confirm')"
+    @confirm="handleConfirm"
     @cancel="emit('cancel')"
     @close="emit('close')"
   >

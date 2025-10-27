@@ -1,31 +1,61 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import DialogComponent from '@/components/DialogComponent.vue'
 import type { LibraryGame } from '@/features/library/game.model.ts'
 
 interface Props {
   open: boolean
   selectedGame: LibraryGame | null
-  isLoadingWithdrawCount: boolean
-  withdrawCount: number | null
-  isDeletingGame: boolean
+  onLoadWithdrawCount: () => Promise<number>
+  onConfirm: () => Promise<void>
 }
 
 const props = defineProps<Props>()
 
 const emit = defineEmits<{
   close: []
-  confirm: []
 }>()
+
+const isLoadingWithdrawCount = ref(false)
+const isDeletingGame = ref(false)
+const withdrawCount = ref<number | null>(null)
 
 // Computed property for delete button disabled state
 const isDeleteButtonDisabled = computed(() => {
   return (
-    props.isLoadingWithdrawCount ||
-    props.withdrawCount === null ||
-    props.withdrawCount > 0
+    isLoadingWithdrawCount.value ||
+    withdrawCount.value === null ||
+    withdrawCount.value > 0
   )
 })
+
+// Load withdraw count when dialog opens
+watch(
+  () => props.open,
+  async (open) => {
+    if (open) {
+      isLoadingWithdrawCount.value = true
+      withdrawCount.value = null
+      try {
+        withdrawCount.value = await props.onLoadWithdrawCount()
+      } catch (error) {
+        console.error('Failed to fetch withdraw count:', error)
+      } finally {
+        isLoadingWithdrawCount.value = false
+      }
+    }
+  },
+)
+
+async function handleConfirm(): Promise<void> {
+  isDeletingGame.value = true
+  try {
+    await props.onConfirm()
+    emit('close')
+  } finally {
+    isDeletingGame.value = false
+  }
+}
 </script>
 
 <template>
@@ -116,7 +146,7 @@ const isDeleteButtonDisabled = computed(() => {
           type="button"
           class="rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
           :disabled="isDeleteButtonDisabled || isDeletingGame"
-          @click="emit('confirm')"
+          @click="handleConfirm"
         >
           <span v-if="isDeletingGame">Deleting...</span>
           <span v-else>Yes, delete it</span>

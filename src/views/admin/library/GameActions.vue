@@ -43,9 +43,9 @@ const gameStatus = computed(() => {
   <div class="text-right">
     <span class="inline-flex rounded-md shadow-xs dark:shadow-none">
       <button
-        v-show="gameStatus === 'withdrawn' || gameStatus === 'reserved'"
+        v-show="gameStatus === 'withdrawn'"
         type="button"
-        class="relative inline-flex items-center gap-x-1.5 rounded-l-md bg-gray-100 px-4 py-3 md:px-3 md:py-2 text-sm font-semibold shadow-xs text-gray-600 dark:text-gray-200 ring-1 ring-gray-300 ring-inset hover:bg-gray-200 dark:bg-white/10 dark:ring-gray-700 dark:hover:bg-white/20"
+        class="relative inline-flex items-center gap-x-1.5 rounded-l-md bg-gray-100 px-4 py-3 md:px-3 md:py-2 text-sm font-semibold shadow-xs text-gray-600 dark:text-gray-200 ring-1 ring-gray-300 ring-inset hover:bg-gray-200 dark:bg-white/10 dark:ring-gray-700 dark:hover:bg-white/20 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-blue-500 dark:focus:outline-blue-400"
         @click="emit('return-game', props.data)"
       >
         <IconArrowBarToDownDashed class="-ml-0.5 size-5" aria-hidden="true" />
@@ -54,7 +54,7 @@ const gameStatus = computed(() => {
       <button
         v-show="gameStatus === 'available'"
         type="button"
-        class="relative cursor-pointer inline-flex items-center gap-x-1.5 rounded-l-md bg-gray-100 px-4 py-3 md:px-3 md:py-2 text-sm font-semibold shadow-xs text-gray-600 dark:text-gray-200 ring-1 ring-gray-300 ring-inset hover:bg-gray-200 dark:bg-white/10 dark:ring-gray-700 dark:hover:bg-white/20"
+        class="relative cursor-pointer inline-flex items-center gap-x-1.5 rounded-l-md bg-gray-100 px-4 py-3 md:px-3 md:py-2 text-sm font-semibold shadow-xs text-gray-600 dark:text-gray-200 ring-1 ring-gray-300 ring-inset hover:bg-gray-200 dark:bg-white/10 dark:ring-gray-700 dark:hover:bg-white/20 focus:outline-2 focus:outline-offset-2 focus:outline-blue-500 dark:focus:outline-blue-400"
         @click="emit('withdraw-game', props.data)"
       >
         <IconArrowBarUp class="-ml-0.5 size-5" aria-hidden="true" />
@@ -64,7 +64,7 @@ const gameStatus = computed(() => {
         <MenuButton
           :class="[
             gameStatus === 'not-available' ? 'rounded-md' : 'rounded-r-md',
-            'inline-flex cursor-pointer ring-1 w-full justify-center -ml-px gap-x-1.5 bg-gray-100 px-4 py-3 md:px-3 md:py-2 text-sm font-semibold text-gray-900 shadow-xs hover:bg-gray-50 dark:bg-white/10 dark:text-white dark:shadow-none dark:hover:bg-white/20 ring-gray-300 ring-inset inset-ring-1 inset-ring-gray-300 dark:ring-gray-700 dark:inset-ring-white/5',
+            'inline-flex cursor-pointer ring-1 w-full justify-center -ml-px gap-x-1.5 bg-gray-100 px-4 py-3 md:px-3 md:py-2 text-sm font-semibold text-gray-900 shadow-xs hover:bg-gray-50 dark:bg-white/10 dark:text-white dark:shadow-none dark:hover:bg-white/20 ring-gray-300 ring-inset inset-ring-1 inset-ring-gray-300 dark:ring-gray-700 dark:inset-ring-white/5 focus:outline-2 focus:outline-offset-2 focus:outline-blue-500 dark:focus:outline-blue-400',
           ]"
         >
           <IconDotsVertical class="size-5" />

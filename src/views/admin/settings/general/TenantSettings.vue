@@ -199,8 +199,8 @@ import CButton from '@/components/CButton.vue'
 import CInput from '@/components/CInput.vue'
 import FilePondUploadDialog from '@/components/FilePondUploadDialog.vue'
 import SettingsSection from '@/components/SettingsSection.vue'
-import tenantService from '@/features/tenant/service'
-import { tenantStore } from '@/stores/tenant'
+import tenantService from '@/features/tenant/service.ts'
+import { tenantStore } from '@/stores/tenant.ts'
 import logger from '@/lib/logger.ts'
 
 // Logo state

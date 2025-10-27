@@ -4,6 +4,7 @@ import { eventStore } from '@/stores/edition'
 import { tenantStore } from '@/stores/tenant.ts'
 import type { LibraryGame } from '@/features/library/game.model.ts'
 import logger from '@/lib/logger.ts'
+import { DateTime } from 'luxon'
 
 export interface LibraryReservation {
   tenant_id: string
@@ -22,16 +23,16 @@ export const libraryReservationService = {
     displayId: string,
   ): Promise<LibraryReservation | undefined> {
     try {
-      const now = new Date().toISOString()
+      const now = DateTime.now().minus({ minute: 1 }).toISO()
       const result = await supabase
         .from('library_reservations')
         .select(
-          'id,display_id,user_id,expires_at,library_game:library_games(id,game:games(name))',
+          'id,display_id,user_id,expires_at,library_game:library_games(id,game:games(name,year,image))',
         )
         .eq('tenant_id', tenantStore.value?.id)
         .eq('edition_id', eventStore.value?.id)
         .eq('display_id', displayId)
-        .gt('expires_at', now)
+        .gte('expires_at', now)
         .single()
 
       return result.data as unknown as LibraryReservation
