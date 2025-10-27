@@ -2,6 +2,7 @@ import type { Access, TenantAccess } from '@/features/auth/access.model.ts'
 import { supabase } from '@/lib/supabase.ts'
 import { tenantStore } from '@/stores/tenant.ts'
 import type { User } from '@/features/auth/user.model.ts'
+import logger from '@/lib/logger.ts'
 
 export const authService = {
   // Authentication methods
@@ -54,7 +55,7 @@ export const authService = {
     })
 
     if (!data && error) {
-      console.error(error)
+      logger.error('Error validating OTP', { error })
       throw new Error('This code is invalid or expired')
     }
   },

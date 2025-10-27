@@ -160,8 +160,7 @@
   <ReturnGameDialog
     :open="returnConfirmDialogOpen"
     :selected-game="selectedGame"
-    :is-returning-game="isReturningGame"
-    @confirm="returnGame"
+    :on-confirm="returnGame"
     @cancel="returnConfirmDialogOpen = false"
     @close="returnConfirmDialogOpen = false"
   />
@@ -169,19 +168,17 @@
   <DeleteGameDialog
     :open="deleteConfirmDialogOpen"
     :selected-game="selectedGame"
-    :is-loading-withdraw-count="isLoadingWithdrawCount"
-    :withdraw-count="withdrawCount"
-    :is-deleting-game="isDeletingGame"
+    :on-load-withdraw-count="loadWithdrawCount"
+    :on-confirm="deleteGame"
     @close="closeDeleteDialog"
-    @confirm="deleteGame"
   />
 
   <MoveGameDialog
     :open="moveDialogOpen"
     :selected-game="selectedGame"
     :locations="locations"
+    :on-move="moveGame"
     @close="cancelMoveGame"
-    @moved="onGameMoved"
   />
 
   <ReservationGameDialog
@@ -225,7 +222,6 @@ const open = ref(false)
 const withdrawDialogOpen = ref(false)
 const selectedGame = ref<LibraryGame | null>(null)
 const returnConfirmDialogOpen = ref(false)
-const isReturningGame = ref(false)
 const searchInput = ref('')
 const reservationInput = ref('')
 const loadingReservation = ref(false)
@@ -233,9 +229,6 @@ const searchQuery = ref('')
 const moveDialogOpen = ref(false)
 const locations = ref<LibraryLocation[]>([])
 const deleteConfirmDialogOpen = ref(false)
-const isDeletingGame = ref(false)
-const withdrawCount = ref<number | null>(null)
-const isLoadingWithdrawCount = ref(false)
 const reservationDialogOpen = ref(false)
 const selectedReservation = ref<LibraryReservation | null>(null)
 let unsubscribe: (() => void) | null = null
@@ -354,10 +347,6 @@ watch(reservationInput, (newVal) => {
 onMounted(() => {
   // subscribe to service updates
   unsubscribe = Service.subscribeToUpdates((updatedGames) => {
-    console.log(
-      'LibraryView: Received games update:',
-      updatedGames?.length || 0,
-    )
     allGames.value = updatedGames || []
   })
 })
@@ -365,27 +354,6 @@ onMounted(() => {
 onUnmounted(() => {
   if (unsubscribe) unsubscribe()
 })
-
-// Add watchers for debugging
-watch(
-  allGames,
-  (newGames) => {
-    console.log('LibraryView: allGames updated to', newGames.length, 'items')
-  },
-  { immediate: true },
-)
-
-watch(
-  filteredGames,
-  (newFilteredGames) => {
-    console.log(
-      'LibraryView: filteredGames updated to',
-      newFilteredGames.length,
-      'items',
-    )
-  },
-  { immediate: true },
-)
 
 // Event handlers
 const onGameAdded = (): void => {
@@ -411,19 +379,16 @@ const onGameWithdrawn = (): void => {
 const returnGame = async (): Promise<void> => {
   if (!selectedGame.value) return
 
-  isReturningGame.value = true
   try {
     await libraryWithdrawService.returnGame(selectedGame.value.id)
     toast.success(
       `${selectedGame.value.game.name} has been returned to the library.`,
     )
-    returnConfirmDialogOpen.value = false
     selectedGame.value = null
   } catch (error) {
     console.error('Failed to return game:', error)
     toast.error('Failed to return the game. Please try again.')
-  } finally {
-    isReturningGame.value = false
+    throw error
   }
 }
 
@@ -432,6 +397,24 @@ const updateGame = async (
   updatedGame: Partial<LibraryGame>,
 ): Promise<void> => {
   await libraryService.updateGame(id, updatedGame)
+}
+
+const moveGame = async (locationId: number): Promise<void> => {
+  if (!selectedGame.value) return
+
+  try {
+    await libraryService.updateGame(selectedGame.value.id, {
+      location_id: locationId,
+    } as Partial<LibraryGame>)
+    toast.success(
+      `${selectedGame.value.game.name} has been moved to a new location.`,
+    )
+    selectedGame.value = null
+  } catch (error) {
+    console.error('Failed to move game:', error)
+    toast.error('Failed to move the game. Please try again.')
+    throw error
+  }
 }
 
 const openMoveGameDialog = async (game: LibraryGame): Promise<void> => {
@@ -448,11 +431,6 @@ const openMoveGameDialog = async (game: LibraryGame): Promise<void> => {
 }
 
 const cancelMoveGame = (): void => {
-  moveDialogOpen.value = false
-  selectedGame.value = null
-}
-
-const onGameMoved = (): void => {
   moveDialogOpen.value = false
   selectedGame.value = null
 }
@@ -485,49 +463,37 @@ const handleReservationWithdraw = async (): Promise<void> => {
 }
 
 // Delete game handlers
-const openDeleteConfirmDialog = async (gameId: number): Promise<void> => {
+const loadWithdrawCount = async (): Promise<number> => {
+  if (!selectedGame.value) return 0
+  return await libraryWithdrawService.countByGame(selectedGame.value.id)
+}
+
+const openDeleteConfirmDialog = (gameId: number): void => {
   const game = allGames.value.find((g) => g.id === gameId)
   if (game) {
     selectedGame.value = game
     deleteConfirmDialogOpen.value = true
-
-    // Fetch withdraw count
-    isLoadingWithdrawCount.value = true
-    withdrawCount.value = null
-    try {
-      withdrawCount.value = await libraryWithdrawService.countByGame(gameId)
-    } catch (error) {
-      console.error('Failed to fetch withdraw count:', error)
-      toast.error('Failed to check game withdraw history')
-    } finally {
-      isLoadingWithdrawCount.value = false
-    }
   }
 }
 
 const closeDeleteDialog = (): void => {
   deleteConfirmDialogOpen.value = false
   selectedGame.value = null
-  withdrawCount.value = null
 }
 
 const deleteGame = async (): Promise<void> => {
   if (!selectedGame.value) return
 
-  isDeletingGame.value = true
   try {
     await libraryService.deleteGame(selectedGame.value.id)
     toast.success(
       `${selectedGame.value.game.name} has been deleted from the library.`,
     )
-    deleteConfirmDialogOpen.value = false
     selectedGame.value = null
-    withdrawCount.value = null
   } catch (error) {
     console.error('Failed to delete game:', error)
     toast.error('Failed to delete the game. Please try again.')
-  } finally {
-    isDeletingGame.value = false
+    throw error
   }
 }
 

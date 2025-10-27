@@ -199,8 +199,9 @@ import CButton from '@/components/CButton.vue'
 import CInput from '@/components/CInput.vue'
 import FilePondUploadDialog from '@/components/FilePondUploadDialog.vue'
 import SettingsSection from '@/components/SettingsSection.vue'
-import tenantService from '@/features/tenant/service'
-import { tenantStore } from '@/stores/tenant'
+import tenantService from '@/features/tenant/service.ts'
+import { tenantStore } from '@/stores/tenant.ts'
+import logger from '@/lib/logger.ts'
 
 // Logo state
 const logoUrl = ref(tenantStore.value?.logo)
@@ -225,7 +226,7 @@ const imagesFolder = computed((): string => {
 // Handle image load/error events for debugging
 const handleImageError = (event: Event): void => {
   const img = event.target as HTMLImageElement
-  console.error('Image failed to load:', {
+  logger.error('Image failed to load:', {
     src: img.src,
     logoUrl: logoUrl.value,
     tenantStoreLogo: tenantStore.value?.logo,
@@ -235,7 +236,7 @@ const handleImageError = (event: Event): void => {
 
 const handleImageLoad = (event: Event): void => {
   const img = event.target as HTMLImageElement
-  console.log('Image loaded successfully:', {
+  logger.debug('Image loaded successfully:', {
     src: img.src,
     logoUrl: logoUrl.value,
     tenantStoreLogo: tenantStore.value?.logo,
@@ -248,14 +249,14 @@ const handleLogoUploadSuccess = (urls: string[]): void => {
   const url = urls[0]
   if (url) {
     logoUrl.value = url
-    console.log('Logo uploaded successfully:', url)
+    logger.debug('Logo uploaded successfully:', { url })
     toast.success('Logo uploaded successfully!')
   }
 }
 
 // Handle logo upload error
 const handleLogoUploadError = (error: unknown): void => {
-  console.error('Logo upload failed:', error)
+  logger.error('Logo upload failed:', { error })
   toast.error('Failed to upload logo. Please try again.')
 }
 
@@ -263,13 +264,13 @@ const handleLogoUploadError = (error: unknown): void => {
 const handleImagesUploadSuccess = (urls: string[]): void => {
   showImageUploadDialog.value = false
   uploadedImages.value = [...uploadedImages.value, ...urls]
-  console.log('Images uploaded successfully:', urls)
+  logger.debug('Images uploaded successfully:', { urls })
   toast.success(`${urls.length} image(s) uploaded successfully!`)
 }
 
 // Handle image gallery upload error
 const handleImagesUploadError = (error: unknown): void => {
-  console.error('Images upload failed:', error)
+  logger.error('Images upload failed:', { error })
   toast.error('Failed to upload images. Please try again.')
 }
 
@@ -359,7 +360,7 @@ const saveTenant = async (): Promise<void> => {
     const updatedTenant = await tenantService.updateTenant(tenantId, updates)
 
     if (updatedTenant) {
-      console.log('Tenant saved successfully:', updatedTenant)
+      logger.debug('Tenant saved successfully:', { updatedTenant })
 
       // Update the tenant store with the new data
       if (tenantStore.value) {
@@ -368,7 +369,7 @@ const saveTenant = async (): Promise<void> => {
 
       toast.success('Organization settings saved successfully!')
     } else {
-      console.error('Failed to save tenant settings')
+      logger.error('Failed to save tenant settings')
       toast.error('Failed to save settings. Please try again.')
     }
   } catch (error) {
@@ -389,7 +390,7 @@ const handleSubmit = async (event: Event): Promise<void> => {
   const { valid } = await r$.$validate()
 
   if (!valid) {
-    console.log('Form has validation errors')
+    logger.debug('Form has validation errors')
     return
   }
 

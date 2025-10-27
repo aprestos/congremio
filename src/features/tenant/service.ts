@@ -1,5 +1,6 @@
 import type { Tenant } from '@/features/tenant/tenant.model.ts'
 import { supabase } from '@/lib/supabase.ts'
+import logger from '@/lib/logger.ts'
 
 export const tenantService = {
   async get(): Promise<Array<Tenant>> {
@@ -7,7 +8,7 @@ export const tenantService = {
       const result = await supabase.from('tenants').select('id,name,domain')
       return result.data as Tenant[]
     } catch (error) {
-      console.error((error as Error).message)
+      logger.error('Error on tenantService.get()', { error })
       return []
     }
   },
@@ -38,7 +39,7 @@ export const tenantService = {
 
       throw new Error(`No tenant found for domain: ${domain}`)
     } catch (error) {
-      console.error((error as Error).message)
+      logger.error('Error on tenantService.getByDomain()', { error })
       throw error
     }
   },
@@ -50,7 +51,7 @@ export const tenantService = {
         .eq('id', id)
         .single<Tenant>()
       if (error) {
-        console.error((error as Error).message)
+        logger.error('Unable to fetch tenant', { id, error })
         return null
       }
       return data
@@ -68,37 +69,32 @@ export const tenantService = {
       images?: string[]
     },
   ): Promise<Tenant | null> {
-    try {
-      // Filter out undefined values to only update defined fields
-      const filteredUpdates = Object.fromEntries(
-        Object.entries(updates).filter(([, value]) => value !== undefined),
-      )
+    // Filter out undefined values to only update defined fields
+    const filteredUpdates = Object.fromEntries(
+      Object.entries(updates).filter(([, value]) => value !== undefined),
+    )
 
-      // If no valid updates, return null
-      if (Object.keys(filteredUpdates).length === 0) {
-        console.warn('No valid updates provided for tenant')
-        return null
-      }
-
-      const { data, error } = await supabase
-        .from('tenants')
-        .update(filteredUpdates)
-        .eq('id', tenantId)
-        .select()
-        .single<Tenant>()
-
-      if (error) {
-        console.error('Error updating tenant:', error.message)
-        throw error
-      }
-
-      console.log(data)
-      return data
-      //return data as unknown as Tenant;
-    } catch (error) {
-      console.error('Failed to update tenant:', (error as Error).message)
+    // If no valid updates, return null
+    if (Object.keys(filteredUpdates).length === 0) {
+      logger.info('No valid updates provided for tenant')
       return null
     }
+
+    const { data, error } = await supabase
+      .from('tenants')
+      .update(filteredUpdates)
+      .eq('id', tenantId)
+      .select()
+      .single<Tenant>()
+
+    if (error) {
+      logger.error('Error updating tenant:', { error })
+      throw new Error(
+        'An error occurred while updating the tenant. Try again later.',
+      )
+    }
+
+    return data
   },
 
   async generateReservationId(

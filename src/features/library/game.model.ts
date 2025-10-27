@@ -1,5 +1,6 @@
 import type { Game } from '@/features/external-game/model.ts'
 import type { LibraryLocation } from '@/features/library/locations/location.model.ts'
+import { DateTime } from 'luxon'
 
 export enum LibraryGameStatus {
   available = 'available',
@@ -25,7 +26,8 @@ export const getStatus = (game: LibraryGame | null): string => {
   if (game.status === LibraryGameStatus.reserved) {
     if (
       game.reserved_until &&
-      new Date(game.reserved_until).getTime() > new Date().getTime()
+      DateTime.fromISO(game.reserved_until).plus({ minute: 1 }).toMillis() >
+        DateTime.now().toMillis()
     ) {
       return 'reserved'
     } else {

@@ -28,7 +28,7 @@ import SkeletonLoader from '@/components/SkeletonLoader.vue'
 
 const props = defineProps<{ data: LibraryGame }>()
 
-const withdraw = ref<LibraryWithdraw | undefined>(undefined)
+const withdraw = ref<LibraryWithdraw | null>(null)
 const withdrawUser = ref<User | null | undefined>(undefined)
 const createdByUser = ref<User | null | undefined>(undefined)
 const isLoadingWithdraw = ref(false)

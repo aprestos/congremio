@@ -2,6 +2,7 @@ import type { LibraryGame } from '@/features/library/game.model.ts'
 import { supabase } from '@/lib/supabase.ts'
 import { eventStore } from '@/stores/edition'
 import { tenantStore } from '@/stores/tenant.ts'
+import logger from '@/lib/logger.ts'
 
 export interface FilterOptions {
   searchQuery?: string
@@ -28,7 +29,7 @@ export const libraryService = {
         .eq('edition_id', eventStore.value?.id)
       return result.data as unknown as LibraryGame[]
     } catch (error) {
-      console.error((error as Error).message)
+      logger.error('Error on libraryService.get()', { error })
       return []
     }
   },
@@ -42,7 +43,7 @@ export const libraryService = {
         .single()
       return result.data as unknown as LibraryGame
     } catch (error) {
-      console.error((error as Error).message)
+      logger.error('Unable to fetch library game by id', { error })
       return null
     }
   },
@@ -196,10 +197,9 @@ export const libraryService = {
           `game_name.ilike.%${query}%,owner.ilike.%${query}%,notes.ilike.%${query}%`,
         )
 
-      console.log('Search results:', result.data)
       return result.data as LibraryGame[]
     } catch (error) {
-      console.error('Search error:', (error as Error).message)
+      logger.error('Search error:', { error })
       return []
     }
   },

@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase.ts'
 import { eventStore } from '@/stores/edition'
 import { tenantStore } from '@/stores/tenant.ts'
+import logger from '@/lib/logger.ts'
 
 export interface LibraryWithdraw {
   id: number
@@ -22,10 +23,9 @@ export const libraryWithdrawService = {
         .eq('tenant_id', tenantStore.value?.id)
         .eq('edition_id', eventStore.value?.id)
 
-      console.log(result.data)
       return result.data as LibraryWithdraw[]
     } catch (error) {
-      console.error((error as Error).message)
+      logger.error('Error on libraryWithdrawService.get()', { error })
       return []
     }
   },
@@ -63,7 +63,7 @@ export const libraryWithdrawService = {
 
   async getActiveByLibraryGameId(
     libraryGameId: number,
-  ): Promise<LibraryWithdraw | undefined> {
+  ): Promise<LibraryWithdraw | null> {
     try {
       const result = await supabase
         .from('library_withdraws')
@@ -73,15 +73,12 @@ export const libraryWithdrawService = {
         .eq('edition_id', eventStore.value?.id)
         .is('ended_at', null)
         .order('started_at', { ascending: false })
-        .single()
+        .single<LibraryWithdraw>()
 
-      return result.data as LibraryWithdraw
+      return result.data
     } catch (error) {
-      console.error(
-        'Error fetching withdraws by library game:',
-        (error as Error).message,
-      )
-      return undefined
+      logger.error('Error fetching withdraws by library game:', { error })
+      return null
     }
   },
 
@@ -97,10 +94,7 @@ export const libraryWithdrawService = {
 
       return result.data as LibraryWithdraw[]
     } catch (error) {
-      console.error(
-        'Error fetching active withdraws:',
-        (error as Error).message,
-      )
+      logger.error('Error fetching active withdraws:', { error })
       return []
     }
   },
@@ -116,10 +110,7 @@ export const libraryWithdrawService = {
 
       return result.count || 0
     } catch (error) {
-      console.error(
-        'Error counting withdraws by library game:',
-        (error as Error).message,
-      )
+      logger.error('Error counting withdraws by library game:', { error })
       return 0
     }
   },

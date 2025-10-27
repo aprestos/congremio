@@ -114,7 +114,6 @@ const handleSearch = useDebounceFn(async (value: string) => {
   try {
     if (value?.length > 1) {
       const result = await props.onSearch(value)
-      console.log('search results:', result)
       internalOptions.value = result.map((item) => {
         // Type assertion to access properties safely
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
