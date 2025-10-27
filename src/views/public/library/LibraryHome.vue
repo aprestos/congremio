@@ -183,8 +183,8 @@
             </div>
           </div>
 
-          <div class="hidden flex items-center">
-            <Listbox v-model="selectedSort">
+          <div class="flex items-center">
+            <Listbox v-model="selectedSort" class="hidden">
               <div class="relative">
                 <ListboxButton
                   class="group flex flex-col items-start bg-gray-100 dark:bg-gray-700 px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 min-w-[120px]"

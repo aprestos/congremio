@@ -31,7 +31,7 @@ const router = createRouter({
         {
           path: 'library',
           name: RouteNames.public.library,
-          component: () => import('@/views/public/library/HomeView.vue'),
+          component: () => import('@/views/public/library/LibraryHome.vue'),
         },
       ],
     },
