@@ -30,7 +30,10 @@
               leave-to="opacity-0 translate-y-full sm:translate-y-0 sm:scale-95"
             >
               <DialogPanel
-                class="relative transform overflow-y-auto max-h-full w-full sm:h-auto sm:w-auto sm:rounded-lg bg-white dark:bg-gray-800 text-left shadow-2xl transition-all sm:my-8 sm:max-w-lg md:min-w-[500px] sm:overflow-visible"
+                :class="[
+                  'relative transform overflow-y-auto max-h-full w-full sm:h-auto sm:w-auto sm:rounded-lg bg-white dark:bg-gray-800 text-left shadow-2xl transition-all sm:my-8 sm:overflow-visible',
+                  dialogSizeClasses,
+                ]"
               >
                 <div class="px-4 py-5 sm:px-6">
                   <div
@@ -82,14 +85,19 @@ import {
   TransitionRoot,
 } from '@headlessui/vue'
 import { IconX } from '@tabler/icons-vue'
+import { computed } from 'vue'
+
+type DialogSize = 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full'
 
 interface Props {
   open: boolean
   title?: string
+  size?: DialogSize
 }
 
 const props = withDefaults(defineProps<Props>(), {
   title: '',
+  size: 'md',
 })
 
 const emit = defineEmits<{
@@ -99,4 +107,16 @@ const emit = defineEmits<{
 const closeDialog = (): void => {
   emit('close')
 }
+
+const dialogSizeClasses = computed((): string => {
+  const sizeMap: Record<DialogSize, string> = {
+    sm: 'sm:max-w-sm',
+    md: 'sm:max-w-lg md:min-w-[500px]',
+    lg: 'sm:max-w-2xl md:min-w-[700px]',
+    xl: 'sm:max-w-4xl md:min-w-[900px]',
+    '2xl': 'sm:max-w-6xl md:min-w-[1100px]',
+    full: 'sm:max-w-[90vw] md:min-w-[80vw]',
+  }
+  return sizeMap[props.size]
+})
 </script>

@@ -105,6 +105,11 @@ const router = createRouter({
       ],
     },
     {
+      path: '/users/:id',
+      name: RouteNames.public.user,
+      component: () => import('../views/public/UserDetailsView.vue'),
+    },
+    {
       path: '/not-found',
       name: RouteNames.error.notFound,
       component: () => import('../views/NotFoundView.vue'),

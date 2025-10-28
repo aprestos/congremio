@@ -5,13 +5,15 @@ import logger from '@/lib/logger.ts'
 
 export interface LibraryWithdraw {
   id: number
-  library_game_id: number
+  library_game_id?: number
+  library_game?: { game: { name: string; year: number; image: string } }
   tenant_id: string
-  event_id: number
+  edition_id: number
   started_at: number
   ended_at: number
   user_id: string
   created_by: string
+  notes?: string
 }
 
 export const libraryWithdrawService = {
@@ -19,7 +21,7 @@ export const libraryWithdrawService = {
     try {
       const result = await supabase
         .from('library_withdraws')
-        .select('*')
+        .select('*,library_game:library_games(game:games(name,year,image))')
         .eq('tenant_id', tenantStore.value?.id)
         .eq('edition_id', eventStore.value?.id)
 
@@ -113,6 +115,40 @@ export const libraryWithdrawService = {
       logger.error('Error counting withdraws by library game:', { error })
       return 0
     }
+  },
+
+  async getByUserId(userId: string): Promise<Array<LibraryWithdraw>> {
+    try {
+      const result = await supabase
+        .from('library_withdraws')
+        .select(
+          '*,library_game:library_games(game:games(name,year,image)),edition:editions(name)',
+        )
+        .eq('user_id', userId)
+        .eq('tenant_id', tenantStore.value?.id)
+        .order('started_at', { ascending: false })
+
+      return result.data as LibraryWithdraw[]
+    } catch (error) {
+      logger.error('Error fetching withdraws by user:', { error })
+      return []
+    }
+  },
+
+  async getByLibraryGameId(libraryGameId: number): Promise<LibraryWithdraw[]> {
+    const { data, error } = await supabase
+      .from('library_withdraws')
+      .select('*,library_game:library_games(game:games(name,year,image))')
+      .eq('library_game_id', libraryGameId)
+      .eq('tenant_id', tenantStore.value?.id)
+      .eq('edition_id', eventStore.value?.id)
+      .order('started_at', { ascending: false })
+
+    if (error) {
+      logger.error('Failed to withdraws by library game id', { error })
+      return []
+    }
+    return data as unknown as LibraryWithdraw[]
   },
 } as const
 

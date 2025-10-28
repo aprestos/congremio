@@ -14,6 +14,7 @@ export interface LibraryReservation {
   display_id: number
   user_id: string
   expires_at: string
+  status: string
 }
 
 type ReservationUpdateCallback = (reservations: LibraryReservation[]) => void
@@ -22,65 +23,62 @@ export const libraryReservationService = {
   async getByDisplayId(
     displayId: string,
   ): Promise<LibraryReservation | undefined> {
-    try {
-      const now = DateTime.now().minus({ minute: 1 }).toISO()
-      const result = await supabase
-        .from('library_reservations')
-        .select(
-          'id,display_id,user_id,expires_at,library_game:library_games(id,game:games(name,year,image))',
-        )
-        .eq('tenant_id', tenantStore.value?.id)
-        .eq('edition_id', eventStore.value?.id)
-        .eq('display_id', displayId)
-        .gte('expires_at', now)
-        .single()
+    const now = DateTime.now().minus({ minute: 1 }).toISO()
+    const { data, error } = await supabase
+      .from('library_reservations')
+      .select(
+        'id,display_id,user_id,expires_at,library_game:library_games(id,game:games(name,year,image))',
+      )
+      .eq('tenant_id', tenantStore.value?.id)
+      .eq('edition_id', eventStore.value?.id)
+      .eq('status', 'active')
+      .eq('display_id', displayId)
+      .gte('expires_at', now)
+      .single()
 
-      return result.data as unknown as LibraryReservation
-    } catch (error) {
-      console.error((error as Error).message)
-      return undefined
+    if (error) {
+      logger.error('Failed to get reservation by id', { error })
+      throw new Error('Unable to fetch reservations')
     }
+
+    return data as unknown as LibraryReservation
   },
 
   async get(): Promise<Array<LibraryReservation>> {
     const user = await authService.getUser()
 
-    try {
-      const now = new Date().toISOString()
-      const result = await supabase
-        .from('library_reservations')
-        .select(
-          'id,display_id,expires_at,user_id,library_game:library_games(game:games(name,year,image))',
-        )
-        .eq('tenant_id', tenantStore.value?.id)
-        .eq('edition_id', eventStore.value?.id)
-        .eq('user_id', user?.id)
-        .gt('expires_at', now)
+    const now = new Date().toISOString()
+    const { data, error } = await supabase
+      .from('library_reservations')
+      .select(
+        'id,display_id,expires_at,user_id,library_game:library_games(game:games(name,year,image))',
+      )
+      .eq('tenant_id', tenantStore.value?.id)
+      .eq('edition_id', eventStore.value?.id)
+      .eq('user_id', user?.id)
+      .eq('status', 'active')
+      .gt('expires_at', now)
 
-      return result.data as unknown as LibraryReservation[]
-    } catch (error) {
-      logger.error('Error fetching reservations', { error })
-      return []
+    if (error) {
+      logger.error('Failed to get reservation by id', { error })
+      throw new Error('Unable to fetch reservations')
     }
+
+    return data as unknown as LibraryReservation[]
   },
 
   async post(libraryGameId: number): Promise<void> {
-    const { data, error } = await supabase.functions.invoke(
-      'library-reservations',
-      {
-        method: 'POST',
-        body: {
-          library_game_id: libraryGameId,
-          tenant_id: tenantStore.value?.id,
-          edition_id: eventStore.value?.id,
-        },
+    const { error } = await supabase.functions.invoke('library-reservations', {
+      method: 'POST',
+      body: {
+        library_game_id: libraryGameId,
+        tenant_id: tenantStore.value?.id,
+        edition_id: eventStore.value?.id,
       },
-    )
+    })
 
-    if (data) {
-      return
-    } else {
-      logger.error('Error creating reservation', error)
+    if (error) {
+      logger.error('Error creating reservation', { error })
       throw new Error('Failed to reserve game')
     }
   },

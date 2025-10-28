@@ -88,7 +88,7 @@ const publicPages = [
   {
     id: 2,
     name: 'Flea Market',
-    to: { name: RouteNames.public.fleeMarket },
+    to: { name: RouteNames.public.fleaMarket },
     initial: 'FM',
     enabled: settingsStore?.value?.flea?.enabled ?? false,
   },

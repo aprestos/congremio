@@ -187,21 +187,21 @@ export const libraryService = {
   },
 
   async search(query: string): Promise<Array<LibraryGame>> {
-    try {
-      const result = await supabase
-        .from('library_games')
-        .select('*')
-        .eq('tenant_id', tenantStore.value?.id)
-        .eq('edition_id', eventStore.value?.id)
-        .or(
-          `game_name.ilike.%${query}%,owner.ilike.%${query}%,notes.ilike.%${query}%`,
-        )
+    const { data, error } = await supabase
+      .from('library_games')
+      .select('*')
+      .eq('tenant_id', tenantStore.value?.id)
+      .eq('edition_id', eventStore.value?.id)
+      .or(
+        `game_name.ilike.%${query}%,owner.ilike.%${query}%,notes.ilike.%${query}%`,
+      )
 
-      return result.data as LibraryGame[]
-    } catch (error) {
-      logger.error('Search error:', { error })
+    if (error) {
+      logger.error('Failed to search for library games', { error })
       return []
     }
+
+    return data as LibraryGame[]
   },
 
   async updateGame(

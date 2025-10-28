@@ -18,8 +18,8 @@
         Sign in to your account
       </h2>
       <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
-        Enter your email address and we'll send you a secure verification code to sign
-        in
+        Enter your email address and we'll send you a secure verification code
+        to sign in
       </p>
     </div>
 

@@ -88,7 +88,9 @@ onUnmounted(() => {
 // Filter out expired reservations
 const activeReservations = computed(() => {
   return reservations.value.filter(
-    (reservation) => new Date(reservation.expires_at).getTime() > now.value,
+    (reservation) =>
+      reservation.status === 'active' &&
+      new Date(reservation.expires_at).getTime() > now.value,
   )
 })
 

@@ -1,4 +1,5 @@
 import { Logtail } from '@logtail/browser'
+import { tenantStore } from '@/stores/tenant.ts'
 
 const isDevelopment =
   import.meta.env.VITE_ENVIRONMENT === 'development' || false
@@ -40,38 +41,62 @@ if (isDevelopment) {
 }
 
 class Logger {
-  info(message: string, context?: Record<string, unknown>): void {
+  info(message: string, content?: Record<string, unknown>): void {
     if (this.shouldLog(LogLevel.INFO)) {
-      void logtail?.info(message, context)
+      void logtail?.info(message, {
+        context: {
+          tenant_id: tenantStore.value?.id,
+          event_id: tenantStore.value?.id,
+        },
+        content,
+      })
       void logtail?.flush()
     } else {
-      console.info(message, context)
+      console.info(message, content)
     }
   }
 
-  warn(message: string, context?: Record<string, unknown>): void {
+  warn(message: string, content?: Record<string, unknown>): void {
     if (this.shouldLog(LogLevel.WARN)) {
-      void logtail?.warn(message, context)
+      void logtail?.warn(message, {
+        context: {
+          tenant_id: tenantStore.value?.id,
+          event_id: tenantStore.value?.id,
+        },
+        content,
+      })
       void logtail?.flush()
     } else {
-      console.warn(message, context)
+      console.warn(message, content)
     }
   }
 
-  error(message: string, context?: Record<string, unknown>): void {
+  error(message: string, content?: Record<string, unknown>): void {
     if (this.shouldLog(LogLevel.ERROR)) {
-      void logtail?.error(message, context)
+      void logtail?.error(message, {
+        context: {
+          tenant_id: tenantStore.value?.id,
+          event_id: tenantStore.value?.id,
+        },
+        content,
+      })
       void logtail?.flush()
     } else {
-      console.error(message, context)
+      console.error(message, content)
     }
   }
 
-  debug(message: string, context?: Record<string, unknown>): void {
+  debug(message: string, content?: Record<string, unknown>): void {
     if (this.shouldLog(LogLevel.DEBUG)) {
-      void logtail?.debug(message, context)
+      void logtail?.debug(message, {
+        context: {
+          tenant_id: tenantStore.value?.id,
+          event_id: tenantStore.value?.id,
+        },
+        content,
+      })
     } else {
-      console.debug(message, context)
+      console.debug(message, content)
     }
   }
   private shouldLog(level: number): boolean {

@@ -32,7 +32,7 @@ describe('tenantService.getByDomain', () => {
       .mockResolvedValue({ data: mockTenant, error: null })
 
     const mockedFrom = vi.mocked(supabase.from)
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     mockedFrom.mockReturnValue({
       select: mockSelect,
       or: mockOr,

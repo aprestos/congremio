@@ -87,7 +87,7 @@ const features = [
       'Buy, sell, and trade board games with fellow enthusiasts. Find rare gems and expand your collection.',
     icon: IconDeviceGamepad2,
     enabled: settings.value?.flea?.enabled ?? false,
-    route: RouteNames.public.fleeMarket,
+    route: RouteNames.public.fleaMarket,
   },
 ]
 

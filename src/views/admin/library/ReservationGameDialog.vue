@@ -8,18 +8,15 @@
       <!-- Reservation Number -->
       <div class="text-center">
         <div class="text-4xl font-bold text-gray-900 dark:text-white">
-          #{{ props.reservation.display_id }}
+          #&nbsp;{{ props.reservation.display_id }}
         </div>
-        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-          Reservation Number
-        </p>
       </div>
 
       <h2 class="text-2xl font-light text-gray-900 dark:text-white mb-4">
         Reserved Game
       </h2>
       <!-- Game Details -->
-      <div class="p-6 rounded-lg bg-gray-100">
+      <div class="p-6 rounded-lg bg-gray-100 dark:bg-gray-900">
         <div class="flex items-center gap-4">
           <img
             v-if="props.reservation?.library_game?.game?.image"
@@ -53,15 +50,31 @@
       <h2 class="text-2xl font-light text-gray-900 dark:text-white mb-4">
         Person
       </h2>
-      <!-- User Details -->
-      <div class="p-6 rounded-lg bg-gray-100">
+      <!-- User Details - Loading State -->
+      <div
+        v-if="isLoadingUser"
+        class="p-6 rounded-lg dark:bg-gray-900 bg-gray-100 animate-pulse"
+      >
+        <div class="flex items-center gap-4">
+          <div
+            class="w-20 h-20 rounded-full bg-gray-300 dark:bg-gray-700 flex-shrink-0"
+          ></div>
+          <div class="flex-1 space-y-3">
+            <div class="h-5 bg-gray-300 dark:bg-gray-700 rounded w-32"></div>
+            <div class="h-4 bg-gray-300 dark:bg-gray-700 rounded w-40"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- User Details - Loaded -->
+      <div v-else class="p-6 rounded-lg dark:bg-gray-900 bg-gray-100">
         <div class="flex items-center gap-4">
           <div
             class="flex text-4xl w-20 h-20 items-center justify-center rounded-full bg-indigo-600 text-white font-semibold"
           >
             F
           </div>
-          <div class="flex-1 p-4 bg-gray-100">
+          <div class="flex-1 p-4">
             <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
               {{ user?.name || 'User' }}
             </h3>
@@ -100,7 +113,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { toast } from 'vue-sonner'
 import DialogComponent from '@/components/DialogComponent.vue'
 import type { LibraryReservation } from '@/features/library/reservations/service'
@@ -138,24 +151,26 @@ const isWithdrawing = ref(false)
 
 const user = ref<User | null>(null)
 
-onMounted(async () => {
-  if (!props.reservation?.user_id) return
+// Watch reservation prop to load user data when it changes
+watch(
+  () => props.reservation,
+  async (reservation) => {
+    if (!reservation?.user_id) {
+      user.value = null
+      return
+    }
 
-  isLoadingUser.value = true
-
-  try {
-    user.value = await userService.getById(props.reservation?.user_id)
-  } catch (error) {
-    console.error('Failed to fetch user data:', error)
-    toast.error('Failed to fetch user data. Please try again.')
-  } finally {
-    isLoadingUser.value = false
-  }
-})
-onUnmounted(() => {
-  isLoadingUser.value = false
-  user.value = null
-})
+    isLoadingUser.value = true
+    try {
+      user.value = await userService.getById(reservation.user_id)
+    } catch (error) {
+      console.error('Failed to fetch user data:', error)
+      toast.error('Failed to fetch user data. Please try again.')
+    } finally {
+      isLoadingUser.value = false
+    }
+  },
+)
 
 // Computed properties
 const gameName = computed(() => {

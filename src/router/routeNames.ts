@@ -6,16 +6,16 @@ enum Admin {
   settings = 'admin.settings',
   settingsGeneral = 'admin.settings.general',
   settingsLibrary = 'admin.settings.library',
-  fleeMarket = 'admin.flee-market',
 }
 
 enum Public {
   root = 'root',
   home = 'public.home',
   library = 'public.library',
-  fleeMarket = 'public.flee-market',
   tournaments = 'public.tournaments',
   prototypes = 'public.prototypes',
+  fleaMarket = 'public.flea-market',
+  user = 'public.user',
 }
 
 enum Auth {

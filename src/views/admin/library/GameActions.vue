@@ -12,6 +12,7 @@ import {
   IconArchive,
   IconTrash,
   IconEdit,
+  IconHistory,
   IconDotsVertical,
 } from '@tabler/icons-vue'
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue'
@@ -24,6 +25,7 @@ const emit = defineEmits<{
   (e: 'return-game', game: LibraryGame): void
   (e: 'withdraw-game', game: LibraryGame, userId?: string): void
   (e: 'move', game: LibraryGame): void
+  (e: 'open-history-dialog', game: LibraryGame): void
 }>()
 
 const props = defineProps<{ data: LibraryGame }>()
@@ -63,7 +65,9 @@ const gameStatus = computed(() => {
       <Menu as="div" class="relative inline-block">
         <MenuButton
           :class="[
-            gameStatus === 'not-available' ? 'rounded-md' : 'rounded-r-md',
+            gameStatus === 'not-available' || gameStatus === 'reserved'
+              ? 'rounded-md'
+              : 'rounded-r-md',
             'inline-flex cursor-pointer ring-1 w-full justify-center -ml-px gap-x-1.5 bg-gray-100 px-4 py-3 md:px-3 md:py-2 text-sm font-semibold text-gray-900 shadow-xs hover:bg-gray-50 dark:bg-white/10 dark:text-white dark:shadow-none dark:hover:bg-white/20 ring-gray-300 ring-inset inset-ring-1 inset-ring-gray-300 dark:ring-gray-700 dark:inset-ring-white/5 focus:outline-2 focus:outline-offset-2 focus:outline-blue-500 dark:focus:outline-blue-400',
           ]"
         >
@@ -105,6 +109,28 @@ const gameStatus = computed(() => {
                 </a>
               </MenuItem>
             </div>
+            <MenuItem v-slot="{ active }">
+              <a
+                :class="[
+                  active
+                    ? 'bg-gray-100 text-gray-900 outline-hidden dark:bg-white/5 dark:text-white'
+                    : 'text-gray-700 dark:text-gray-300',
+                  'flex items-center px-4 py-2 text-sm cursor-pointer',
+                ]"
+                @click="emit('open-history-dialog', props.data)"
+              >
+                <IconHistory
+                  :class="[
+                    active
+                      ? 'text-gray-500 dark:text-white'
+                      : 'text-gray-400 dark:text-gray-500',
+                    'mr-3 size-5',
+                  ]"
+                  aria-hidden="true"
+                />
+                History
+              </a>
+            </MenuItem>
             <div class="py-1">
               <MenuItem
                 v-show="getStatus(props.data) === 'not-available'"

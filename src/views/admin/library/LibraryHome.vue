@@ -122,6 +122,7 @@
           @withdraw-game="openWithdrawDialog"
           @return-game="openReturnConfirmDialog"
           @delete-game="openDeleteConfirmDialog"
+          @open-history-dialog="openHistoryDialog"
         />
       </template>
     </DataTable>
@@ -187,6 +188,16 @@
     @close="closeReservationDialog"
     @withdraw="handleReservationWithdraw"
   />
+
+  <!-- History Dialog -->
+  <DialogComponent
+    :open="historyDialogOpen"
+    title="Withdrawal History"
+    size="lg"
+    @close="closeHistoryDialog"
+  >
+    <WithdrawHistory v-if="selectedGameId" :library-game-id="selectedGameId" />
+  </DialogComponent>
 </template>
 
 <script setup lang="ts">
@@ -215,6 +226,7 @@ import ReservationGameDialog from '@/views/admin/library/ReservationGameDialog.v
 import { libraryLocationService } from '@/features/library/locations/service.ts'
 import type { LibraryLocation } from '@/features/library/locations/location.model.ts'
 import type { LibraryReservation } from '@/features/library/reservations/service'
+import WithdrawHistory from '@/views/public/WithdrawHistory.vue'
 
 // Data
 const allGames = ref<LibraryGame[]>([])
@@ -231,6 +243,8 @@ const locations = ref<LibraryLocation[]>([])
 const deleteConfirmDialogOpen = ref(false)
 const reservationDialogOpen = ref(false)
 const selectedReservation = ref<LibraryReservation | null>(null)
+const historyDialogOpen = ref(false)
+const selectedGameId = ref<number | null>(null)
 let unsubscribe: (() => void) | null = null
 
 // Table column definitions
@@ -440,6 +454,16 @@ const closeReservationDialog = (): void => {
   reservationDialogOpen.value = false
   selectedReservation.value = null
   reservationInput.value = ''
+}
+
+const openHistoryDialog = (game: LibraryGame): void => {
+  selectedGameId.value = game.id
+  historyDialogOpen.value = true
+}
+
+const closeHistoryDialog = (): void => {
+  historyDialogOpen.value = false
+  selectedGameId.value = null
 }
 
 const handleReservationWithdraw = async (): Promise<void> => {

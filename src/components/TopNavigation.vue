@@ -64,12 +64,12 @@
                 <!-- Profile Dropdown -->
                 <Menu as="div" class="relative">
                   <MenuButton
-                    class="flex items-center rounded-full hover:ring-2 hover:ring-gray-300 dark:hover:ring-gray-600 transition-all"
+                    class="flex cursor-pointer items-center rounded-full hover:ring-2 hover:ring-gray-300 dark:hover:ring-gray-600 transition-all"
                   >
                     <div
                       class="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-600 text-white text-sm font-semibold"
                     >
-                      {{ userInitial }}
+                      {{ user?.name ? user.name[0] : 'U' }}
                     </div>
                   </MenuButton>
 
@@ -85,6 +85,23 @@
                       class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white dark:bg-gray-800 py-1 shadow-lg ring-1 ring-black/10 ring-opacity-5 focus:outline-none"
                     >
                       <MenuItem v-slot="{ active }">
+                        <RouterLink
+                          :to="{
+                            name: RouteNames.public.user,
+                            params: { id: user?.id },
+                          }"
+                        >
+                          <button
+                            :class="[
+                              active ? 'bg-gray-100 dark:bg-gray-700' : '',
+                              'cursor-pointer block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300',
+                            ]"
+                          >
+                            Profile
+                          </button>
+                        </RouterLink>
+                      </MenuItem>
+                      <MenuItem v-slot="{ active }" class="cursor-pointer">
                         <button
                           :class="[
                             active ? 'bg-gray-100 dark:bg-gray-700' : '',
@@ -125,32 +142,27 @@ import {
   PopoverGroup,
 } from '@headlessui/vue'
 import { IconSettings } from '@tabler/icons-vue'
-import { computed, onMounted, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 
 import { authService } from '@/features/auth/service.ts'
 import { tenantStore } from '@/stores/tenant.ts'
 import SkeletonLoader from '@/components/SkeletonLoader.vue'
 import { RouteNames } from '@/router/routeNames'
+import type { User } from '@/features/auth/user.model.ts'
 
-const userEmail = ref<string | null>(null)
+const user = ref<User | null>(null)
 const isStaffOrAdmin = ref(false)
 const isAuthenticated = ref(false)
-
-const userInitial = computed(() => {
-  if (!userEmail.value) return '?'
-  return userEmail.value.charAt(0).toUpperCase()
-})
 
 // Load user email and check admin role on component mount
 onMounted(async () => {
   try {
-    const user = await authService.getUser()
-    if (user?.email) {
-      userEmail.value = user.email
+    user.value = await authService.getUser()
+    if (user.value) {
       isAuthenticated.value = true
 
       // Check if user has staff or admin role
-      isStaffOrAdmin.value = authService.hasAnyOfTheRoles(user, [
+      isStaffOrAdmin.value = authService.hasAnyOfTheRoles(user.value, [
         'staff',
         'admin',
       ])
@@ -169,7 +181,6 @@ const handleSignOut = async (): Promise<void> => {
     // Reset authentication state
     isAuthenticated.value = false
     isStaffOrAdmin.value = false
-    userEmail.value = null
   } catch (error) {
     console.error('Error signing out:', error)
   }
