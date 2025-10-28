@@ -217,7 +217,10 @@ export const libraryService = {
       .delete()
       .eq('id', libraryGameId)
 
-    if (error) throw new Error('Unable to delete game')
+    if (error) {
+      logger.error(`Trying to delete game ${libraryGameId}`, { error })
+      throw new Error('Unable to delete game')
+    }
   },
 } as const
 
