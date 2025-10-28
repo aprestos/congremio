@@ -25,37 +25,57 @@ const parseLogLevel = (level: string): number => {
 
 const currentLogLevel = parseLogLevel(logLevel)
 
-const logtail = new Logtail(token, {
-  sendLogsToConsoleOutput: isDevelopment,
-  endpoint: `https://${endpoint}`,
-})
+let logtail: Logtail | undefined = undefined
+
+if (isDevelopment) {
+  console.log('Development environment detected, using console for logging.')
+} else if (!token || !endpoint) {
+  console.log(
+    'Logtail token or endpoint not provided, using console for logging.',
+  )
+} else {
+  logtail = new Logtail(token, {
+    endpoint: `https://${endpoint}`,
+  })
+}
 
 class Logger {
   info(message: string, context?: Record<string, unknown>): void {
     if (this.shouldLog(LogLevel.INFO)) {
       void logtail?.info(message, context)
+      void logtail?.flush()
+    } else {
+      console.info(message, context)
     }
   }
 
   warn(message: string, context?: Record<string, unknown>): void {
     if (this.shouldLog(LogLevel.WARN)) {
       void logtail?.warn(message, context)
+      void logtail?.flush()
+    } else {
+      console.warn(message, context)
     }
   }
 
   error(message: string, context?: Record<string, unknown>): void {
     if (this.shouldLog(LogLevel.ERROR)) {
       void logtail?.error(message, context)
+      void logtail?.flush()
+    } else {
+      console.error(message, context)
     }
   }
 
   debug(message: string, context?: Record<string, unknown>): void {
     if (this.shouldLog(LogLevel.DEBUG)) {
       void logtail?.debug(message, context)
+    } else {
+      console.debug(message, context)
     }
   }
   private shouldLog(level: number): boolean {
-    return isDevelopment || level >= currentLogLevel
+    return !!logtail && !isDevelopment && level >= currentLogLevel
   }
 }
 
