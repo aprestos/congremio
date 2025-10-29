@@ -17,7 +17,7 @@ import type { LibraryLocation } from '@/features/library/locations/location.mode
 import { libraryLocationService } from '@/features/library/locations/service.ts'
 import { queueService } from '@/features/queues/queue.service.ts'
 import { tenantStore } from '@/stores/tenant.ts'
-import { eventStore } from '@/stores/edition.ts'
+import { editionStore } from '@/stores/edition.ts'
 import logger from '@/lib/logger.ts'
 
 const locations = ref<LibraryLocation[]>([])
@@ -130,7 +130,7 @@ const clearImportList = (): void => {
 const importGames = async (): Promise<void> => {
   await queueService.add(
     tenantStore.value?.id,
-    eventStore.value?.id,
+    editionStore.value?.id,
     'library-games',
     gamesToImport.value,
   )

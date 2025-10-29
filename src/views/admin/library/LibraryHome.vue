@@ -193,10 +193,13 @@
   <DialogComponent
     :open="historyDialogOpen"
     title="Withdrawal History"
-    size="lg"
+    size="xl"
     @close="closeHistoryDialog"
   >
-    <WithdrawHistory v-if="selectedGameId" :library-game-id="selectedGameId" />
+    <WithdrawGameHistory
+      v-if="selectedGameId"
+      :library-game-id="selectedGameId"
+    />
   </DialogComponent>
 </template>
 
@@ -226,7 +229,7 @@ import ReservationGameDialog from '@/views/admin/library/ReservationGameDialog.v
 import { libraryLocationService } from '@/features/library/locations/service.ts'
 import type { LibraryLocation } from '@/features/library/locations/location.model.ts'
 import type { LibraryReservation } from '@/features/library/reservations/service'
-import WithdrawHistory from '@/views/public/WithdrawHistory.vue'
+import WithdrawGameHistory from '@/views/admin/library/WithdrawGameHistory.vue'
 
 // Data
 const allGames = ref<LibraryGame[]>([])

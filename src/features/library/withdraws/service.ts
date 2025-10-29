@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase.ts'
-import { eventStore } from '@/stores/edition'
+import { editionStore } from '@/stores/edition'
 import { tenantStore } from '@/stores/tenant.ts'
 import logger from '@/lib/logger.ts'
 
@@ -23,7 +23,7 @@ export const libraryWithdrawService = {
         .from('library_withdraws')
         .select('*,library_game:library_games(game:games(name,year,image))')
         .eq('tenant_id', tenantStore.value?.id)
-        .eq('edition_id', eventStore.value?.id)
+        .eq('edition_id', editionStore.value?.id)
 
       return result.data as LibraryWithdraw[]
     } catch (error) {
@@ -35,7 +35,7 @@ export const libraryWithdrawService = {
   async create(libraryGameId: number, userId: string): Promise<void> {
     const { error } = await supabase.from('library_withdraws').insert({
       tenant_id: tenantStore.value?.id,
-      edition_id: eventStore.value?.id,
+      edition_id: editionStore.value?.id,
       library_game_id: libraryGameId,
       started_at: new Date().toISOString(),
       user_id: userId,
@@ -55,7 +55,7 @@ export const libraryWithdrawService = {
       })
       .eq('library_game_id', libraryGameId)
       .eq('tenant_id', tenantStore.value?.id)
-      .eq('edition_id', eventStore.value?.id)
+      .eq('edition_id', editionStore.value?.id)
       .is('ended_at', null)
 
     if (error) {
@@ -72,7 +72,7 @@ export const libraryWithdrawService = {
         .select('*')
         .eq('library_game_id', libraryGameId)
         .eq('tenant_id', tenantStore.value?.id)
-        .eq('edition_id', eventStore.value?.id)
+        .eq('edition_id', editionStore.value?.id)
         .is('ended_at', null)
         .order('started_at', { ascending: false })
         .single<LibraryWithdraw>()
@@ -90,7 +90,7 @@ export const libraryWithdrawService = {
         .from('library_withdraws')
         .select('*')
         .eq('tenant_id', tenantStore.value?.id)
-        .eq('edition_id', eventStore.value?.id)
+        .eq('edition_id', editionStore.value?.id)
         .is('ended_at', null)
         .order('started_at', { ascending: false })
 
@@ -108,7 +108,7 @@ export const libraryWithdrawService = {
         .select('*', { count: 'exact', head: true })
         .eq('library_game_id', libraryGameId)
         .eq('tenant_id', tenantStore.value?.id)
-        .eq('edition_id', eventStore.value?.id)
+        .eq('edition_id', editionStore.value?.id)
 
       return result.count || 0
     } catch (error) {
@@ -141,7 +141,7 @@ export const libraryWithdrawService = {
       .select('*,library_game:library_games(game:games(name,year,image))')
       .eq('library_game_id', libraryGameId)
       .eq('tenant_id', tenantStore.value?.id)
-      .eq('edition_id', eventStore.value?.id)
+      .eq('edition_id', editionStore.value?.id)
       .order('started_at', { ascending: false })
 
     if (error) {

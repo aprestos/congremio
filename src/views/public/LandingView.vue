@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import { eventStore } from '@/stores/edition.ts'
+import { editionStore } from '@/stores/edition.ts'
 import { settingsStore } from '@/features/settings/useSettings.store.ts'
 import {
   IconCalendar,
@@ -18,7 +18,7 @@ import { RouteNames } from '@/router/routeNames.ts'
 import { tenantStore } from '@/stores/tenant.ts'
 
 // Set page-specific theme color
-const edition = computed(() => eventStore.value)
+const edition = computed(() => editionStore.value)
 const tenant = computed(() => tenantStore.value)
 const settings = computed(() => settingsStore.value)
 

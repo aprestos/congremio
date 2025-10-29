@@ -11,7 +11,7 @@ import SkeletonLoader from '@/components/SkeletonLoader.vue'
 import { HandRaisedIcon } from '@heroicons/vue/24/outline'
 import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
 import CButton from '@/components/CButton.vue'
-import { eventStore } from '@/stores/edition.ts'
+import { editionStore } from '@/stores/edition.ts'
 
 interface Props {
   game?: LibraryGame
@@ -88,7 +88,7 @@ const closeAuthDialog = (): void => {
 
 // Check if convention is currently happening
 const isConventionHappening = computed(() => {
-  const edition = eventStore.value
+  const edition = editionStore.value
   if (!edition?.start_date || !edition?.end_date) {
     return false
   }

@@ -10,7 +10,7 @@ import { editionService } from '@/features/events/service.ts'
 import LocalStorageService from '@/features/localstorage/local-storage.service'
 import tenantService from '@/features/tenant/service'
 import type { Tenant } from '@/features/tenant/tenant.model.ts'
-import { eventStore } from '@/stores/edition'
+import { editionStore } from '@/stores/edition'
 import { tenantStore } from '@/stores/tenant'
 import App from './App.vue'
 import router from './router'
@@ -35,8 +35,8 @@ async function loadTenant(): Promise<Tenant | null> {
 
 async function loadEdition(tenantId: string): Promise<Edition | null> {
   if (tenantId) {
-    eventStore.value = await editionService.getCurrentEvent(tenantId)
-    return eventStore?.value || null
+    editionStore.value = await editionService.getCurrentEvent(tenantId)
+    return editionStore?.value || null
   }
   return null
 }

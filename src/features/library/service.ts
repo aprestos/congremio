@@ -1,6 +1,6 @@
 import type { LibraryGame } from '@/features/library/game.model.ts'
 import { supabase } from '@/lib/supabase.ts'
-import { eventStore } from '@/stores/edition'
+import { editionStore } from '@/stores/edition'
 import { tenantStore } from '@/stores/tenant.ts'
 import logger from '@/lib/logger.ts'
 
@@ -26,7 +26,7 @@ export const libraryService = {
           'id,owner,notes,game:games(*),location:locations(id,name),edition_id,status,reserved_until',
         )
         .eq('tenant_id', tenantStore.value?.id)
-        .eq('edition_id', eventStore.value?.id)
+        .eq('edition_id', editionStore.value?.id)
       return result.data as unknown as LibraryGame[]
     } catch (error) {
       logger.error('Error on libraryService.get()', { error })
@@ -56,7 +56,7 @@ export const libraryService = {
   ): Promise<void> {
     const { error } = await supabase.from('library_games').insert({
       tenant_id: tenantStore.value?.id,
-      edition_id: eventStore.value?.id,
+      edition_id: editionStore.value?.id,
       game_id: gameId,
       location_id: locationId,
       status: 'not-available',
@@ -191,7 +191,7 @@ export const libraryService = {
       .from('library_games')
       .select('*')
       .eq('tenant_id', tenantStore.value?.id)
-      .eq('edition_id', eventStore.value?.id)
+      .eq('edition_id', editionStore.value?.id)
       .or(
         `game_name.ilike.%${query}%,owner.ilike.%${query}%,notes.ilike.%${query}%`,
       )
