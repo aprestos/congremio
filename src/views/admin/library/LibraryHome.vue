@@ -117,12 +117,12 @@
       <template #actions="{ item }">
         <GameActions
           :data="item"
-          @move="openMoveGameDialog"
-          @update-game="updateGame"
-          @withdraw-game="openWithdrawDialog"
-          @return-game="openReturnConfirmDialog"
-          @delete-game="openDeleteConfirmDialog"
-          @open-history-dialog="openHistoryDialog"
+          @edit="(game) => openDialog(Dialog.edit, game)"
+          @move="(game) => openDialog(Dialog.move, game)"
+          @withdraw="(game) => openDialog(Dialog.withdraw, game)"
+          @return="(game) => openDialog(Dialog.return, game)"
+          @delete="(game) => openDialog(Dialog.delete, game)"
+          @history="(game) => openDialog(Dialog.history, game)"
         />
       </template>
     </DataTable>
@@ -133,74 +133,57 @@
     class="group fixed bottom-0 right-0 flex items-end justify-end w-24 h-24 p-1"
   >
     <button
-      class="z-50 bg-black/10 backdrop-blur-lg rounded-full text-nowrap absolute shadow-xl mr-4 mb-4 py-4 px-4 font-semibold dark:bg-slate-600 text-gray-600 hover:bg-slate-700 dark:hover:bg-slate-700 transition-colors"
-      @click="open = true"
+      class="z-50 rounded-full text-gray-900 dark:text-gray-200 text-nowrap absolute mr-4 mb-4 py-4 px-4 font-semibold dark:bg-gray-800/90 backdrop-blur-2xl bg-gray-50/90 ring-1 ring-gray-200 dark:ring-gray-700 overflow-hidden shadow-2xl transition-colors"
+      @click="() => openDialog(Dialog.add)"
     >
       <IconPlus stroke="2.5" class="size-6 inline-block" />
     </button>
   </div>
 
   <!-- Dialogs -->
-  <DialogComponent :open="open" title="Add a library game">
-    <AddLibraryGameView @game-added="onGameAdded" @close="open = false" />
-  </DialogComponent>
+  <DialogAddGame :open="shownDialog === Dialog.add" @close="closeDialog" />
 
-  <DialogComponent
-    :open="withdrawDialogOpen"
-    title="Withdraw Game"
-    @close="withdrawDialogOpen = false"
-  >
-    <WithdrawGameView
-      v-if="selectedGame"
-      :game="selectedGame"
-      @game-withdrawn="onGameWithdrawn"
-      @close="withdrawDialogOpen = false"
-    />
-  </DialogComponent>
-
-  <ReturnGameDialog
-    :open="returnConfirmDialogOpen"
-    :selected-game="selectedGame"
-    :on-confirm="returnGame"
-    @cancel="returnConfirmDialogOpen = false"
-    @close="returnConfirmDialogOpen = false"
+  <DialogWithdrawGame
+    :open="shownDialog === Dialog.withdraw"
+    :game="selectedGame"
+    @close="closeDialog"
   />
 
-  <DeleteGameDialog
-    :open="deleteConfirmDialogOpen"
+  <DialogReturnGame
+    :open="shownDialog === Dialog.return"
     :selected-game="selectedGame"
-    :on-load-withdraw-count="loadWithdrawCount"
-    :on-confirm="deleteGame"
-    @close="closeDeleteDialog"
+    @close="closeDialog"
   />
 
-  <MoveGameDialog
-    :open="moveDialogOpen"
+  <DialogDeleteGame
+    :open="shownDialog === Dialog.delete"
     :selected-game="selectedGame"
-    :locations="locations"
-    :on-move="moveGame"
-    @close="cancelMoveGame"
+    @close="closeDialog"
   />
 
-  <ReservationGameDialog
-    :open="reservationDialogOpen"
+  <DialogMoveGame
+    :open="shownDialog === Dialog.move"
+    :selected-game="selectedGame"
+    @close="closeDialog"
+  />
+
+  <DialogReservedGame
+    :open="shownDialog === Dialog.reservation"
     :reservation="selectedReservation"
-    @close="closeReservationDialog"
-    @withdraw="handleReservationWithdraw"
+    @close="closeDialog"
   />
 
-  <!-- History Dialog -->
-  <DialogComponent
-    :open="historyDialogOpen"
-    title="Withdrawal History"
-    size="xl"
-    @close="closeHistoryDialog"
-  >
-    <WithdrawGameHistory
-      v-if="selectedGameId"
-      :library-game-id="selectedGameId"
-    />
-  </DialogComponent>
+  <DialogGameHistory
+    :open="shownDialog === Dialog.history"
+    :selected-game="selectedGame"
+    @close="closeDialog"
+  />
+
+  <DialogEditGame
+    :open="shownDialog === Dialog.edit"
+    :game="selectedGame"
+    @close="closeDialog"
+  />
 </template>
 
 <script setup lang="ts">
@@ -211,43 +194,43 @@ import { toast } from 'vue-sonner'
 import { IconSearch, IconNumber } from '@tabler/icons-vue'
 
 import DataTable from '@/components/DataTable.vue'
-import DialogComponent from '@/components/DialogComponent.vue'
 import CInput from '@/components/CInput.vue'
 import { getStatus, type LibraryGame } from '@/features/library/game.model.ts'
 import type { DataTableColumn } from '@/components/DataTable.vue'
-import Service, { libraryService } from '@/features/library/service.ts'
-import libraryWithdrawService from '@/features/library/withdraws/service.ts'
 import libraryReservationService from '@/features/library/reservations/service.ts'
-import AddLibraryGameView from '@/views/admin/library/AddLibraryGameView.vue'
-import WithdrawGameView from '@/views/admin/library/WithdrawGameView.vue'
 import GameActions from '@/views/admin/library/GameActions.vue'
 import GameStatus from '@/views/admin/library/GameStatus.vue'
-import DeleteGameDialog from '@/views/admin/library/DeleteGameDialog.vue'
-import ReturnGameDialog from '@/views/admin/library/ReturnGameDialog.vue'
-import MoveGameDialog from '@/views/admin/library/MoveGameDialog.vue'
-import ReservationGameDialog from '@/views/admin/library/ReservationGameDialog.vue'
-import { libraryLocationService } from '@/features/library/locations/service.ts'
-import type { LibraryLocation } from '@/features/library/locations/location.model.ts'
 import type { LibraryReservation } from '@/features/library/reservations/service'
-import WithdrawGameHistory from '@/views/admin/library/WithdrawGameHistory.vue'
+import DialogMoveGame from '@/views/admin/library/DialogMoveGame.vue'
+import DialogDeleteGame from '@/views/admin/library/DialogDeleteGame.vue'
+import DialogReturnGame from '@/views/admin/library/DialogReturnGame.vue'
+import DialogReservedGame from '@/views/admin/library/DialogReservedGame.vue'
+import DialogWithdrawGame from '@/views/admin/library/DialogWithdrawGame.vue'
+import DialogAddGame from '@/views/admin/library/DialogAddGame.vue'
+import DialogGameHistory from '@/views/admin/library/DialogGameHistory.vue'
+import DialogEditGame from '@/views/admin/library/DialogEditGame.vue'
+import libraryService from '@/features/library/service.ts'
+
+enum Dialog {
+  add,
+  withdraw,
+  return,
+  move,
+  edit,
+  delete,
+  reservation,
+  history,
+}
 
 // Data
+const shownDialog = ref<Dialog | null>(null)
 const allGames = ref<LibraryGame[]>([])
-const open = ref(false)
-const withdrawDialogOpen = ref(false)
 const selectedGame = ref<LibraryGame | null>(null)
-const returnConfirmDialogOpen = ref(false)
 const searchInput = ref('')
 const reservationInput = ref('')
 const loadingReservation = ref(false)
 const searchQuery = ref('')
-const moveDialogOpen = ref(false)
-const locations = ref<LibraryLocation[]>([])
-const deleteConfirmDialogOpen = ref(false)
-const reservationDialogOpen = ref(false)
 const selectedReservation = ref<LibraryReservation | null>(null)
-const historyDialogOpen = ref(false)
-const selectedGameId = ref<number | null>(null)
 let unsubscribe: (() => void) | null = null
 
 // Table column definitions
@@ -332,6 +315,16 @@ const filteredGames = computed(() => {
   })
 })
 
+const openDialog = (dialog: Dialog, game?: LibraryGame): void => {
+  shownDialog.value = dialog
+  if (game) selectedGame.value = game
+}
+
+const closeDialog = (): void => {
+  shownDialog.value = null
+  selectedGame.value = null
+}
+
 // Reservation lookup (debounced)
 const handleReservationChange = useDebounceFn(
   async (reservationNumber: string): Promise<void> => {
@@ -340,15 +333,11 @@ const handleReservationChange = useDebounceFn(
     try {
       const result =
         await libraryReservationService.getByDisplayId(reservationNumber)
-      if (result) {
-        selectedReservation.value = result
-        reservationDialogOpen.value = true
-      } else {
-        toast.error('Reservation not found')
-      }
-    } catch (error) {
-      console.error('Reservation lookup failed', error)
-      toast.error('Reservation lookup failed')
+
+      selectedReservation.value = result
+      shownDialog.value = Dialog.reservation
+    } catch {
+      toast.error('Reservation not found or expired')
     } finally {
       loadingReservation.value = false
     }
@@ -363,7 +352,7 @@ watch(reservationInput, (newVal) => {
 // Lifecycle
 onMounted(() => {
   // subscribe to service updates
-  unsubscribe = Service.subscribeToUpdates((updatedGames) => {
+  unsubscribe = libraryService.subscribeToUpdates((updatedGames) => {
     allGames.value = updatedGames || []
   })
 })
@@ -371,158 +360,6 @@ onMounted(() => {
 onUnmounted(() => {
   if (unsubscribe) unsubscribe()
 })
-
-// Event handlers
-const onGameAdded = (): void => {
-  open.value = false
-  toast.success('Game has been added to the library!')
-}
-
-const openWithdrawDialog = (game: LibraryGame): void => {
-  selectedGame.value = game
-  withdrawDialogOpen.value = true
-}
-
-const openReturnConfirmDialog = (game: LibraryGame): void => {
-  selectedGame.value = game
-  returnConfirmDialogOpen.value = true
-}
-
-const onGameWithdrawn = (): void => {
-  withdrawDialogOpen.value = false
-  selectedGame.value = null
-}
-
-const returnGame = async (): Promise<void> => {
-  if (!selectedGame.value) return
-
-  try {
-    await libraryWithdrawService.returnGame(selectedGame.value.id)
-    toast.success(
-      `${selectedGame.value.game.name} has been returned to the library.`,
-    )
-    selectedGame.value = null
-  } catch (error) {
-    console.error('Failed to return game:', error)
-    toast.error('Failed to return the game. Please try again.')
-    throw error
-  }
-}
-
-const updateGame = async (
-  id: number,
-  updatedGame: Partial<LibraryGame>,
-): Promise<void> => {
-  await libraryService.updateGame(id, updatedGame)
-}
-
-const moveGame = async (locationId: number): Promise<void> => {
-  if (!selectedGame.value) return
-
-  try {
-    await libraryService.updateGame(selectedGame.value.id, {
-      location_id: locationId,
-    } as Partial<LibraryGame>)
-    toast.success(
-      `${selectedGame.value.game.name} has been moved to a new location.`,
-    )
-    selectedGame.value = null
-  } catch (error) {
-    console.error('Failed to move game:', error)
-    toast.error('Failed to move the game. Please try again.')
-    throw error
-  }
-}
-
-const openMoveGameDialog = async (game: LibraryGame): Promise<void> => {
-  selectedGame.value = game
-
-  // Load locations
-  try {
-    locations.value = await libraryLocationService.get()
-    moveDialogOpen.value = true
-  } catch (error) {
-    console.error('Failed to load locations:', error)
-    toast.error('Failed to load locations. Please try again.')
-  }
-}
-
-const cancelMoveGame = (): void => {
-  moveDialogOpen.value = false
-  selectedGame.value = null
-}
-
-// Reservation handlers
-const closeReservationDialog = (): void => {
-  reservationDialogOpen.value = false
-  selectedReservation.value = null
-  reservationInput.value = ''
-}
-
-const openHistoryDialog = (game: LibraryGame): void => {
-  selectedGameId.value = game.id
-  historyDialogOpen.value = true
-}
-
-const closeHistoryDialog = (): void => {
-  historyDialogOpen.value = false
-  selectedGameId.value = null
-}
-
-const handleReservationWithdraw = async (): Promise<void> => {
-  // Find the game associated with this reservation
-  const reservation = selectedReservation.value
-  if (!reservation) return
-
-  try {
-    await libraryWithdrawService.create(
-      selectedReservation.value?.library_game.id as number,
-      selectedReservation.value?.user_id as string,
-    )
-
-    toast.success('Game withdrawn successfully')
-
-    closeReservationDialog()
-  } catch (error) {
-    console.error('Failed to withdraw game: ', error)
-    toast.error('Failed to withdraw the game. Please try again.')
-  }
-}
-
-// Delete game handlers
-const loadWithdrawCount = async (): Promise<number> => {
-  if (!selectedGame.value) return 0
-  return await libraryWithdrawService.countByGame(selectedGame.value.id)
-}
-
-const openDeleteConfirmDialog = (gameId: number): void => {
-  const game = allGames.value.find((g) => g.id === gameId)
-  if (game) {
-    selectedGame.value = game
-    deleteConfirmDialogOpen.value = true
-  }
-}
-
-const closeDeleteDialog = (): void => {
-  deleteConfirmDialogOpen.value = false
-  selectedGame.value = null
-}
-
-const deleteGame = async (): Promise<void> => {
-  if (!selectedGame.value) return
-
-  try {
-    await libraryService.deleteGame(selectedGame.value.id)
-    toast.success(
-      `${selectedGame.value.game.name} has been deleted from the library.`,
-    )
-    selectedGame.value = null
-  } catch (error) {
-    console.error('Failed to delete game:', error)
-    toast.error('Failed to delete the game. Please try again.')
-    throw error
-  }
-}
 
 // Image handlers
 const handleImageError = (event: Event): void => {

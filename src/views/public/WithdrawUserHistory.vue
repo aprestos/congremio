@@ -87,13 +87,12 @@ function getDurationHours(
 </script>
 
 <template>
-  <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-lg overflow-hidden">
+  <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
     <div class="px-6 py-8 border-b border-gray-200 dark:border-gray-700">
       <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
         Withdrawal History
       </h2>
       <p class="text-gray-600 dark:text-gray-400 mt-1">
-        {{ currentEventWithdraws }}
         total withdrawal{{ currentEventWithdraws.length !== 1 ? 's' : '' }}
       </p>
     </div>
@@ -136,7 +135,7 @@ function getDurationHours(
                 <WithdrawTimeline :withdraws="currentEventWithdraws">
                   <template #card="{ withdraw }">
                     <div
-                      class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 hover:shadow-md transition-shadow"
+                      class="bg-gray-50 dark:bg-black/20 rounded-lg p-4 hover:shadow-md transition-shadow"
                     >
                       <div class="flex gap-4">
                         <!-- Game Image -->

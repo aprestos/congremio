@@ -17,23 +17,23 @@ import {
 } from '@tabler/icons-vue'
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue'
 import { computed } from 'vue'
+import libraryService from '@/features/library/service.ts'
 // Use function overload signatures for defineEmits so we can have optional userId for withdraw-game
 const emit = defineEmits<{
-  (e: 'update-game', id: number, game: Partial<LibraryGame>): void
-  (e: 'delete-game', gameId: number): void
-  (e: 'open-update-dialog', game: LibraryGame): void
-  (e: 'return-game', game: LibraryGame): void
-  (e: 'withdraw-game', game: LibraryGame, userId?: string): void
+  (e: 'delete', game: LibraryGame): void
+  (e: 'edit', game: LibraryGame): void
+  (e: 'return', game: LibraryGame): void
+  (e: 'withdraw', game: LibraryGame, userId?: string): void
   (e: 'move', game: LibraryGame): void
-  (e: 'open-history-dialog', game: LibraryGame): void
+  (e: 'history', game: LibraryGame): void
 }>()
 
 const props = defineProps<{ data: LibraryGame }>()
 
-const updateStatus = (status: LibraryGameStatus): void => {
+const updateStatus = async (status: LibraryGameStatus): Promise<void> => {
   // Close the dialog - realtime will handle the list update
   const updatedGame: Partial<LibraryGame> = { status }
-  emit('update-game', props.data.id, updatedGame)
+  await libraryService.updateGame(props.data.id, updatedGame)
 }
 
 const gameStatus = computed(() => {
@@ -48,7 +48,7 @@ const gameStatus = computed(() => {
         v-show="gameStatus === 'withdrawn'"
         type="button"
         class="relative inline-flex items-center gap-x-1.5 rounded-l-md bg-gray-100 px-4 py-3 md:px-3 md:py-2 text-sm font-semibold shadow-xs text-gray-600 dark:text-gray-200 ring-1 ring-gray-300 ring-inset hover:bg-gray-200 dark:bg-white/10 dark:ring-gray-700 dark:hover:bg-white/20 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-blue-500 dark:focus:outline-blue-400"
-        @click="emit('return-game', props.data)"
+        @click="emit('return', props.data)"
       >
         <IconArrowBarToDownDashed class="-ml-0.5 size-5" aria-hidden="true" />
         <span class="hidden md:inline">Return</span>
@@ -57,7 +57,7 @@ const gameStatus = computed(() => {
         v-show="gameStatus === 'available'"
         type="button"
         class="relative cursor-pointer inline-flex items-center gap-x-1.5 rounded-l-md bg-gray-100 px-4 py-3 md:px-3 md:py-2 text-sm font-semibold shadow-xs text-gray-600 dark:text-gray-200 ring-1 ring-gray-300 ring-inset hover:bg-gray-200 dark:bg-white/10 dark:ring-gray-700 dark:hover:bg-white/20 focus:outline-2 focus:outline-offset-2 focus:outline-blue-500 dark:focus:outline-blue-400"
-        @click="emit('withdraw-game', props.data)"
+        @click="emit('withdraw', props.data)"
       >
         <IconArrowBarUp class="-ml-0.5 size-5" aria-hidden="true" />
         <span class="hidden md:inline">Loan</span>
@@ -85,7 +85,31 @@ const gameStatus = computed(() => {
           <MenuItems
             class="absolute right-0 z-15 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg outline-1 outline-black/5 dark:divide-white/10 dark:bg-gray-800 dark:shadow-none dark:-outline-offset-1 dark:outline-white/10"
           >
-            <div class="py-1 hidden">
+            <div class="py-1">
+              <MenuItem v-slot="{ active }">
+                <a
+                  :class="[
+                    active
+                      ? 'bg-gray-100 text-gray-900 outline-hidden dark:bg-white/5 dark:text-white'
+                      : 'text-gray-700 dark:text-gray-300',
+                    'flex items-center px-4 py-2 text-sm cursor-pointer',
+                  ]"
+                  @click="emit('history', props.data)"
+                >
+                  <IconHistory
+                    :class="[
+                      active
+                        ? 'text-gray-500 dark:text-white'
+                        : 'text-gray-400 dark:text-gray-500',
+                      'mr-3 size-5',
+                    ]"
+                    aria-hidden="true"
+                  />
+                  History
+                </a>
+              </MenuItem>
+            </div>
+            <div class="py-1">
               <MenuItem v-slot="{ active }" class="cursor-not-allowed">
                 <a
                   :class="[
@@ -94,7 +118,7 @@ const gameStatus = computed(() => {
                       : 'text-gray-700 dark:text-gray-300',
                     'flex items-center px-4 py-2 text-sm cursor-pointer',
                   ]"
-                  @click="emit('open-update-dialog', props.data)"
+                  @click="emit('edit', props.data)"
                 >
                   <IconEdit
                     :class="[
@@ -108,34 +132,8 @@ const gameStatus = computed(() => {
                   Edit
                 </a>
               </MenuItem>
-            </div>
-            <MenuItem v-slot="{ active }">
-              <a
-                :class="[
-                  active
-                    ? 'bg-gray-100 text-gray-900 outline-hidden dark:bg-white/5 dark:text-white'
-                    : 'text-gray-700 dark:text-gray-300',
-                  'flex items-center px-4 py-2 text-sm cursor-pointer',
-                ]"
-                @click="emit('open-history-dialog', props.data)"
-              >
-                <IconHistory
-                  :class="[
-                    active
-                      ? 'text-gray-500 dark:text-white'
-                      : 'text-gray-400 dark:text-gray-500',
-                    'mr-3 size-5',
-                  ]"
-                  aria-hidden="true"
-                />
-                History
-              </a>
-            </MenuItem>
-            <div class="py-1">
-              <MenuItem
-                v-show="getStatus(props.data) === 'not-available'"
-                v-slot="{ active }"
-              >
+
+              <MenuItem v-slot="{ active }">
                 <a
                   :class="[
                     active
@@ -143,9 +141,9 @@ const gameStatus = computed(() => {
                       : 'text-gray-700 dark:text-gray-300',
                     'flex items-center px-4 py-2 text-sm cursor-pointer',
                   ]"
-                  @click="updateStatus('available' as LibraryGameStatus)"
+                  @click="emit('move', props.data)"
                 >
-                  <IconCircleCheck
+                  <IconChevronsRight
                     :class="[
                       active
                         ? 'text-gray-500 dark:text-white'
@@ -154,7 +152,7 @@ const gameStatus = computed(() => {
                     ]"
                     aria-hidden="true"
                   />
-                  Mark as available
+                  Move
                 </a>
               </MenuItem>
               <MenuItem
@@ -182,7 +180,10 @@ const gameStatus = computed(() => {
                   Mark as not available
                 </a>
               </MenuItem>
-              <MenuItem v-slot="{ active }">
+              <MenuItem
+                v-show="getStatus(props.data) === 'not-available'"
+                v-slot="{ active }"
+              >
                 <a
                   :class="[
                     active
@@ -190,9 +191,9 @@ const gameStatus = computed(() => {
                       : 'text-gray-700 dark:text-gray-300',
                     'flex items-center px-4 py-2 text-sm cursor-pointer',
                   ]"
-                  @click="emit('move', props.data)"
+                  @click="updateStatus('available' as LibraryGameStatus)"
                 >
-                  <IconChevronsRight
+                  <IconCircleCheck
                     :class="[
                       active
                         ? 'text-gray-500 dark:text-white'
@@ -201,7 +202,7 @@ const gameStatus = computed(() => {
                     ]"
                     aria-hidden="true"
                   />
-                  Move
+                  Mark as available
                 </a>
               </MenuItem>
             </div>
@@ -214,7 +215,7 @@ const gameStatus = computed(() => {
                       : 'text-gray-700 dark:text-gray-300',
                     'flex items-center px-4 py-2 text-sm cursor-pointer',
                   ]"
-                  @click="emit('delete-game', props.data.id)"
+                  @click="emit('delete', props.data)"
                 >
                   <IconTrash
                     :class="[

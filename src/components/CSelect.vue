@@ -55,7 +55,10 @@
           </div>
         </template>
       </VueSelect>
-      <p v-if="helperText" class="text-xs mt-1 text-muted-color">
+      <p
+        v-if="helperText"
+        class="text-xs mt-1 text-gray-600 dark:text-gray-400"
+      >
         {{ helperText }}
       </p>
     </div>
@@ -68,6 +71,7 @@ import { useDebounceFn } from '@vueuse/core'
 import { defineEmits, defineProps, ref, watchEffect } from 'vue'
 import VueSelect, { type Option } from 'vue3-select-component'
 import ValidationErrors from '@/components/ValidationErrors.vue'
+import logger from '@/lib/logger.ts'
 
 const props = defineProps<{
   id: string
@@ -114,6 +118,7 @@ const handleSearch = useDebounceFn(async (value: string) => {
   try {
     if (value?.length > 1) {
       const result = await props.onSearch(value)
+      logger.debug('users', { result })
       internalOptions.value = result.map((item) => {
         // Type assertion to access properties safely
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

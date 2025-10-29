@@ -48,8 +48,9 @@ const handleSubmit = async (emailValue: string): Promise<void> => {
   try {
     await authService.signInWithEmail(emailValue)
     emailSent.value = true
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
-    console.error('Error sending magic link:', error)
+    toast.error('Failed to sign in. Please try again later.')
   } finally {
     formRef.value?.setLoading(false)
   }

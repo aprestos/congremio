@@ -22,7 +22,7 @@ const router = createRouter({
     {
       path: '',
       name: RouteNames.public.home,
-      component: () => import('../views/public/LandingView.vue'),
+      component: () => import('../views/public/PageLanding.vue'),
     },
     {
       path: '',
@@ -31,7 +31,7 @@ const router = createRouter({
         {
           path: 'library',
           name: RouteNames.public.library,
-          component: () => import('@/views/public/library/LibraryHome.vue'),
+          component: () => import('@/views/public/library/PageLibraryHome.vue'),
         },
       ],
     },
@@ -107,7 +107,7 @@ const router = createRouter({
     {
       path: '/users/:id',
       name: RouteNames.public.user,
-      component: () => import('../views/public/UserDetailsView.vue'),
+      component: () => import('../views/public/PageUserProfile.vue'),
     },
     {
       path: '/not-found',
