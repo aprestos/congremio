@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { toast } from 'vue-sonner'
 import { IconArrowLeft } from '@tabler/icons-vue'
@@ -7,33 +7,21 @@ import { userService, type User } from '@/features/users/service.ts'
 import libraryWithdrawService, {
   type LibraryWithdraw,
 } from '@/features/library/withdraws/service.ts'
-import logger from '@/lib/logger.ts'
 import UserHeader from './UserHeader.vue'
-import WithdrawHistory from './WithdrawHistory.vue'
+import WithdrawUserHistory from './WithdrawUserHistory.vue'
 import { RouteNames } from '@/router/routeNames.ts'
 import CButton from '@/components/CButton.vue'
+import { editionStore } from '@/stores/edition.ts'
 
 const route = useRoute()
 const userId = route.params.id as string
 
 const user = ref<User | null>(null)
-const withdraws = ref<LibraryWithdraw[]>([])
+const withdraws = ref<Map<number, LibraryWithdraw[]>>(
+  new Map<number, LibraryWithdraw[]>(),
+)
 const isLoadingUser = ref(false)
 const isLoadingWithdraws = ref(false)
-
-const groupedWithdraws = computed<Map<number, LibraryWithdraw[]>>(() => {
-  const grouped = new Map<number, LibraryWithdraw[]>()
-
-  for (const withdraw of withdraws.value) {
-    const editionId = withdraw.edition_id
-
-    if (!grouped.has(editionId)) grouped.set(editionId, [])
-
-    grouped.get(editionId)?.push(withdraw)
-  }
-  logger.debug('withdraws', { grouped })
-  return grouped
-})
 
 async function loadUserData(): Promise<void> {
   isLoadingUser.value = true
@@ -50,7 +38,10 @@ async function loadUserData(): Promise<void> {
 async function loadWithdraws(): Promise<void> {
   isLoadingWithdraws.value = true
   try {
-    withdraws.value = await libraryWithdrawService.getByUserId(userId)
+    withdraws.value.set(
+      editionStore.value?.id as number,
+      await libraryWithdrawService.getByUserId(userId),
+    )
   } catch (error) {
     console.error('Failed to load withdraws:', error)
     toast.error('Failed to load withdrawal history')
@@ -88,9 +79,8 @@ onMounted(() => {
       <UserHeader :user="user" :is-loading="isLoadingUser" />
 
       <!-- Withdrawal History Component -->
-      <WithdrawHistory
+      <WithdrawUserHistory
         :withdraws="withdraws"
-        :grouped-withdraws="groupedWithdraws"
         :is-loading="isLoadingWithdraws"
       />
     </div>

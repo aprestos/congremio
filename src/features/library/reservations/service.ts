@@ -1,6 +1,5 @@
-import { authService } from '@/features/auth/service'
 import { supabase } from '@/lib/supabase.ts'
-import { eventStore } from '@/stores/edition'
+import { editionStore } from '@/stores/edition'
 import { tenantStore } from '@/stores/tenant.ts'
 import type { LibraryGame } from '@/features/library/game.model.ts'
 import logger from '@/lib/logger.ts'
@@ -30,7 +29,7 @@ export const libraryReservationService = {
         'id,display_id,user_id,expires_at,library_game:library_games(id,game:games(name,year,image))',
       )
       .eq('tenant_id', tenantStore.value?.id)
-      .eq('edition_id', eventStore.value?.id)
+      .eq('edition_id', editionStore.value?.id)
       .eq('status', 'active')
       .eq('display_id', displayId)
       .gte('expires_at', now)
@@ -44,9 +43,7 @@ export const libraryReservationService = {
     return data as unknown as LibraryReservation
   },
 
-  async get(): Promise<Array<LibraryReservation>> {
-    const user = await authService.getUser()
-
+  async get(userId: string): Promise<Array<LibraryReservation>> {
     const now = new Date().toISOString()
     const { data, error } = await supabase
       .from('library_reservations')
@@ -54,8 +51,8 @@ export const libraryReservationService = {
         'id,display_id,expires_at,user_id,library_game:library_games(game:games(name,year,image))',
       )
       .eq('tenant_id', tenantStore.value?.id)
-      .eq('edition_id', eventStore.value?.id)
-      .eq('user_id', user?.id)
+      .eq('edition_id', editionStore.value?.id)
+      .eq('user_id', userId)
       .eq('status', 'active')
       .gt('expires_at', now)
 
@@ -73,7 +70,7 @@ export const libraryReservationService = {
       body: {
         library_game_id: libraryGameId,
         tenant_id: tenantStore.value?.id,
-        edition_id: eventStore.value?.id,
+        edition_id: editionStore.value?.id,
       },
     })
 
@@ -83,10 +80,13 @@ export const libraryReservationService = {
     }
   },
 
-  subscribeToUpdates(onUpdate: ReservationUpdateCallback): () => void {
+  subscribeToUpdates(
+    userId: string,
+    onUpdate: ReservationUpdateCallback,
+  ): () => void {
     // Initial load using async/await
     const initializeData = async (): Promise<void> => {
-      const reservations = await this.get()
+      const reservations = await this.get(userId)
       onUpdate(reservations)
     }
 
@@ -95,7 +95,7 @@ export const libraryReservationService = {
 
     const handleDatabaseChange = (): void => {
       // Fetch fresh data and update if changed
-      void this.get().then((freshReservations) => {
+      void this.get(userId).then((freshReservations) => {
         onUpdate(freshReservations)
       })
     }

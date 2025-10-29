@@ -248,7 +248,7 @@ import SettingsSection from '@/components/SettingsSection.vue'
 import FilePondUploadDialog from '@/components/FilePondUploadDialog.vue'
 import { editionService } from '@/features/events/service.ts'
 import { tenantStore } from '@/stores/tenant.ts'
-import { eventStore } from '@/stores/edition.ts'
+import { editionStore } from '@/stores/edition.ts'
 import logger from '@/lib/logger.ts'
 
 interface DailySchedule {
@@ -307,29 +307,30 @@ const handlePosterUploadError = (error: any): void => {
 
 // Load initial data from eventStore
 onMounted(() => {
-  if (eventStore.value) {
+  if (editionStore.value) {
     // Format dates to YYYY-MM-DD for input type="date"
-    if (eventStore.value.start_date) {
-      formData.value.startDate = eventStore.value.start_date.split('T')[0] ?? ''
+    if (editionStore.value.start_date) {
+      formData.value.startDate =
+        editionStore.value.start_date.split('T')[0] ?? ''
     }
-    if (eventStore.value.end_date) {
-      formData.value.endDate = eventStore.value.end_date.split('T')[0] ?? ''
+    if (editionStore.value.end_date) {
+      formData.value.endDate = editionStore.value.end_date.split('T')[0] ?? ''
     }
-    if (eventStore.value.name) {
-      formData.value.name = eventStore.value.name
+    if (editionStore.value.name) {
+      formData.value.name = editionStore.value.name
     }
-    if (eventStore.value.location?.title) {
-      formData.value.locationTitle = eventStore.value.location.title
+    if (editionStore.value.location?.title) {
+      formData.value.locationTitle = editionStore.value.location.title
     }
-    if (eventStore.value.location?.url) {
-      formData.value.locationUrl = eventStore.value.location.url
+    if (editionStore.value.location?.url) {
+      formData.value.locationUrl = editionStore.value.location.url
     }
-    if (eventStore.value.description) {
-      formData.value.description = eventStore.value.description
+    if (editionStore.value.description) {
+      formData.value.description = editionStore.value.description
     }
-    if (eventStore.value.poster_url) {
-      formData.value.poster = eventStore.value.poster_url
-      posterPreview.value = eventStore.value.poster_url
+    if (editionStore.value.poster_url) {
+      formData.value.poster = editionStore.value.poster_url
+      posterPreview.value = editionStore.value.poster_url
     }
   }
 })
@@ -389,7 +390,7 @@ const saveEdition = async (): Promise<void> => {
         : null,
     }
 
-    await editionService.save(tenantStore.value?.id, eventStore.value?.id, {
+    await editionService.save(tenantStore.value?.id, editionStore.value?.id, {
       ...(editionData.startDate && { start_date: editionData.startDate }),
       ...(editionData.endDate && { end_date: editionData.endDate }),
       ...(editionData.name && { name: editionData.name }),
@@ -405,9 +406,9 @@ const saveEdition = async (): Promise<void> => {
     })
 
     // Update eventStore with new values
-    if (eventStore.value) {
-      eventStore.value = {
-        ...eventStore.value,
+    if (editionStore.value) {
+      editionStore.value = {
+        ...editionStore.value,
         ...(editionData.startDate && { start_date: editionData.startDate }),
         ...(editionData.endDate && { end_date: editionData.endDate }),
         ...(editionData.name && { name: editionData.name }),

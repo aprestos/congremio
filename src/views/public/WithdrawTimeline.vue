@@ -1,25 +1,12 @@
 <script setup lang="ts">
 import type { LibraryWithdraw } from '@/features/library/withdraws/service.ts'
 import { DateTime } from 'luxon'
-import WithdrawCard from './WithdrawCard.vue'
 
 interface Props {
   withdraws: LibraryWithdraw[]
 }
 
 defineProps<Props>()
-
-function formatDate(dateStr: string | number): string {
-  try {
-    const date =
-      typeof dateStr === 'string'
-        ? DateTime.fromISO(dateStr)
-        : DateTime.fromMillis(Number(dateStr))
-    return date.toFormat('MMM dd, yyyy HH:mm')
-  } catch {
-    return 'Invalid date'
-  }
-}
 
 function getDay(dateStr: string | number): string {
   try {
@@ -42,26 +29,6 @@ function getMonth(dateStr: string | number): string {
     return date.toFormat('MMM')
   } catch {
     return '---'
-  }
-}
-
-function getDurationHours(
-  startedAt: string | number,
-  endedAt: string | number | null,
-): number | null {
-  try {
-    const start =
-      typeof startedAt === 'string'
-        ? DateTime.fromISO(startedAt)
-        : DateTime.fromMillis(Number(startedAt))
-    if (!endedAt) return null
-    const end =
-      typeof endedAt === 'string'
-        ? DateTime.fromISO(endedAt)
-        : DateTime.fromMillis(Number(endedAt))
-    return Math.round(end.diff(start, 'hours').hours * 10) / 10
-  } catch {
-    return null
   }
 }
 </script>
@@ -106,12 +73,10 @@ function getDurationHours(
           ></div>
         </div>
 
-        <!-- Withdraw Card -->
-        <WithdrawCard
-          :withdraw="withdraw"
-          :format-date="formatDate"
-          :get-duration-hours="getDurationHours"
-        />
+        <!-- Card slot -->
+        <div class="flex-1 pb-4">
+          <slot name="card" :withdraw="withdraw"></slot>
+        </div>
       </div>
     </div>
   </div>

@@ -60,6 +60,7 @@ import libraryReservationService, {
 } from '@/features/library/reservations/service.ts'
 import CircularCountdown from '@/components/CircularCountdown.vue'
 import ReservationDetail from '@/views/public/library/ReservationDetail.vue'
+import { authService } from '@/features/auth/service.ts'
 
 const reservations = ref<LibraryReservation[]>([])
 const loading = ref(true)
@@ -99,14 +100,17 @@ const closeReservationDetail = () => {
   selectedReservation.value = null
 }
 
-onMounted(() => {
-  // Subscribe to realtime updates
-  unsubscribe = libraryReservationService.subscribeToUpdates(
-    (updatedReservations) => {
-      reservations.value = updatedReservations
-      loading.value = false
-    },
-  )
+onMounted(async () => {
+  const user = await authService.getUser()
+  if (user) {
+    unsubscribe = libraryReservationService.subscribeToUpdates(
+      user.id,
+      (updatedReservations) => {
+        reservations.value = updatedReservations
+        loading.value = false
+      },
+    )
+  }
 })
 
 onUnmounted(() => {
