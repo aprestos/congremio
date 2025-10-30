@@ -93,7 +93,7 @@ function getDurationHours(
         Withdrawal History
       </h2>
       <p class="text-gray-600 dark:text-gray-400 mt-1">
-        total withdrawal{{ currentEventWithdraws.length !== 1 ? 's' : '' }}
+        {{ currentEventWithdraws.length }} total withdrawal{{ currentEventWithdraws.length !== 1 ? 's' : '' }}
       </p>
     </div>
 
