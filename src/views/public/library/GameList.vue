@@ -5,12 +5,12 @@ import {
   libraryService,
   type FilterOptions,
 } from '@/features/library/service.ts'
-import GameDetail from './GameDetail.vue'
 import GameItem from './GameItem.vue'
 import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
 import libraryReservationService from '@/features/library/reservations/service.ts'
 import { toast } from 'vue-sonner'
 import { authService } from '@/features/auth/service.ts'
+import DialogGameDetail from '@/views/public/library/DialogGameDetail.vue'
 
 const allGames = ref<LibraryGame[]>([])
 const loading = ref(true)
@@ -254,18 +254,8 @@ onUnmounted(() => {
       </p>
     </div>
 
-    <!-- End of results indicator -->
-    <div
-      v-if="!loading && !hasMoreGames && filteredGames.length > 0"
-      class="mt-8 text-center"
-    >
-      <p class="text-sm text-gray-500 dark:text-gray-400">
-        You've reached the end of the library
-      </p>
-    </div>
-
     <!-- Game Detail Modal -->
-    <GameDetail
+    <DialogGameDetail
       v-if="selectedGameId"
       :game-id="selectedGameId"
       :open="isDetailModalOpen"

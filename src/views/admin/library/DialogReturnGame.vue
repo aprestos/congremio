@@ -9,18 +9,17 @@ import { userService } from '@/features/users/service.ts'
 import type { User } from '@/features/users/service.ts'
 import { useTimeAgo } from '@vueuse/core'
 import { IconHourglassHigh } from '@tabler/icons-vue'
+import { toast } from 'vue-sonner'
 
 interface Props {
   open: boolean
   selectedGame: LibraryGame | null
-  onConfirm: () => Promise<void>
 }
 
 const props = defineProps<Props>()
 
 const emit = defineEmits<{
   close: []
-  cancel: []
 }>()
 
 const activeWithdraw = ref<LibraryWithdraw | null>(null)
@@ -64,10 +63,25 @@ watch(
 async function handleConfirm(): Promise<void> {
   isReturningGame.value = true
   try {
-    await props.onConfirm()
+    await returnGame()
     emit('close')
   } finally {
     isReturningGame.value = false
+  }
+}
+
+const returnGame = async (): Promise<void> => {
+  if (!props.selectedGame?.id) return
+
+  try {
+    await libraryWithdrawService.returnGame(props.selectedGame?.id)
+    toast.success(
+      `${props.selectedGame.game.name} has been returned to the library.`,
+    )
+  } catch (error) {
+    console.error('Failed to return game:', error)
+    toast.error('Failed to return the game. Please try again.')
+    throw error
   }
 }
 </script>
@@ -80,7 +94,7 @@ async function handleConfirm(): Promise<void> {
     cancel-text="Cancel"
     :loading="isReturningGame"
     @confirm="handleConfirm"
-    @cancel="emit('cancel')"
+    @cancel="emit('close')"
     @close="emit('close')"
   >
     <template #default>

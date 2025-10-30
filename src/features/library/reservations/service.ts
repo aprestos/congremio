@@ -19,9 +19,7 @@ export interface LibraryReservation {
 type ReservationUpdateCallback = (reservations: LibraryReservation[]) => void
 
 export const libraryReservationService = {
-  async getByDisplayId(
-    displayId: string,
-  ): Promise<LibraryReservation | undefined> {
+  async getByDisplayId(displayId: string): Promise<LibraryReservation | null> {
     const now = DateTime.now().minus({ minute: 1 }).toISO()
     const { data, error } = await supabase
       .from('library_reservations')
@@ -37,10 +35,10 @@ export const libraryReservationService = {
 
     if (error) {
       logger.error('Failed to get reservation by id', { error })
-      throw new Error('Unable to fetch reservations')
+      throw new Error('Reservation not found')
     }
 
-    return data as unknown as LibraryReservation
+    return data as unknown as LibraryReservation | null
   },
 
   async get(userId: string): Promise<Array<LibraryReservation>> {
@@ -48,7 +46,7 @@ export const libraryReservationService = {
     const { data, error } = await supabase
       .from('library_reservations')
       .select(
-        'id,display_id,expires_at,user_id,library_game:library_games(game:games(name,year,image))',
+        'id,status,display_id,expires_at,user_id,library_game:library_games(game:games(name,year,image))',
       )
       .eq('tenant_id', tenantStore.value?.id)
       .eq('edition_id', editionStore.value?.id)
@@ -62,6 +60,22 @@ export const libraryReservationService = {
     }
 
     return data as unknown as LibraryReservation[]
+  },
+
+  async countByGame(libraryGameId: number): Promise<number> {
+    try {
+      const result = await supabase
+        .from('library_reservations')
+        .select('*', { count: 'exact', head: true })
+        .eq('library_game_id', libraryGameId)
+        .eq('tenant_id', tenantStore.value?.id)
+        .eq('edition_id', editionStore.value?.id)
+
+      return result.count || 0
+    } catch (error) {
+      logger.error('Error counting reservations by library game:', { error })
+      return 0
+    }
   },
 
   async post(libraryGameId: number): Promise<void> {

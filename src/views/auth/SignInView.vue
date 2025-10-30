@@ -48,8 +48,9 @@ const handleSubmit = async (emailValue: string): Promise<void> => {
   try {
     await authService.signInWithEmail(emailValue)
     emailSent.value = true
-  } catch (error) {
-    console.error('Error sending magic link:', error)
+  
+  } catch {
+    toast.error('Failed to sign in. Please try again later.')
   } finally {
     formRef.value?.setLoading(false)
   }

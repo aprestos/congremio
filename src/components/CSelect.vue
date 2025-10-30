@@ -55,7 +55,10 @@
           </div>
         </template>
       </VueSelect>
-      <p v-if="helperText" class="text-xs mt-1 text-muted-color">
+      <p
+        v-if="helperText"
+        class="text-xs mt-1 text-gray-600 dark:text-gray-400"
+      >
         {{ helperText }}
       </p>
     </div>

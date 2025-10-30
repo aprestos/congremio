@@ -15,7 +15,7 @@ export const userService = {
     const url = new URL(
       `${import.meta.env.VITE_API_URL as string}/functions/v1/users`,
     )
-    url.searchParams.set('query', query)
+    url.searchParams.set('q', query)
 
     const {
       data: { session },
@@ -40,7 +40,10 @@ export const userService = {
     const { data, error } = await supabase.functions.invoke(`users/${id}`, {
       method: 'GET',
     })
-    if (error) throw error
+    if (error) {
+      logger.error('Unable to get user', { error })
+      throw new Error('Unable to get user')
+    }
     return data as User
   },
 

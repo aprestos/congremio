@@ -102,7 +102,7 @@
           type="button"
           class="order-1 sm:order-2 w-full sm:w-auto rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed"
           :disabled="isWithdrawing"
-          @click="handleWithdraw"
+          @click="handleReservationWithdraw"
         >
           <span v-if="isWithdrawing">Withdrawing...</span>
           <span v-else>Withdraw Game</span>
@@ -119,6 +119,7 @@ import DialogComponent from '@/components/DialogComponent.vue'
 import type { LibraryReservation } from '@/features/library/reservations/service'
 import { type User, userService } from '@/features/users/service.ts'
 import { IconMail } from '@tabler/icons-vue'
+import libraryWithdrawService from '@/features/library/withdraws/service.ts'
 
 interface LibraryGameWithDetails {
   game?: {
@@ -211,26 +212,33 @@ const gameImage = computed(() => {
 
 // Event handlers
 const handleClose = (): void => {
-  isWithdrawing.value = false
   emit('close')
-}
-
-const handleWithdraw = (): void => {
-  if (!props.reservation) return
-
-  isWithdrawing.value = true
-  try {
-    emit('withdraw', props.reservation.id)
-  } catch (error) {
-    console.error('Failed to withdraw game:', error)
-    toast.error('Failed to withdraw the game. Please try again.')
-  } finally {
-    isWithdrawing.value = false
-  }
 }
 
 const handleImageError = (event: Event): void => {
   const target = event.target as HTMLImageElement
   target.style.display = 'none'
+}
+
+const handleReservationWithdraw = async (): Promise<void> => {
+  // Find the game associated with this reservation
+  if (!props.reservation) return
+  isWithdrawing.value = true
+
+  try {
+    await libraryWithdrawService.create(
+      props.reservation?.library_game.id as number,
+      props.reservation?.user_id,
+    )
+
+    toast.success('Game withdrawn successfully')
+
+    emit('close')
+  } catch (error) {
+    console.error('Failed to withdraw game: ', error)
+    toast.error('Failed to withdraw the game. Please try again.')
+  } finally {
+    isWithdrawing.value = false
+  }
 }
 </script>

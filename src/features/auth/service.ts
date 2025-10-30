@@ -35,7 +35,7 @@ export const authService = {
   },
 
   async signInWithEmail(email: string): Promise<void> {
-    await supabase.auth.signInWithOtp({
+    const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
         shouldCreateUser: true,
@@ -45,6 +45,10 @@ export const authService = {
         },
       },
     })
+    if (error) {
+      logger.error('Failed to send sign-in email', { error })
+      throw new Error('Unable to send email. Please try again later.')
+    }
   },
 
   async validateOTP(email: string, token: string): Promise<void> {

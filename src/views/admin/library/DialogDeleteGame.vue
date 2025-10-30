@@ -1,13 +1,16 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import DialogComponent from '@/components/DialogComponent.vue'
 import type { LibraryGame } from '@/features/library/game.model.ts'
+import libraryWithdrawService from '@/features/library/withdraws/service.ts'
+import { toast } from 'vue-sonner'
+import libraryService from '@/features/library/service.ts'
+import libraryReservationService from '@/features/library/reservations/service.ts'
+import logger from '@/lib/logger.ts'
 
 interface Props {
   open: boolean
   selectedGame: LibraryGame | null
-  onLoadWithdrawCount: () => Promise<number>
-  onConfirm: () => Promise<void>
 }
 
 const props = defineProps<Props>()
@@ -16,42 +19,45 @@ const emit = defineEmits<{
   close: []
 }>()
 
-const isLoadingWithdrawCount = ref(false)
 const isDeletingGame = ref(false)
-const withdrawCount = ref<number | null>(null)
+const isLoading = ref(false)
+const canBeDeleted = ref<boolean>(false)
 
-// Computed property for delete button disabled state
-const isDeleteButtonDisabled = computed(() => {
-  return (
-    isLoadingWithdrawCount.value ||
-    withdrawCount.value === null ||
-    withdrawCount.value > 0
-  )
+onMounted(() => {
+  canBeDeleted.value = false
+  isLoading.value = false
 })
 
-// Load withdraw count when dialog opens
 watch(
   () => props.open,
-  async (open) => {
-    if (open) {
-      isLoadingWithdrawCount.value = true
-      withdrawCount.value = null
-      try {
-        withdrawCount.value = await props.onLoadWithdrawCount()
-      } catch (error) {
-        console.error('Failed to fetch withdraw count:', error)
-      } finally {
-        isLoadingWithdrawCount.value = false
-      }
+  async (): Promise<void> => {
+    if (!props.selectedGame) return
+    isLoading.value = true
+    const [loansCount, reservationsCount] = await Promise.all([
+      libraryWithdrawService.countByGame(props.selectedGame.id),
+      libraryReservationService.countByGame(props.selectedGame.id),
+    ])
+    if (loansCount === 0 && reservationsCount === 0) {
+      canBeDeleted.value = true
     }
+    isLoading.value = false
   },
 )
 
-async function handleConfirm(): Promise<void> {
+const deleteGame = async (): Promise<void> => {
+  if (!props.selectedGame) return
   isDeletingGame.value = true
+
   try {
-    await props.onConfirm()
+    await libraryService.deleteGame(props.selectedGame.id)
+    toast.success(
+      `${props.selectedGame.game.name} has been deleted from the library.`,
+    )
     emit('close')
+  } catch (error) {
+    logger.error('Failed to delete game', { error })
+    toast.error('Failed to delete the game. Please try again.')
+    throw error
   } finally {
     isDeletingGame.value = false
   }
@@ -62,15 +68,12 @@ async function handleConfirm(): Promise<void> {
   <DialogComponent :open="open" title="Delete Game" @close="emit('close')">
     <div v-if="selectedGame" class="space-y-6">
       <!-- Loading State -->
-      <div
-        v-if="isLoadingWithdrawCount"
-        class="flex items-center justify-center py-8"
-      >
+      <div v-if="isLoading" class="flex items-center justify-center py-8">
         <div
           class="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-indigo-600 dark:border-gray-700 dark:border-t-indigo-400"
         />
         <span class="ml-3 text-sm text-gray-600 dark:text-gray-400"
-          >Checking withdraw history...</span
+          >Checking history...</span
         >
       </div>
 
@@ -78,7 +81,7 @@ async function handleConfirm(): Promise<void> {
       <div v-else>
         <!-- Warning if withdraws exist -->
         <div
-          v-if="withdrawCount !== null && withdrawCount > 0"
+          v-if="!canBeDeleted"
           class="rounded-md bg-yellow-50 dark:bg-yellow-900/20 p-4 mb-4"
         >
           <div class="flex">
@@ -104,14 +107,9 @@ async function handleConfirm(): Promise<void> {
               </h3>
               <div class="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
                 <p>
-                  This game has
-                  <strong class="text-gray-900 dark:text-white">
-                    {{ withdrawCount }}
-                  </strong>
-                  withdraw record
-                  <span v-if="withdrawCount > 1">s</span> in the system and
-                  cannot be deleted. Games with withdrawal history must be
-                  retained for record-keeping purposes.
+                  This game has withdraw or reservation records in the system
+                  and cannot be deleted. Games history must be retained for
+                  record-keeping purposes.
                 </p>
               </div>
             </div>
@@ -119,7 +117,7 @@ async function handleConfirm(): Promise<void> {
         </div>
 
         <!-- Confirmation message if no withdraws -->
-        <div v-else-if="withdrawCount === 0">
+        <div v-else-if="canBeDeleted">
           <p class="text-sm text-gray-600 dark:text-gray-400">
             Are you sure you want to delete
             <strong class="text-gray-900 dark:text-white">
@@ -145,8 +143,8 @@ async function handleConfirm(): Promise<void> {
         <button
           type="button"
           class="rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
-          :disabled="isDeleteButtonDisabled || isDeletingGame"
-          @click="handleConfirm"
+          :disabled="!canBeDeleted || isDeletingGame"
+          @click="deleteGame"
         >
           <span v-if="isDeletingGame">Deleting...</span>
           <span v-else>Yes, delete it</span>

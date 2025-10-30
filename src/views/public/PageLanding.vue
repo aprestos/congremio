@@ -30,8 +30,8 @@ onMounted(() => {
     'https://images.unsplash.com/photo-1547638375-ebf04735d792?q=80&w=800&auto=format&fit=crop',
     'https://images.unsplash.com/photo-1719494206741-79831f9f4d51?q=80&w=800&auto=format&fit=crop',
     'https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?q=80&w=800&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1509228627152-4b2b6f0b3f36?q=80&w=800&auto=format&fit=crop',
     'https://images.unsplash.com/photo-1549056572-75914d5d5fd4?q=80&w=800&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1585504198199-20277593b94f?q=80&w=800&auto=format&fit=crop',
     ...(tenant.value?.images ?? []),
   ]
 

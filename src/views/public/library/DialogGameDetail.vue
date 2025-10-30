@@ -1,5 +1,5 @@
 <template>
-  <DialogComponent :open="open" title="" @close="closeModal">
+  <DialogComponent size="lg" :open="open" title="" @close="closeModal">
     <!-- Loading SkeletonLoader -->
     <div
       v-if="!game"

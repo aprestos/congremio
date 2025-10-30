@@ -54,7 +54,6 @@ withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
   confirm: []
-  cancel: []
   close: []
 }>()
 
@@ -63,7 +62,6 @@ const handleConfirm = (): void => {
 }
 
 const handleCancel = (): void => {
-  emit('cancel')
   emit('close')
 }
 </script>

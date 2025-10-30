@@ -143,9 +143,10 @@ export const libraryService = {
         const playtimeFilters = filters.selectedFilters.playtime
         filtered = filtered.filter((game) => {
           const maxPlaytime = game.game.max_playtime
+          const minPlaytime = game.game.min_playtime
           return playtimeFilters.some((time) => {
             const minutes = parseInt(time)
-            return maxPlaytime <= minutes
+            return maxPlaytime >= minutes && minPlaytime <= minutes
           })
         })
       }

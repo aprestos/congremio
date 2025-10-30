@@ -44,10 +44,10 @@
         <button
           type="button"
           class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed"
-          :disabled="isMoving || selectedLocationId === null"
-          @click="handleMove"
+          :disabled="isSaving || selectedLocationId === null"
+          @click="moveGame"
         >
-          <span v-if="isMoving">Moving...</span>
+          <span v-if="isSaving">Moving...</span>
           <span v-else>Move Game</span>
         </button>
       </div>
@@ -61,12 +61,13 @@ import DialogComponent from '@/components/DialogComponent.vue'
 import CSelect from '@/components/CSelect.vue'
 import type { LibraryGame } from '@/features/library/game.model.ts'
 import type { LibraryLocation } from '@/features/library/locations/location.model.ts'
+import { toast } from 'vue-sonner'
+import libraryService from '@/features/library/service.ts'
+import { libraryLocationService } from '@/features/library/locations/service.ts'
 
 interface Props {
   open?: boolean
   selectedGame?: LibraryGame | null
-  locations?: LibraryLocation[]
-  onMove: (locationId: number) => Promise<void>
 }
 
 interface Emits {
@@ -81,14 +82,16 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<Emits>()
 
+const locations = ref<LibraryLocation[]>([])
 const selectedLocationId = ref<number | null>(null)
-const isMoving = ref(false)
+const isSaving = ref(false)
 
 // Watch for selectedGame changes to update the selected location
 watch(
   () => props.selectedGame,
-  (game) => {
+  async (game) => {
     if (game) {
+      locations.value = await libraryLocationService.get()
       selectedLocationId.value = game.location?.id || null
     }
   },
@@ -97,7 +100,7 @@ watch(
 
 // Computed properties
 const locationOptions = computed(() => {
-  return props.locations.map((loc: LibraryLocation) => ({
+  return locations.value.map((loc: LibraryLocation) => ({
     value: loc.id,
     label: loc.name,
   }))
@@ -114,16 +117,22 @@ const handleClose = (): void => {
   emit('close')
 }
 
-const handleMove = async (): Promise<void> => {
-  if (selectedLocationId.value === null) return
-
-  isMoving.value = true
+const moveGame = async (): Promise<void> => {
+  if (!props.selectedGame || !selectedLocationId.value) return
+  isSaving.value = true
   try {
-    await props.onMove(selectedLocationId.value)
-    selectedLocationId.value = null
+    await libraryService.updateGame(props.selectedGame.id, {
+      location_id: selectedLocationId.value,
+    } as Partial<LibraryGame>)
+    toast.success(
+      `${props.selectedGame.game.name} has been moved to a new location.`,
+    )
     emit('close')
+  } catch (error) {
+    console.error('Failed to move game:', error)
+    toast.error('Failed to move the game. Please try again.')
   } finally {
-    isMoving.value = false
+    isSaving.value = false
   }
 }
 
