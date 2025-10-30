@@ -263,7 +263,6 @@ onUnmounted(() => {
     <!-- Game Detail Modal -->
     <DialogGameDetail
       v-if="selectedGameId"
-      size="xl"
       :game-id="selectedGameId"
       :open="isDetailModalOpen"
       @close="closeGameDetail"
