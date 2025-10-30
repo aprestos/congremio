@@ -71,7 +71,6 @@ import { useDebounceFn } from '@vueuse/core'
 import { defineEmits, defineProps, ref, watchEffect } from 'vue'
 import VueSelect, { type Option } from 'vue3-select-component'
 import ValidationErrors from '@/components/ValidationErrors.vue'
-import logger from '@/lib/logger.ts'
 
 const props = defineProps<{
   id: string
