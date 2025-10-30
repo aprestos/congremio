@@ -132,6 +132,10 @@ import {
   LockClosedIcon,
 } from '@heroicons/vue/24/outline'
 import { ref, computed } from 'vue'
+import { authService } from '@/features/auth/service.ts'
+import router from '@/router'
+import { RouteNames } from '@/router/routeNames.ts'
+import { toast } from 'vue-sonner'
 
 interface Props {
   email: string
@@ -139,10 +143,9 @@ interface Props {
 
 interface Emits {
   (e: 'back'): void
-  (e: 'verify', otp: string, setLoading: (loading: boolean) => void): void
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 const OTP_LENGTH = 6
@@ -210,13 +213,20 @@ const handlePaste = (event: ClipboardEvent): void => {
   }
 }
 
-const handleSubmit = (): void => {
+const handleSubmit = async (): Promise<void> => {
   if (isOtpComplete.value) {
+    isLoading.value = true
     const otp = otpDigits.value.join('')
-    const setLoading = (loading: boolean): void => {
-      isLoading.value = loading
+    try {
+      await authService.validateOTP(props.email, otp)
+      void router.push({ name: RouteNames.auth.confirm })
+    } catch (error) {
+      console.error('OTP verification error:', error)
+      toast.error('Unable to verify OTP. Please try again.')
+    } finally {
+      otpDigits.value = [...Array.from({ length: OTP_LENGTH }, () => '')]
+      isLoading.value = false
     }
-    emit('verify', otp, setLoading)
   }
 }
 </script>
