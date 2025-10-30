@@ -73,7 +73,7 @@ export const libraryReservationService = {
 
       return result.count || 0
     } catch (error) {
-      logger.error('Error counting withdraws by library game:', { error })
+      logger.error('Error counting reservations by library game:', { error })
       return 0
     }
   },
