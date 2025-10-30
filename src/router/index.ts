@@ -68,7 +68,7 @@ const router = createRouter({
         {
           path: 'library',
           name: RouteNames.admin.library,
-          component: () => import('../views/admin/library/LibraryHome.vue'),
+          component: () => import('../views/admin/library/PageLibraryHome.vue'),
         },
         {
           path: 'events',

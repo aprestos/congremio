@@ -254,12 +254,6 @@ onUnmounted(() => {
       </p>
     </div>
 
-    <!-- End of results indicator -->
-    <div
-      v-if="!loading && !hasMoreGames && filteredGames.length > 0"
-      class="mt-8 text-center"
-    ></div>
-
     <!-- Game Detail Modal -->
     <DialogGameDetail
       v-if="selectedGameId"

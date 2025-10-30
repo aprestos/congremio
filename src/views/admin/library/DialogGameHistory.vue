@@ -48,12 +48,12 @@ watch(
     }
 
     isLoadingUsers.value = true
-    let user
+
     for (const item of withdraws.value) {
       if (!users.value.has(item.user_id)) {
         try {
           const result = await userService.getById(item.user_id)
-          user = result?.name || result?.email || ''
+          const user = result?.name || result?.email || ''
           users.value.set(item.user_id, user)
         } catch {}
       }
