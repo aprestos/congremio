@@ -2,6 +2,7 @@
 import { useRegle } from '@regle/core'
 import { required } from '@regle/rules'
 import { onMounted, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { Option } from 'vue3-select-component'
 import CButton from '@/components/CButton.vue'
 import CInput from '@/components/CInput.vue'
@@ -12,6 +13,8 @@ import type { LibraryGame } from '@/features/library/game.model.ts'
 import DialogComponent from '@/components/DialogComponent.vue'
 import libraryService from '@/features/library/service.ts'
 import { toast } from 'vue-sonner'
+
+const { t } = useI18n()
 
 interface Props {
   open: boolean
@@ -73,12 +76,14 @@ const submit = async (): Promise<void> => {
       location_id: formData.value.selectedLocation,
       ...(formData.value.notes && { notes: formData.value.notes }),
     })
-    toast.success(`${props.game?.game.name} has been updated successfully.`)
+    toast.success(
+      t('admin.library.editSuccess', { name: props.game?.game.name }),
+    )
 
     // Emit event to notify parent that game was updated successfully
     emit('close')
   } catch {
-    toast.error('Failed to update the game. Please try again.')
+    toast.error(t('admin.library.editFailed'))
   } finally {
     isSubmitting.value = false
   }
@@ -102,7 +107,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <DialogComponent title="Edit library game" :open="props.open">
+  <DialogComponent :title="t('admin.library.editGame')" :open="props.open">
     <form>
       <div class="space-y-12 mx-auto max-w-7xl">
         <div class="">
@@ -111,14 +116,14 @@ onMounted(async () => {
               <img
                 class="size-16 rounded-lg object-cover shadow-sm"
                 :src="game?.game.image || '/placeholder-game.jpg'"
-                :alt="game?.game.name || 'Game image'"
+                :alt="game?.game.name || t('admin.library.unknownGame')"
               />
             </div>
             <div class="flex-1 min-w-0">
               <h3
                 class="text-lg font-semibold text-gray-900 dark:text-white truncate"
               >
-                {{ game?.game.name || 'Unknown Game' }}
+                {{ game?.game.name || t('admin.library.unknownGame') }}
               </h3>
               <div
                 class="mt-1 flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400"
@@ -137,7 +142,7 @@ onMounted(async () => {
                       d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                     />
                   </svg>
-                  {{ game?.game.year || 'Unknown' }}
+                  {{ game?.game.year || t('admin.library.unknown') }}
                 </span>
                 <span v-if="game?.location?.name" class="flex items-center">
                   <svg
@@ -170,25 +175,25 @@ onMounted(async () => {
             <CInput
               id="owner"
               v-model="formData.owner"
-              label="Owner"
+              :label="t('admin.library.owner')"
               :errors="r$.$errors.owner"
             />
 
             <CSelect
               id="location"
               v-model="formData.selectedLocation"
-              label="Location"
-              placeholder="Select a location"
+              :label="t('admin.library.location')"
+              :placeholder="t('admin.library.selectALocation')"
               :options="locations"
-              helper-text="Optional"
+              :helper-text="t('admin.library.optional')"
             />
 
             <CTextArea
               id="notes"
               v-model="formData.notes"
-              label="Notes"
+              :label="t('admin.library.notes')"
               :rows="4"
-              helper-text="Optional"
+              :helper-text="t('admin.library.optional')"
             />
           </div>
         </div>
@@ -203,7 +208,7 @@ onMounted(async () => {
           class="order-2 sm:order-1 w-full sm:w-auto"
           @click="emit('close')"
         >
-          Cancel
+          {{ t('common.cancel') }}
         </CButton>
         <CButton
           type="button"
@@ -211,10 +216,10 @@ onMounted(async () => {
           size="lg"
           class="order-1 sm:order-2 w-full sm:w-auto"
           :loading="isSubmitting"
-          loading-text="Updating..."
+          :loading-text="t('admin.library.updating')"
           @click="submit"
         >
-          Update
+          {{ t('admin.library.update') }}
         </CButton>
       </div>
     </form>

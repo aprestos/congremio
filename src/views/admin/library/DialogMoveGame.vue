@@ -1,5 +1,9 @@
 <template>
-  <DialogComponent :open="props.open" title="Move Game" @close="handleClose">
+  <DialogComponent
+    :open="props.open"
+    :title="t('admin.library.moveGame')"
+    @close="handleClose"
+  >
     <div v-if="props.selectedGame" class="space-y-6">
       <!-- Game Info -->
       <div class="flex items-center space-x-4">
@@ -18,7 +22,7 @@
             {{ props.selectedGame.game.name }}
           </h3>
           <p class="text-sm text-gray-500 dark:text-gray-400">
-            Current location: {{ currentLocationName }}
+            {{ t('admin.library.currentLocation') }}: {{ currentLocationName }}
           </p>
         </div>
       </div>
@@ -27,9 +31,9 @@
       <CSelect
         id="location"
         v-model="selectedLocationId"
-        label="New Location"
+        :label="t('admin.library.newLocation')"
         :options="locationOptions"
-        placeholder="Select a location"
+        :placeholder="t('admin.library.selectALocation')"
       />
 
       <!-- Actions -->
@@ -39,7 +43,7 @@
           class="rounded-md bg-white dark:bg-gray-700 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600"
           @click="handleClose"
         >
-          Cancel
+          {{ t('common.cancel') }}
         </button>
         <button
           type="button"
@@ -47,8 +51,8 @@
           :disabled="isSaving || selectedLocationId === null"
           @click="moveGame"
         >
-          <span v-if="isSaving">Moving...</span>
-          <span v-else>Move Game</span>
+          <span v-if="isSaving">{{ t('admin.library.moving') }}</span>
+          <span v-else>{{ t('admin.library.moveGame') }}</span>
         </button>
       </div>
     </div>
@@ -57,6 +61,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import DialogComponent from '@/components/DialogComponent.vue'
 import CSelect from '@/components/CSelect.vue'
 import type { LibraryGame } from '@/features/library/game.model.ts'
@@ -64,6 +69,8 @@ import type { LibraryLocation } from '@/features/library/locations/location.mode
 import { toast } from 'vue-sonner'
 import libraryService from '@/features/library/service.ts'
 import { libraryLocationService } from '@/features/library/locations/service.ts'
+
+const { t } = useI18n()
 
 interface Props {
   open?: boolean
@@ -121,16 +128,22 @@ const moveGame = async (): Promise<void> => {
   if (!props.selectedGame || !selectedLocationId.value) return
   isSaving.value = true
   try {
+    const newLocation = locations.value.find(
+      (loc) => loc.id === selectedLocationId.value,
+    )
     await libraryService.updateGame(props.selectedGame.id, {
       location_id: selectedLocationId.value,
     } as Partial<LibraryGame>)
     toast.success(
-      `${props.selectedGame.game.name} has been moved to a new location.`,
+      t('admin.library.moveSuccess', {
+        name: props.selectedGame.game.name,
+        location: newLocation?.name || '',
+      }),
     )
     emit('close')
   } catch (error) {
     console.error('Failed to move game:', error)
-    toast.error('Failed to move the game. Please try again.')
+    toast.error(t('admin.library.moveFailed'))
   } finally {
     isSaving.value = false
   }

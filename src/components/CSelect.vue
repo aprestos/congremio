@@ -12,6 +12,8 @@
         :model-value="modelValue"
         :is-searchable="true"
         :options="internalOptions"
+        :filterable="false"
+        :filter-by="() => true"
         :placeholder="placeholder"
         :is-loading="isLoading"
         :classes="{
@@ -130,6 +132,8 @@ const handleSearch = useDebounceFn(async (value: string) => {
           secondaryLabel: typedItem[props.optionSecondaryLabel || 'label'],
         } as unknown as Option<string>
       })
+    } else if (value.length === 0) {
+      internalOptions.value = []
     }
   } finally {
     isLoading.value = false

@@ -157,22 +157,23 @@ export const libraryService = {
         filtered = filtered.filter((game) => {
           return tagFilters.some((tag) => {
             switch (tag) {
-              case 'New arrivals':
+              case 'new-arrivals':
                 // Filter games from current year
                 return parseInt(game.game.year) === new Date().getFullYear()
-              case 'Family':
+              case 'family':
                 // Filter family-friendly games (suitable for all ages, typically min_age <= 8)
-                return (
-                  parseInt(game.game.min_age) <= 8 && game.game.max_players >= 3
-                )
-              case 'Classics':
+                return game.game.min_age <= 8 && game.game.max_players >= 3
+              case 'classics':
                 // Filter classic games (older than 10 years)
                 return parseInt(game.game.year) <= new Date().getFullYear() - 15
-              case '2-player only':
+              case 'two-player-only':
                 // Filter 2-player only games (older than 10 years)
                 return (
                   game.game.min_players === 2 && game.game.max_players === 2
                 )
+              case 'children':
+                // Filter children games (minage until 5)
+                return game.game.min_age <= 5
               case 'Most played':
                 // This would require play count data - for now return games with good player count range
                 return game.game.min_players <= 4 && game.game.max_players >= 4

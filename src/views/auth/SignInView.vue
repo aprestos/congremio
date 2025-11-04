@@ -48,7 +48,6 @@ const handleSubmit = async (emailValue: string): Promise<void> => {
   try {
     await authService.signInWithEmail(emailValue)
     emailSent.value = true
-  
   } catch {
     toast.error('Failed to sign in. Please try again later.')
   } finally {

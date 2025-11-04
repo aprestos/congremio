@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { LibraryWithdraw } from '@/features/library/withdraws/service.ts'
 import libraryWithdrawService from '@/features/library/withdraws/service.ts'
 import { DateTime } from 'luxon'
@@ -7,6 +8,8 @@ import { IconCalendar, IconCircleCheck } from '@tabler/icons-vue'
 import { toast } from 'vue-sonner'
 import WithdrawTimeline from './WithdrawTimeline.vue'
 import { editionStore } from '@/stores/edition.ts'
+
+const { t } = useI18n()
 
 interface Props {
   userId?: string
@@ -90,10 +93,15 @@ function getDurationHours(
   <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
     <div class="px-6 py-8 border-b border-gray-200 dark:border-gray-700">
       <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
-        Withdrawal History
+        {{ t('withdraw.history') }}
       </h2>
       <p class="text-gray-600 dark:text-gray-400 mt-1">
-        {{ currentEventWithdraws.length }} total withdrawal{{ currentEventWithdraws.length !== 1 ? 's' : '' }}
+        {{ currentEventWithdraws.length }}
+        {{
+          currentEventWithdraws.length === 1
+            ? t('withdraw.totalWithdrawals')
+            : t('withdraw.totalWithdrawalsPlural')
+        }}
       </p>
     </div>
 
@@ -113,8 +121,10 @@ function getDurationHours(
       class="px-6 py-12 text-center"
     >
       <div class="text-gray-500 dark:text-gray-400">
-        <p class="text-lg font-medium mb-2">No withdrawals yet</p>
-        <p class="text-sm">This user hasn't withdrawn any games.</p>
+        <p class="text-lg font-medium mb-2">
+          {{ t('withdraw.noWithdrawalsYet') }}
+        </p>
+        <p class="text-sm">{{ t('withdraw.noWithdrawalsMessage') }}</p>
       </div>
     </div>
 
@@ -183,7 +193,11 @@ function getDurationHours(
                                 ]"
                               >
                                 <IconCircleCheck class="size-3.5" />
-                                {{ withdraw.ended_at ? 'Returned' : 'Active' }}
+                                {{
+                                  withdraw.ended_at
+                                    ? t('withdraw.returned')
+                                    : t('withdraw.active')
+                                }}
                               </span>
                             </div>
                           </div>
@@ -197,7 +211,7 @@ function getDurationHours(
                               class="flex items-center justify-between text-sm"
                             >
                               <div class="text-gray-600 dark:text-gray-400">
-                                Returned on
+                                {{ t('withdraw.returnedOn') }}
                                 {{ formatDate(withdraw.ended_at) }}
                               </div>
                               <div
@@ -215,7 +229,7 @@ function getDurationHours(
                                     withdraw.ended_at,
                                   )
                                 }}
-                                hours
+                                {{ t('withdraw.hours') }}
                               </div>
                             </div>
                           </div>
@@ -277,7 +291,11 @@ function getDurationHours(
                                 ]"
                               >
                                 <IconCircleCheck class="size-3.5" />
-                                {{ withdraw.ended_at ? 'Returned' : 'Active' }}
+                                {{
+                                  withdraw.ended_at
+                                    ? t('withdraw.returned')
+                                    : t('withdraw.active')
+                                }}
                               </span>
                             </div>
                           </div>
@@ -291,7 +309,7 @@ function getDurationHours(
                               class="flex items-center justify-between text-sm"
                             >
                               <div class="text-gray-600 dark:text-gray-400">
-                                Returned on
+                                {{ t('withdraw.returnedOn') }}
                                 {{ formatDate(withdraw.ended_at) }}
                               </div>
                               <div
@@ -309,7 +327,7 @@ function getDurationHours(
                                     withdraw.ended_at,
                                   )
                                 }}
-                                hours
+                                {{ t('withdraw.hours') }}
                               </div>
                             </div>
                           </div>

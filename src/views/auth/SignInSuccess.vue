@@ -13,14 +13,14 @@
     <!-- Main content -->
     <div class="mt-6 text-center">
       <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-        Check your inbox!
+        {{ t('auth.checkInbox') }}
       </h3>
       <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">
-        We've sent a secure login code to
+        {{ t('auth.verificationCodeSent') }}
         <span class="font-medium text-gray-900 dark:text-white">
           {{ email }}
         </span>
-        . Enter the code below to sign in to your account.
+        . {{ t('auth.enterCodeDescription') }}
       </p>
     </div>
 
@@ -31,7 +31,7 @@
           for="otp"
           class="block text-sm font-medium leading-6 text-gray-900 dark:text-white text-center"
         >
-          Enter verification code
+          {{ t('auth.enterVerificationCode') }}
         </label>
         <div class="mt-3 flex justify-center gap-2">
           <input
@@ -76,7 +76,7 @@
               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
             />
           </svg>
-          {{ isLoading ? 'Verifying...' : 'Verify code' }}
+          {{ isLoading ? t('auth.verifying') : t('auth.verifyCode') }}
         </button>
       </div>
     </form>
@@ -84,12 +84,12 @@
     <!-- Additional help -->
     <div class="mt-6 text-center">
       <p class="text-xs text-gray-500 dark:text-gray-400">
-        Didn't receive the code? Check your spam folder or
+        {{ t('auth.didntReceiveCode') }}
         <button
           class="font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300"
           @click="emit('back')"
         >
-          try again
+          {{ t('auth.tryAgain') }}
         </button>
       </p>
     </div>
@@ -105,8 +105,7 @@
         </div>
         <div class="ml-3">
           <p class="text-xs text-gray-600 dark:text-gray-400">
-            This code will expire in 20 minutes for security purposes. If you
-            don't use it within that time, you'll need to request a new one.
+            {{ t('auth.codeExpiresNote') }}
           </p>
         </div>
       </div>
@@ -119,7 +118,7 @@
         @click="emit('back')"
       >
         <ArrowLeftIcon class="mr-2 h-4 w-4" aria-hidden="true" />
-        Send to different email
+        {{ t('auth.sendToDifferentEmail') }}
       </button>
     </div>
   </div>
@@ -132,10 +131,13 @@ import {
   LockClosedIcon,
 } from '@heroicons/vue/24/outline'
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { authService } from '@/features/auth/service.ts'
 import router from '@/router'
 import { RouteNames } from '@/router/routeNames.ts'
 import { toast } from 'vue-sonner'
+
+const { t } = useI18n()
 
 interface Props {
   email: string

@@ -1,7 +1,7 @@
 <template>
   <div>
     <header class="relative">
-      <nav aria-label="Top" class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+      <nav aria-label="Top" class="mx-auto max-w-7xl sm:px-6 lg:px-8 xl:px-0">
         <div
           class="border-b border-gray-200 dark:border-white/5 px-4 pb-14 sm:px-0 sm:pb-0"
         >
@@ -43,6 +43,7 @@
             </PopoverGroup>
 
             <div class="flex flex-1 items-center justify-end space-x-4">
+              <LanguageSwitcher />
               <!-- Show authenticated user elements -->
               <template v-if="isAuthenticated">
                 <!-- Admin Panel Button (only show if user is staff or admin) -->
@@ -52,7 +53,7 @@
                   class="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                 >
                   <IconSettings class="h-4 w-4" aria-hidden="true" />
-                  Admin
+                  {{ t('navigation.admin') }}
                 </RouterLink>
 
                 <!-- Separator (only show if admin button is visible) -->
@@ -94,10 +95,11 @@
                           <button
                             :class="[
                               active ? 'bg-gray-100 dark:bg-gray-700' : '',
-                              'cursor-pointer block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300',
+                              'cursor-pointer flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300',
                             ]"
                           >
-                            Profile
+                            <IconUser class="h-4 w-4" aria-hidden="true" />
+                            {{ t('navigation.profile') }}
                           </button>
                         </RouterLink>
                       </MenuItem>
@@ -105,11 +107,12 @@
                         <button
                           :class="[
                             active ? 'bg-gray-100 dark:bg-gray-700' : '',
-                            'block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300',
+                            'flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300',
                           ]"
                           @click="handleSignOut"
                         >
-                          Sign out
+                          <IconLogout class="h-4 w-4" aria-hidden="true" />
+                          {{ t('auth.signOut') }}
                         </button>
                       </MenuItem>
                     </MenuItems>
@@ -123,7 +126,7 @@
                 :to="{ name: RouteNames.auth.signIn }"
                 class="flex items-center gap-2 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-colors"
               >
-                Sign in
+                {{ t('auth.signIn') }}
               </RouterLink>
             </div>
           </div>
@@ -141,15 +144,18 @@ import {
   MenuItems,
   PopoverGroup,
 } from '@headlessui/vue'
-import { IconSettings } from '@tabler/icons-vue'
+import { IconSettings, IconUser, IconLogout } from '@tabler/icons-vue'
 import { onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import { authService } from '@/features/auth/service.ts'
 import { tenantStore } from '@/stores/tenant.ts'
 import SkeletonLoader from '@/components/SkeletonLoader.vue'
 import { RouteNames } from '@/router/routeNames'
 import type { User } from '@/features/auth/user.model.ts'
+import LanguageSwitcher from '@/components/LanguageSwitcher.vue'
 
+const { t } = useI18n()
 const user = ref<User | null>(null)
 const isStaffOrAdmin = ref(false)
 const isAuthenticated = ref(false)
@@ -197,12 +203,12 @@ interface NavigationItem {
   categories: Category[]
 }
 
-const navigation: NavigationItem[] = [
+const navigation = ref<NavigationItem[]>([
   {
-    name: 'Library',
+    name: t('navigation.library'),
     href: '/library',
     current: true,
     categories: [{ name: 'Popular' }, { name: 'New' }, { name: 'All' }],
   },
-]
+])
 </script>

@@ -3,7 +3,6 @@ import './index.css'
 
 import { createPinia } from 'pinia'
 import { createApp } from 'vue'
-import { createI18n } from 'vue-i18n'
 import VueCountdown from '@chenfengyuan/vue-countdown'
 
 import { editionService } from '@/features/events/service.ts'
@@ -18,6 +17,8 @@ import { createHead } from '@unhead/vue/client'
 import { settingsStore } from '@/features/settings/useSettings.store.ts'
 import { settingsService } from '@/features/settings/service.ts'
 import type { Edition } from '@/features/events/event.model.ts'
+import i18n from '@/i18n'
+import { loadSavedLocale } from '@/composables/useLocale'
 
 async function loadTenant(): Promise<Tenant | null> {
   const tenantId = LocalStorageService.getTenantId()
@@ -54,9 +55,8 @@ async function loadSettings(
 async function initializeApp(): Promise<void> {
   const app = createApp(App)
 
-  const i18n = createI18n({
-    // something vue-i18n options here ...
-  })
+  // Load locale preference (from localStorage or browser default)
+  i18n.global.locale = loadSavedLocale()
 
   // Load tenant first before setting up router
   const tenant = await loadTenant()
@@ -69,7 +69,7 @@ async function initializeApp(): Promise<void> {
 
   app.use(createPinia())
   app.use(router)
-  app.use(i18n as any)
+  app.use(i18n)
   app.component(VueCountdown.name as string, VueCountdown)
 
   const head = createHead()

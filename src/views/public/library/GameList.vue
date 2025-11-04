@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed, nextTick, watch } from 'vue'
+import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { getStatus, type LibraryGame } from '@/features/library/game.model.ts'
 import {
   libraryService,
@@ -11,6 +13,10 @@ import libraryReservationService from '@/features/library/reservations/service.t
 import { toast } from 'vue-sonner'
 import { authService } from '@/features/auth/service.ts'
 import DialogGameDetail from '@/views/public/library/DialogGameDetail.vue'
+import { RouteNames } from '@/router/routeNames.ts'
+
+const { t } = useI18n()
+const router = useRouter()
 
 const allGames = ref<LibraryGame[]>([])
 const loading = ref(true)
@@ -27,6 +33,9 @@ const showReservationDialog = ref(false)
 const selectedGameForReservation = ref<LibraryGame | null>(null)
 const loadingReservation = ref(false)
 const isAuthenticated = ref(false)
+
+// Authentication required dialog state
+const showAuthDialog = ref(false)
 
 interface Props {
   filters?: FilterOptions | undefined
@@ -114,12 +123,18 @@ const closeGameDetail = (): void => {
   selectedGameId.value = ''
 }
 
-const handleReserveClick = (gameId: number): void => {
-  const game = allGames.value.find((g) => g.id === gameId)
-  if (game && getStatus(game) === 'available') {
-    selectedGameForReservation.value = game
-    showReservationDialog.value = true
+const handleReserveClick = (game: LibraryGame): void => {
+  if (!game || getStatus(game) !== 'available') return
+
+  // Check if user is authenticated
+  if (!isAuthenticated.value) {
+    showAuthDialog.value = true
+    return
   }
+
+  // User is authenticated, show reservation confirmation
+  selectedGameForReservation.value = game
+  showReservationDialog.value = true
 }
 
 const confirmReservation = async (): Promise<void> => {
@@ -141,6 +156,15 @@ const confirmReservation = async (): Promise<void> => {
 const cancelReservation = (): void => {
   showReservationDialog.value = false
   selectedGameForReservation.value = null
+}
+
+const redirectToSignIn = (): void => {
+  showAuthDialog.value = false
+  void router.push({ name: RouteNames.auth.signIn })
+}
+
+const closeAuthDialog = (): void => {
+  showAuthDialog.value = false
 }
 
 onMounted(async () => {
@@ -174,7 +198,7 @@ onUnmounted(() => {
 <template>
   <div class="mx-auto max-w-2xl md:max-w-7xl">
     <div
-      class="grid grid-cols-2 gap-y-12 gap-x-6 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8"
+      class="grid grid-cols-2 gap-y-12 gap-x-6 sm:grid-cols-3 sm:gap-x-6 xl:grid-cols-4 xl:gap-x-8"
     >
       <template v-if="loading">
         <GameItem :loading="true" />
@@ -186,9 +210,8 @@ onUnmounted(() => {
         v-for="game in games"
         :key="game.id"
         :game="game"
-        :is-authenticated="isAuthenticated"
         @game-click="openGameDetail"
-        @add-to-bag-click="handleReserveClick"
+        @reserve-game="handleReserveClick"
       />
     </div>
 
@@ -222,7 +245,7 @@ onUnmounted(() => {
             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
           ></path>
         </svg>
-        <span class="text-sm">Loading more games...</span>
+        <span class="text-sm">{{ t('library.loadingMoreGames') }}</span>
       </div>
     </div>
 
@@ -247,10 +270,10 @@ onUnmounted(() => {
         </svg>
       </div>
       <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">
-        No games found
+        {{ t('library.noGamesFound') }}
       </h3>
       <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-        Try adjusting your search or filters to find what you're looking for.
+        {{ t('library.noGamesFoundDescription') }}
       </p>
     </div>
 
@@ -265,9 +288,9 @@ onUnmounted(() => {
     <!-- Reservation Confirmation Dialog -->
     <ConfirmationDialog
       :open="showReservationDialog"
-      title="Reserve Game"
-      confirm-text="Reserve"
-      cancel-text="Cancel"
+      :title="t('library.reserveGame')"
+      :confirm-text="t('game.reserve')"
+      :cancel-text="t('common.cancel')"
       :loading="loadingReservation"
       @confirm="confirmReservation"
       @cancel="cancelReservation"
@@ -275,7 +298,7 @@ onUnmounted(() => {
     >
       <div class="space-y-3">
         <p class="text-sm text-gray-600 dark:text-gray-300">
-          Are you sure you want to reserve
+          {{ t('library.areYouSureReserve') }}
           <strong>{{ selectedGameForReservation?.game.name }}</strong
           >?
         </p>
@@ -283,17 +306,35 @@ onUnmounted(() => {
           class="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-md p-3"
         >
           <div class="text-sm text-purple-800 dark:text-purple-200">
-            <p class="font-medium mb-1">Important:</p>
+            <p class="font-medium mb-1">{{ t('library.important') }}</p>
             <ul class="list-disc list-inside space-y-1">
               <li>
-                This reservation is only valid for <strong>4 minutes</strong>
+                {{ t('library.reservationValid') }}
+                <strong>4 {{ t('library.minutes') }}</strong>
               </li>
               <li>
-                Only <strong>one active reservation per user</strong> is allowed
+                {{ t('library.oneReservationPerUser') }}
               </li>
             </ul>
           </div>
         </div>
+      </div>
+    </ConfirmationDialog>
+
+    <!-- Authentication Required Dialog -->
+    <ConfirmationDialog
+      :open="showAuthDialog"
+      :title="t('auth.authenticationRequired')"
+      :confirm-text="t('auth.signIn')"
+      :cancel-text="t('common.cancel')"
+      @confirm="redirectToSignIn"
+      @cancel="closeAuthDialog"
+      @close="closeAuthDialog"
+    >
+      <div class="space-y-3">
+        <p class="text-sm text-gray-600 dark:text-gray-300">
+          {{ t('auth.authenticationRequiredMessage') }}
+        </p>
       </div>
     </ConfirmationDialog>
   </div>

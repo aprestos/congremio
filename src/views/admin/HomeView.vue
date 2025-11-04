@@ -21,6 +21,7 @@
 <script setup lang="ts">
 import { CalendarDaysIcon } from '@heroicons/vue/24/outline'
 import { computed, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import BottomNavBar from '@/components/navigation/BottomNavBar.vue'
 import SidebarNavigationGrey from '@/components/navigation/SidebarNavigationGrey.vue'
 import { authService } from '@/features/auth/service.ts'
@@ -34,6 +35,7 @@ import {
 } from '@tabler/icons-vue'
 import type { User } from '@/features/auth/user.model.ts'
 
+const { t } = useI18n()
 const userEmail = ref<string | null>(null)
 const user = ref<User | null>(null)
 
@@ -43,25 +45,25 @@ const enabledNavigation = computed(() => {
 
 const navigation = ref([
   {
-    label: 'Dashboard',
+    label: t('admin.navigation.dashboard'),
     routeName: RouteNames.admin.dashboard as string,
     icon: IconHome,
     enabled: false,
   },
   {
-    label: 'Library',
+    label: t('admin.navigation.library'),
     routeName: RouteNames.admin.library as string,
     icon: IconBooks,
     enabled: settingsStore?.value?.library?.enabled ?? false,
   },
   {
-    label: 'Events',
+    label: t('admin.navigation.events'),
     routeName: RouteNames.admin.events as string,
     icon: CalendarDaysIcon,
     enabled: settingsStore?.value?.events?.enabled ?? false,
   },
   {
-    label: 'Tournaments',
+    label: t('admin.navigation.tournaments'),
     routeName: RouteNames.admin.tournaments as string,
     icon: IconTrophy,
     enabled: settingsStore?.value?.tournaments?.enabled ?? false,
@@ -70,7 +72,7 @@ const navigation = ref([
 
 const bottomNavigation = ref([
   {
-    label: 'Settings',
+    label: t('admin.navigation.settings'),
     routeName: RouteNames.admin.settingsGeneral as string,
     icon: IconSettings,
     enabled: false, // Will be set in onMounted
@@ -80,14 +82,14 @@ const bottomNavigation = ref([
 const publicPages = [
   {
     id: 1,
-    name: 'Library',
+    name: t('navigation.library'),
     to: { name: RouteNames.public.library },
     initial: 'L',
     enabled: settingsStore?.value?.library?.enabled ?? false,
   },
   {
     id: 2,
-    name: 'Flea Market',
+    name: t('admin.navigation.fleaMarket'),
     to: { name: RouteNames.public.fleaMarket },
     initial: 'FM',
     enabled: settingsStore?.value?.flea?.enabled ?? false,
