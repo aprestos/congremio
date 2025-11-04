@@ -73,7 +73,7 @@
                           }"
                         />
                         <span class="flex-1" @click="selectTag(category.id)">
-                          {{ t(`library.${category.id}`) }}
+                          {{ t(`library.filter-options.${category.id}`) }}
                         </span>
                       </label>
                     </li>
