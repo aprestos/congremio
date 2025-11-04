@@ -1,13 +1,8 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
-
-interface NavigationItem {
-  label: string
-  routeName: string
-  icon: unknown
-  enabled: boolean
-}
-
+import type { NavigationItem } from '@/navigation/navigation.model.ts'
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 defineProps<{
   navigation: NavigationItem[]
 }>()
@@ -26,7 +21,7 @@ const route = useRoute()
       <div class="flex items-center py-1 px-1">
         <RouterLink
           v-for="item in navigation"
-          :key="item.label"
+          :key="item.id"
           :to="{ name: item.routeName }"
           :class="[
             item.routeName === route.name
@@ -41,7 +36,7 @@ const route = useRoute()
             aria-hidden="true"
           />
           <span class="hidden text-xs font-medium truncate max-w-full">{{
-            item.label
+            t(`admin.navigation.${item.id}`)
           }}</span>
         </RouterLink>
       </div>

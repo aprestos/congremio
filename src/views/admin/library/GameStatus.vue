@@ -34,6 +34,8 @@ const createdByUser = ref<User | null | undefined>(undefined)
 const isLoadingWithdraw = ref(false)
 const isLoadingUsers = ref(false)
 
+const status = computed(() => getStatus(props.data))
+
 // Computed properties for safe template access
 const withdrawDate = computed(() => {
   if (!withdraw.value?.started_at) return new Date().toLocaleDateString()
@@ -91,12 +93,12 @@ const fetchWithdrawDetails = async (): Promise<void> => {
     <PopoverButton
       class="cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-full"
     >
-      <CBadge v-show="getStatus(props.data) === 'available'" type="green"
+      <CBadge v-show="status === 'available'" type="green"
         ><span class="hidden md:inline">{{ getStatusLabel(props.data) }}</span
         ><span class="md:hidden"><IconCheck /></span
       ></CBadge>
       <CBadge
-        v-show="getStatus(props.data) === 'withdrawn'"
+        v-show="status === 'withdrawn'"
         text=""
         type="yellow"
         @click="fetchWithdrawDetails"
@@ -104,18 +106,14 @@ const fetchWithdrawDetails = async (): Promise<void> => {
         ><span class="md:hidden"><IconExclamationMark /></span
       ></CBadge>
       <CBadge
-        v-show="getStatus(props.data) === 'not-available'"
+        v-show="status === 'not-available'"
         text="Not available"
         type="red"
       >
         <span class="hidden md:inline">{{ getStatusLabel(props.data) }}</span
         ><span class="md:hidden"><IconX /></span>
       </CBadge>
-      <CBadge
-        v-show="getStatus(props.data) === 'reserved'"
-        text="Reserved"
-        type="blue"
-      >
+      <CBadge v-show="status === 'reserved'" text="Reserved" type="blue">
         <span class="hidden md:inline">{{ getStatusLabel(props.data) }}</span
         ><span class="md:hidden"><IconX /></span>
       </CBadge>
