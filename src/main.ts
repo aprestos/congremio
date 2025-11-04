@@ -18,7 +18,6 @@ import { settingsStore } from '@/features/settings/useSettings.store.ts'
 import { settingsService } from '@/features/settings/service.ts'
 import type { Edition } from '@/features/events/event.model.ts'
 import i18n from '@/i18n'
-import { loadSavedLocale } from '@/composables/useLocale'
 
 async function loadTenant(): Promise<Tenant | null> {
   const tenantId = LocalStorageService.getTenantId()
@@ -54,9 +53,6 @@ async function loadSettings(
 // Initialize app
 async function initializeApp(): Promise<void> {
   const app = createApp(App)
-
-  // Load locale preference (from localStorage or browser default)
-  i18n.global.locale = loadSavedLocale()
 
   // Load tenant first before setting up router
   const tenant = await loadTenant()
