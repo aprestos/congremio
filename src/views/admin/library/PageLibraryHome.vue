@@ -11,7 +11,7 @@
             <CInput
               id="search"
               v-model="searchInput"
-              placeholder="Search"
+              :placeholder="t('admin.library.search')"
               type="text"
               name="search"
             >
@@ -29,7 +29,7 @@
               v-model="reservationInput"
               type="text"
               name="reservation"
-              placeholder="Reservation"
+              :placeholder="t('admin.library.reservation')"
             >
               <template #icon-left>
                 <IconNumber
@@ -192,6 +192,7 @@ import { onMounted, onUnmounted, ref, computed, watch } from 'vue'
 import { useDebounceFn } from '@vueuse/core'
 import { toast } from 'vue-sonner'
 import { IconSearch, IconNumber } from '@tabler/icons-vue'
+import { useI18n } from 'vue-i18n'
 
 import DataTable from '@/components/DataTable.vue'
 import CInput from '@/components/CInput.vue'
@@ -210,6 +211,8 @@ import DialogAddGame from '@/views/admin/library/DialogAddGame.vue'
 import DialogGameHistory from '@/views/admin/library/DialogGameHistory.vue'
 import DialogEditGame from '@/views/admin/library/DialogEditGame.vue'
 import libraryService from '@/features/library/service.ts'
+
+const { t } = useI18n()
 
 enum Dialog {
   add,
@@ -234,10 +237,10 @@ const selectedReservation = ref<LibraryReservation | null>(null)
 let unsubscribe: (() => void) | null = null
 
 // Table column definitions
-const tableColumns: DataTableColumn<LibraryGame>[] = [
+const tableColumns = computed((): DataTableColumn<LibraryGame>[] => [
   {
     key: 'name',
-    label: 'Name',
+    label: t('admin.library.name'),
     sortable: true,
     sortFn: (a: LibraryGame, b: LibraryGame): number => {
       return a.game.name.localeCompare(b.game.name)
@@ -245,7 +248,7 @@ const tableColumns: DataTableColumn<LibraryGame>[] = [
   },
   {
     key: 'status',
-    label: 'Status',
+    label: t('admin.library.status'),
     cellClass: 'whitespace-nowrap',
     sortable: true,
     sortFn: (a: LibraryGame, b: LibraryGame): number => {
@@ -254,7 +257,7 @@ const tableColumns: DataTableColumn<LibraryGame>[] = [
   },
   {
     key: 'location',
-    label: 'Location',
+    label: t('admin.library.location'),
     breakpoint: 'md',
     sortable: true,
     cellClass: 'whitespace-nowrap',
@@ -270,30 +273,30 @@ const tableColumns: DataTableColumn<LibraryGame>[] = [
   },
   {
     key: 'players',
-    label: 'Players',
+    label: t('admin.library.players'),
     breakpoint: '2xl',
     cellClass: 'whitespace-nowrap',
   },
   {
     key: 'playtime',
-    label: 'Playtime',
+    label: t('admin.library.playtime'),
     breakpoint: '2xl',
     cellClass: 'whitespace-nowrap',
   },
   {
     key: 'age',
-    label: 'Age',
+    label: t('admin.library.age'),
     breakpoint: '2xl',
     cellClass: 'whitespace-nowrap',
   },
   {
     key: 'owner',
-    label: 'Owner',
+    label: t('admin.library.owner'),
     breakpoint: 'md',
     sortable: true,
     cellClass: 'whitespace-nowrap',
   },
-]
+])
 
 // Debounced search query
 const setSearchQuery = useDebounceFn((val: string) => {
@@ -337,9 +340,10 @@ const handleReservationChange = useDebounceFn(
       selectedReservation.value = result
       shownDialog.value = Dialog.reservation
     } catch {
-      toast.error('Reservation not found or expired')
+      toast.error(t('admin.library.reservationNotFound'))
     } finally {
       loadingReservation.value = false
+      reservationInput.value = ''
     }
   },
   300,

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import DialogComponent from '@/components/DialogComponent.vue'
 import type { LibraryWithdraw } from '@/features/library/withdraws/service.ts'
 import libraryWithdrawService from '@/features/library/withdraws/service.ts'
@@ -10,6 +11,8 @@ import { useTimeAgo } from '@vueuse/core'
 import { userService } from '@/features/users/service.ts'
 import WithdrawTimeline from '../../public/WithdrawTimeline.vue'
 import type { LibraryGame } from '@/features/library/game.model.ts'
+
+const { t } = useI18n()
 
 interface Props {
   open: boolean
@@ -86,7 +89,7 @@ function getDurationHours(
 <template>
   <DialogComponent
     :open="open"
-    title="Withdrawal History"
+    :title="t('withdraw.history')"
     size="lg"
     @close="emit('close')"
   >
@@ -106,8 +109,10 @@ function getDurationHours(
 
       <div v-else-if="withdraws.length === 0" class="px-6 py-12 text-center">
         <div class="text-gray-500 dark:text-gray-400">
-          <p class="text-lg font-medium mb-2">No withdrawals yet</p>
-          <p class="text-sm">This game has not been withdrawn by any user</p>
+          <p class="text-lg font-medium mb-2">
+            {{ t('admin.library.noWithdrawalsYet') }}
+          </p>
+          <p class="text-sm">{{ t('admin.library.gameNotWithdrawn') }}</p>
         </div>
       </div>
 
@@ -135,7 +140,7 @@ function getDurationHours(
                     v-else
                     class="font-normal text-gray-600 dark:text-gray-300 truncate"
                   >
-                    Unknown user
+                    {{ t('admin.library.unknownUser') }}
                   </h5>
                 </div>
 
@@ -145,7 +150,7 @@ function getDurationHours(
                 >
                   <IconStopwatch class="size-4" />
                   {{ getDurationHours(withdraw.started_at, withdraw.ended_at) }}
-                  hours
+                  {{ t('admin.library.hours') }}
                 </div>
                 <div
                   v-else
@@ -167,7 +172,11 @@ function getDurationHours(
                   ]"
                 >
                   <IconCircleCheck class="size-3.5" />
-                  {{ withdraw.ended_at ? 'Returned' : 'Active' }}
+                  {{
+                    withdraw.ended_at
+                      ? t('admin.library.returned')
+                      : t('admin.library.active')
+                  }}
                 </span>
               </div>
             </div>

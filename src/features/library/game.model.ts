@@ -1,6 +1,7 @@
 import type { Game } from '@/features/external-game/model.ts'
 import type { LibraryLocation } from '@/features/library/locations/location.model.ts'
 import { DateTime } from 'luxon'
+import { i18n } from '@/i18n'
 
 export enum LibraryGameStatus {
   available = 'available',
@@ -55,14 +56,17 @@ export const getStatusColor = (game: LibraryGame): string => {
 
 export const getStatusLabel = (game: LibraryGame): string => {
   const status = getStatus(game)
+  const { t } = i18n.global
 
   switch (status) {
     case 'withdrawn':
-      return 'Withdrawn'
+      return t('game.withdrawn')
     case 'reserved':
-      return 'Reserved'
+      return t('game.reserved')
     case 'not-available':
-      return 'Not Available'
+      return t('game.notAvailable')
+    case 'available':
+      return t('game.available')
     default:
       return ''
   }

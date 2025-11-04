@@ -10,11 +10,14 @@ import {
   IconCheck,
 } from '@tabler/icons-vue'
 import { onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { authService } from '@/features/auth/service.ts'
 import router from '@/router'
 import { RouteNames } from '@/router/routeNames.ts'
 import CInput from '@/components/CInput.vue'
 import logger from '@/lib/logger.ts'
+
+const { t } = useI18n()
 
 const isValidating = ref(true)
 const isSuccess = ref(false)
@@ -69,12 +72,12 @@ const updateDisplayName = async (): Promise<void> => {
   displayNameErrors.value = []
 
   if (!displayName.value.trim()) {
-    displayNameErrors.value.push('Display name is required')
+    displayNameErrors.value.push(t('auth.displayNameRequired'))
     return
   }
 
   if (displayName.value.trim().length < 2) {
-    displayNameErrors.value.push('Display name must be at least 2 characters')
+    displayNameErrors.value.push(t('auth.displayNameMinLength'))
     return
   }
 
@@ -145,10 +148,10 @@ const backToSignIn = async (): Promise<void> => {
       </svg>
     </div>
     <h2 class="mt-6 text-lg font-semibold text-gray-900 dark:text-white">
-      Confirming your sign-in...
+      {{ t('auth.confirmingSignIn') }}
     </h2>
     <p class="mt-2 text-md text-gray-600 dark:text-gray-400">
-      Please wait while we verify your authentication.
+      {{ t('auth.pleaseWaitVerify') }}
     </p>
   </div>
 
@@ -164,10 +167,10 @@ const backToSignIn = async (): Promise<void> => {
     </div>
 
     <h2 class="mt-6 text-lg font-semibold text-gray-900 dark:text-white">
-      Welcome back!
+      {{ t('auth.welcomeBack') }}
     </h2>
     <p class="mt-2 text-md text-gray-600 dark:text-gray-400">
-      You have been successfully signed in to your account.
+      {{ t('auth.successfullySignedIn') }}
     </p>
 
     <!-- Countdown and redirect info -->
@@ -181,7 +184,7 @@ const backToSignIn = async (): Promise<void> => {
         </div>
         <div class="ml-3">
           <p class="text-sm text-green-800 dark:text-green-300">
-            Redirecting you to the home page in {{ countdown }} seconds...
+            {{ t('auth.redirectingIn', { seconds: countdown }) }}
           </p>
         </div>
       </div>
@@ -194,7 +197,7 @@ const backToSignIn = async (): Promise<void> => {
         @click="redirectToHome"
       >
         <IconArrowNarrowRight class="h-4 w-4" aria-hidden="true" />
-        Continue to Home
+        {{ t('auth.continueToHome') }}
       </button>
     </div>
   </div>
@@ -211,10 +214,10 @@ const backToSignIn = async (): Promise<void> => {
     </div>
 
     <h2 class="mt-6 text-lg font-semibold text-gray-900 dark:text-white">
-      Almost there!
+      {{ t('auth.almostThere') }}
     </h2>
     <p class="mt-2 text-md text-gray-600 dark:text-gray-400">
-      Please provide a display name to complete your profile.
+      {{ t('auth.provideDisplayName') }}
     </p>
 
     <!-- Display Name form -->
@@ -222,9 +225,9 @@ const backToSignIn = async (): Promise<void> => {
       <CInput
         id="display-name"
         v-model="displayName"
-        label="Display Name"
+        :label="t('auth.displayName')"
         type="text"
-        placeholder="Enter your display name"
+        :placeholder="t('auth.enterDisplayName')"
         :errors="displayNameErrors"
       />
     </div>
@@ -236,8 +239,8 @@ const backToSignIn = async (): Promise<void> => {
         @click="updateDisplayName"
       >
         <IconCheck class="h-4 w-4" aria-hidden="true" />
-        <span v-if="isUpdatingDisplayName">Updating...</span>
-        <span v-else>Update Display Name</span>
+        <span v-if="isUpdatingDisplayName">{{ t('auth.updating') }}</span>
+        <span v-else>{{ t('auth.updateDisplayName') }}</span>
       </button>
     </div>
   </div>
@@ -254,11 +257,10 @@ const backToSignIn = async (): Promise<void> => {
     </div>
 
     <h2 class="mt-6 text-lg font-semibold text-gray-900 dark:text-white">
-      Authentication failed
+      {{ t('auth.authenticationFailed') }}
     </h2>
     <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
-      We couldn't verify your sign-in. The link may have expired or been used
-      already.
+      {{ t('auth.verifySignInFailed') }}
     </p>
 
     <!-- Error details -->
@@ -285,7 +287,7 @@ const backToSignIn = async (): Promise<void> => {
         @click="backToSignIn"
       >
         <IconArrowNarrowLeft class="h-4 w-4" aria-hidden="true" />
-        Back to Sign In
+        {{ t('auth.backToSignIn') }}
       </button>
     </div>
   </div>

@@ -17,7 +17,11 @@ import {
 } from '@tabler/icons-vue'
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue'
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import libraryService from '@/features/library/service.ts'
+
+const { t } = useI18n()
+
 // Use function overload signatures for defineEmits so we can have optional userId for withdraw-game
 const emit = defineEmits<{
   (e: 'delete', game: LibraryGame): void
@@ -51,7 +55,7 @@ const gameStatus = computed(() => {
         @click="emit('return', props.data)"
       >
         <IconArrowBarToDownDashed class="-ml-0.5 size-5" aria-hidden="true" />
-        <span class="hidden md:inline">Return</span>
+        <span class="hidden md:inline">{{ t('admin.library.return') }}</span>
       </button>
       <button
         v-show="gameStatus === 'available'"
@@ -60,7 +64,7 @@ const gameStatus = computed(() => {
         @click="emit('withdraw', props.data)"
       >
         <IconArrowBarUp class="-ml-0.5 size-5" aria-hidden="true" />
-        <span class="hidden md:inline">Loan</span>
+        <span class="hidden md:inline">{{ t('admin.library.loan') }}</span>
       </button>
       <Menu as="div" class="relative inline-block">
         <MenuButton
@@ -83,7 +87,7 @@ const gameStatus = computed(() => {
           leave-to-class="transform opacity-0 scale-95"
         >
           <MenuItems
-            class="absolute right-0 z-15 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg outline-1 outline-black/5 dark:divide-white/10 dark:bg-gray-800 dark:shadow-none dark:-outline-offset-1 dark:outline-white/10"
+            class="absolute right-0 z-15 mt-2 w-62 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg outline-1 outline-black/5 dark:divide-white/10 dark:bg-gray-800 dark:shadow-none dark:-outline-offset-1 dark:outline-white/10"
           >
             <div class="py-1">
               <MenuItem v-slot="{ active }">
@@ -105,7 +109,7 @@ const gameStatus = computed(() => {
                     ]"
                     aria-hidden="true"
                   />
-                  History
+                  {{ t('admin.library.history') }}
                 </a>
               </MenuItem>
             </div>
@@ -129,7 +133,7 @@ const gameStatus = computed(() => {
                     ]"
                     aria-hidden="true"
                   />
-                  Edit
+                  {{ t('admin.library.edit') }}
                 </a>
               </MenuItem>
 
@@ -152,7 +156,7 @@ const gameStatus = computed(() => {
                     ]"
                     aria-hidden="true"
                   />
-                  Move
+                  {{ t('admin.library.move') }}
                 </a>
               </MenuItem>
               <MenuItem
@@ -177,7 +181,7 @@ const gameStatus = computed(() => {
                     ]"
                     aria-hidden="true"
                   />
-                  Mark as not available
+                  {{ t('admin.library.markAsNotAvailable') }}
                 </a>
               </MenuItem>
               <MenuItem
@@ -202,7 +206,7 @@ const gameStatus = computed(() => {
                     ]"
                     aria-hidden="true"
                   />
-                  Mark as available
+                  {{ t('admin.library.markAsAvailable') }}
                 </a>
               </MenuItem>
             </div>
@@ -226,7 +230,7 @@ const gameStatus = computed(() => {
                     ]"
                     aria-hidden="true"
                   />
-                  Delete
+                  {{ t('common.delete') }}
                 </a>
               </MenuItem>
             </div>

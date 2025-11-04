@@ -43,25 +43,25 @@ const enabledNavigation = computed(() => {
 
 const navigation = ref([
   {
-    label: 'Dashboard',
+    id: 'dashboard',
     routeName: RouteNames.admin.dashboard as string,
     icon: IconHome,
     enabled: false,
   },
   {
-    label: 'Library',
+    id: 'library',
     routeName: RouteNames.admin.library as string,
     icon: IconBooks,
     enabled: settingsStore?.value?.library?.enabled ?? false,
   },
   {
-    label: 'Events',
+    id: 'events',
     routeName: RouteNames.admin.events as string,
     icon: CalendarDaysIcon,
     enabled: settingsStore?.value?.events?.enabled ?? false,
   },
   {
-    label: 'Tournaments',
+    id: 'tournaments',
     routeName: RouteNames.admin.tournaments as string,
     icon: IconTrophy,
     enabled: settingsStore?.value?.tournaments?.enabled ?? false,
@@ -70,7 +70,7 @@ const navigation = ref([
 
 const bottomNavigation = ref([
   {
-    label: 'Settings',
+    id: 'settings',
     routeName: RouteNames.admin.settingsGeneral as string,
     icon: IconSettings,
     enabled: false, // Will be set in onMounted
@@ -79,16 +79,14 @@ const bottomNavigation = ref([
 
 const publicPages = [
   {
-    id: 1,
-    name: 'Library',
-    to: { name: RouteNames.public.library },
+    id: 'library',
+    routeName: RouteNames.public.library,
     initial: 'L',
     enabled: settingsStore?.value?.library?.enabled ?? false,
   },
   {
-    id: 2,
-    name: 'Flea Market',
-    to: { name: RouteNames.public.fleaMarket },
+    id: 'flea-market',
+    routeName: RouteNames.public.fleaMarket,
     initial: 'FM',
     enabled: settingsStore?.value?.flea?.enabled ?? false,
   },

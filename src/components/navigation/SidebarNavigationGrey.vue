@@ -8,18 +8,13 @@ import { ChevronUpDownIcon } from '@heroicons/vue/24/outline'
 import { IconLogout } from '@tabler/icons-vue'
 import { authService } from '@/features/auth/service'
 import { RouteNames } from '@/router/routeNames'
-
-interface NavigationItem {
-  label: string
-  icon: unknown
-  routeName: string
-  enabled: boolean
-}
+import { useI18n } from 'vue-i18n'
+import type { NavigationItem } from '@/navigation/navigation.model.ts'
+const { t } = useI18n()
 
 interface PublicPage {
-  id: number
-  name: string
-  to: string | { name: string }
+  id: string
+  routeName: string
   initial: string
   enabled: boolean
 }
@@ -94,7 +89,7 @@ const handleSignOut = async (): Promise<void> => {
                     ]"
                     aria-hidden="true"
                   />
-                  {{ item.label }}
+                  {{ t(`admin.navigation.${item.id}`) }}
                 </RouterLink>
               </li>
             </ul>
@@ -106,17 +101,19 @@ const handleSignOut = async (): Promise<void> => {
               Public pages
             </div>
             <ul role="list" class="-mx-2 mt-2 space-y-1">
-              <li v-for="item in publicPages" :key="item.name">
+              <li v-for="item in publicPages" :key="item.id">
                 <RouterLink
                   v-if="item.enabled"
-                  :to="item.to"
+                  :to="{ name: item.routeName }"
                   class="text-gray-700 hover:bg-gray-100 hover:text-indigo-600 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-white group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold"
                 >
                   <span
                     class="border-gray-200 text-gray-400 group-hover:border-indigo-600 group-hover:text-indigo-600 dark:border-white/10 dark:group-hover:border-white/20 dark:group-hover:text-white flex size-6 shrink-0 items-center justify-center rounded-lg border bg-white text-[0.625rem] font-medium dark:bg-white/5"
                     >{{ item.initial }}</span
                   >
-                  <span class="truncate">{{ item.name }}</span>
+                  <span class="truncate">{{
+                    t(`admin.navigation.${item.id}`)
+                  }}</span>
                 </RouterLink>
               </li>
             </ul>
@@ -148,7 +145,7 @@ const handleSignOut = async (): Promise<void> => {
               ]"
               aria-hidden="true"
             />
-            {{ item.label }}
+            {{ t(`admin.navigation.${item.id}`) }}
           </RouterLink>
         </div>
 

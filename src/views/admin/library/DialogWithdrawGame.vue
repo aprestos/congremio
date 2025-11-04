@@ -1,5 +1,9 @@
 <template>
-  <DialogComponent :open="open" title="Withdraw Game" @close="emit('close')">
+  <DialogComponent
+    :open="open"
+    :title="t('admin.library.withdrawGame')"
+    @close="emit('close')"
+  >
     <div class="space-y-8">
       <!-- Game Card -->
       <div class="">
@@ -8,14 +12,14 @@
             <img
               class="size-16 rounded-lg object-cover shadow-sm"
               :src="game?.game.image || '/placeholder-game.jpg'"
-              :alt="game?.game.name || 'Game image'"
+              :alt="game?.game.name || t('admin.library.unknownGame')"
             />
           </div>
           <div class="flex-1 min-w-0">
             <h3
               class="text-lg font-semibold text-gray-900 dark:text-white truncate"
             >
-              {{ game?.game.name || 'Unknown Game' }}
+              {{ game?.game.name || t('admin.library.unknownGame') }}
             </h3>
             <div
               class="mt-1 flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400"
@@ -34,7 +38,7 @@
                     d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                   />
                 </svg>
-                {{ game?.game.year || 'Unknown' }}
+                {{ game?.game.year || t('admin.library.unknown') }}
               </span>
               <span v-if="game?.location?.name" class="flex items-center">
                 <svg
@@ -66,16 +70,22 @@
       <!-- Withdraw Form -->
       <form class="space-y-6" @submit.prevent="submit">
         <div class="">
-          <CSelect
+          <CSelect2
             v-if="!showCreateUser"
-            id="withdraw-to-user"
+            id="user"
             v-model="formData.selectedUser"
-            label="Withdraw to"
-            option-label="name"
-            option-secondary-label="email"
-            option-value="id"
-            placeholder="Search and select a user..."
-            :on-search="userService.search"
+            :label="t('admin.library.withdrawTo')"
+            :placeholder="t('admin.library.searchAndSelectUser')"
+            :search-fn="
+              async (query) => {
+                const results = await userService.search(query)
+                return results.map((item) => ({
+                  value: item.id,
+                  label: item.name,
+                  secondaryLabel: item.email ? `(${item.email})` : undefined,
+                })) as Array<Option<string>>
+              }
+            "
             :errors="r$.$errors.selectedUser"
           />
 
@@ -88,9 +98,9 @@
               <CInput
                 id="new-user-email"
                 v-model="newUser.email"
-                label="Email"
+                :label="t('auth.email')"
                 type="email"
-                placeholder="Enter email address"
+                :placeholder="t('auth.enterEmailPlaceholder')"
                 :errors="newUserR$.$errors.email"
               />
             </div>
@@ -104,7 +114,9 @@
             @click="showCreateUser = !showCreateUser"
           >
             {{
-              showCreateUser ? 'Select an existing user' : '+ Create new user'
+              showCreateUser
+                ? t('admin.library.selectExistingUser')
+                : t('admin.library.createNewUser')
             }}
           </button>
         </div>
@@ -118,7 +130,7 @@
             class="order-2 sm:order-1 w-full sm:w-auto"
             @click="emit('close')"
           >
-            Cancel
+            {{ t('common.cancel') }}
           </CButton>
           <CButton
             type="submit"
@@ -127,7 +139,7 @@
             class="order-1 sm:order-2 w-full sm:w-auto"
             :loading="isSubmitting"
             :disabled="isCreatingUser"
-            loading-text="Withdrawing..."
+            :loading-text="t('admin.library.withdrawing')"
           >
             <svg
               class="size-4 mr-2"
@@ -142,7 +154,7 @@
                 d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
               />
             </svg>
-            Withdraw Game
+            {{ t('admin.library.withdrawGame') }}
           </CButton>
         </div>
       </form>
@@ -154,17 +166,21 @@
 import { useRegle } from '@regle/core'
 import { required, email } from '@regle/rules'
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { toast } from 'vue-sonner'
 import 'vue-sonner/style.css'
 
 import DialogComponent from '@/components/DialogComponent.vue'
 import CButton from '@/components/CButton.vue'
-import CSelect from '@/components/CSelect.vue'
 import CInput from '@/components/CInput.vue'
 import type { LibraryGame } from '@/features/library/game.model.ts'
 import libraryWithdrawService from '@/features/library/withdraws/service.ts'
 import { userService } from '@/features/users/service.ts'
 import logger from '@/lib/logger.ts'
+import type { Option } from 'vue3-select-component'
+import CSelect2 from '@/CSelect2.vue'
+
+const { t } = useI18n()
 
 interface Props {
   open: boolean
@@ -221,12 +237,14 @@ const submit = async (): Promise<void> => {
       data.selectedUser,
     )
 
-    toast.success('Game has been withdrawn from the library')
+    toast.success(
+      t('admin.library.withdrawSuccess', { name: props.game?.game.name }),
+    )
 
     emit('close')
   } catch (error) {
     logger.error('Failed to withdraw game', { error })
-    toast.error('Failed to withdraw game. Please try again.')
+    toast.error(t('admin.library.withdrawFailed'))
   } finally {
     isSubmitting.value = false
   }

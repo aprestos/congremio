@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, watch } from 'vue'
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
 import type { LibraryGame } from '@/features/library/game.model.ts'
 import { libraryWithdrawService } from '@/features/library/withdraws/service.ts'
@@ -10,6 +11,8 @@ import type { User } from '@/features/users/service.ts'
 import { useTimeAgo } from '@vueuse/core'
 import { IconHourglassHigh } from '@tabler/icons-vue'
 import { toast } from 'vue-sonner'
+
+const { t } = useI18n()
 
 interface Props {
   open: boolean
@@ -76,11 +79,11 @@ const returnGame = async (): Promise<void> => {
   try {
     await libraryWithdrawService.returnGame(props.selectedGame?.id)
     toast.success(
-      `${props.selectedGame.game.name} has been returned to the library.`,
+      t('admin.library.returnSuccess', { name: props.selectedGame.game.name }),
     )
   } catch (error) {
     console.error('Failed to return game:', error)
-    toast.error('Failed to return the game. Please try again.')
+    toast.error(t('admin.library.returnFailed'))
     throw error
   }
 }
@@ -89,9 +92,9 @@ const returnGame = async (): Promise<void> => {
 <template>
   <ConfirmationDialog
     :open="open"
-    title="Return Game"
-    confirm-text="Yes, return it"
-    cancel-text="Cancel"
+    :title="t('admin.library.returnGame')"
+    :confirm-text="t('admin.library.yesReturnIt')"
+    :cancel-text="t('common.cancel')"
     :loading="isReturningGame"
     @confirm="handleConfirm"
     @cancel="emit('close')"
@@ -106,13 +109,13 @@ const returnGame = async (): Promise<void> => {
           <img
             class="size-16 rounded-lg object-cover shadow-sm shrink-0"
             :src="selectedGame?.game.image || '/placeholder-game.jpg'"
-            :alt="selectedGame?.game.name || 'Game image'"
+            :alt="selectedGame?.game.name || t('admin.library.unknownGame')"
           />
           <div class="flex-1 min-w-0">
             <h3
               class="text-sm font-semibold text-gray-900 dark:text-white mb-1 line-clamp-2"
             >
-              {{ selectedGame?.game.name || 'Unknown Game' }}
+              {{ selectedGame?.game.name || t('admin.library.unknownGame') }}
             </h3>
             <div
               v-if="selectedGame?.location?.name"
@@ -201,7 +204,7 @@ const returnGame = async (): Promise<void> => {
 
         <!-- Confirmation Message -->
         <p class="text-sm text-gray-600 dark:text-gray-400 text-center pt-2">
-          Are you sure you want to return this game to the library?
+          {{ t('admin.library.areYouSureReturn') }}
         </p>
       </div>
     </template>

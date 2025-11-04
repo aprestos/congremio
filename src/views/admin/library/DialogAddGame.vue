@@ -1,49 +1,54 @@
 <template>
   <DialogComponent
     :open="open"
-    title="Add a library game"
+    :title="t('admin.library.addGame')"
     @close="emit('close')"
   >
     <form>
       <div class="space-y-12 mx-auto max-w-7xl">
         <div class="pb-12">
           <div class="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-            <CSelect
+            <CSelect2
               id="external-game"
               v-model="formData.selectedGame"
-              label="Game"
-              placeholder="Type to search"
-              :on-search="gameService.search"
-              option-label="name"
-              option-value="external_id"
-              option-secondary-label="year"
+              :label="t('admin.library.game')"
+              :search-fn="
+                async (query) => {
+                  const results = await gameService.search(query)
+                  return results.map((item) => ({
+                    value: item.external_id,
+                    label: item.name,
+                    secondaryLabel: item.year ? `(${item.year})` : undefined,
+                  })) as Array<Option<string>>
+                }
+              "
               :errors="r$.$errors.selectedGame"
             />
 
             <CInput
               id="owner"
               v-model="formData.owner"
-              label="Owner"
+              :label="t('admin.library.owner')"
               :errors="r$.$errors.owner"
             />
 
             <CSelect
               id="location"
               v-model="formData.selectedLocation"
-              label="Location"
-              placeholder="Select a location"
+              :label="t('admin.library.location')"
+              :placeholder="t('admin.library.selectALocation')"
               :options="locations"
               :errors="r$.$errors.selectedLocation"
-              helper-text="Optional"
+              :helper-text="t('admin.library.optional')"
             />
 
             <CTextArea
               id="notes"
               v-model="formData.notes"
-              label="Notes"
+              :label="t('admin.library.notes')"
               :rows="4"
               :errors="r$.$errors.notes"
-              helper-text="Optional"
+              :helper-text="t('admin.library.optional')"
             />
           </div>
         </div>
@@ -58,7 +63,7 @@
           class="order-2 sm:order-1 w-full sm:w-auto"
           @click="emit('close')"
         >
-          Cancel
+          {{ t('common.cancel') }}
         </CButton>
         <CButton
           type="button"
@@ -66,10 +71,10 @@
           size="lg"
           class="order-1 sm:order-2 w-full sm:w-auto"
           :loading="isSubmitting"
-          loading-text="Submitting..."
+          :loading-text="t('admin.library.submitting')"
           @click="submit"
         >
-          Submit
+          {{ t('admin.library.submit') }}
         </CButton>
       </div>
     </form>
@@ -80,6 +85,7 @@
 import { useRegle } from '@regle/core'
 import { required } from '@regle/rules'
 import { onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { Option } from 'vue3-select-component'
 import DialogComponent from '@/components/DialogComponent.vue'
 import CButton from '@/components/CButton.vue'
@@ -92,6 +98,9 @@ import { libraryService } from '@/features/library/service.ts'
 import { libraryLocationService } from '@/features/library/locations/service.ts'
 import logger from '@/lib/logger.ts'
 import { toast } from 'vue-sonner'
+import CSelect2 from '@/CSelect2.vue'
+
+const { t } = useI18n()
 
 interface Props {
   open: boolean
@@ -100,12 +109,12 @@ interface Props {
 defineProps<Props>()
 
 const formData = ref<{
-  selectedGame: number | undefined
+  selectedGame: string | null
   owner: string
   selectedLocation: number | undefined
   notes: string
 }>({
-  selectedGame: undefined,
+  selectedGame: null,
   owner: '',
   selectedLocation: undefined,
   notes: '',
@@ -149,7 +158,7 @@ const submit = async (): Promise<void> => {
         data.notes,
       )
 
-      toast.success(`${game.name} has been added to the library`)
+      toast.success(t('admin.library.addSuccess'))
 
       // Emit event to notify parent that game was added successfully
       emit('close')

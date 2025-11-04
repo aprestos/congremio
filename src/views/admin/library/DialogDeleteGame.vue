@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import DialogComponent from '@/components/DialogComponent.vue'
 import type { LibraryGame } from '@/features/library/game.model.ts'
 import libraryWithdrawService from '@/features/library/withdraws/service.ts'
@@ -7,6 +8,8 @@ import { toast } from 'vue-sonner'
 import libraryService from '@/features/library/service.ts'
 import libraryReservationService from '@/features/library/reservations/service.ts'
 import logger from '@/lib/logger.ts'
+
+const { t } = useI18n()
 
 interface Props {
   open: boolean
@@ -51,12 +54,12 @@ const deleteGame = async (): Promise<void> => {
   try {
     await libraryService.deleteGame(props.selectedGame.id)
     toast.success(
-      `${props.selectedGame.game.name} has been deleted from the library.`,
+      t('admin.library.deleteSuccess', { name: props.selectedGame.game.name }),
     )
     emit('close')
   } catch (error) {
     logger.error('Failed to delete game', { error })
-    toast.error('Failed to delete the game. Please try again.')
+    toast.error(t('admin.library.deleteFailed'))
     throw error
   } finally {
     isDeletingGame.value = false
@@ -65,16 +68,20 @@ const deleteGame = async (): Promise<void> => {
 </script>
 
 <template>
-  <DialogComponent :open="open" title="Delete Game" @close="emit('close')">
+  <DialogComponent
+    :open="open"
+    :title="t('admin.library.deleteGame')"
+    @close="emit('close')"
+  >
     <div v-if="selectedGame" class="space-y-6">
       <!-- Loading State -->
       <div v-if="isLoading" class="flex items-center justify-center py-8">
         <div
           class="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-indigo-600 dark:border-gray-700 dark:border-t-indigo-400"
         />
-        <span class="ml-3 text-sm text-gray-600 dark:text-gray-400"
-          >Checking history...</span
-        >
+        <span class="ml-3 text-sm text-gray-600 dark:text-gray-400">{{
+          t('admin.library.checkingHistory')
+        }}</span>
       </div>
 
       <!-- Content -->
@@ -100,16 +107,9 @@ const deleteGame = async (): Promise<void> => {
               </svg>
             </div>
             <div class="ml-3">
-              <h3
-                class="text-sm font-medium text-yellow-800 dark:text-yellow-200"
-              >
-                Cannot delete this game
-              </h3>
               <div class="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
                 <p>
-                  This game has withdraw or reservation records in the system
-                  and cannot be deleted. Games history must be retained for
-                  record-keeping purposes.
+                  {{ t('admin.library.cannotDeleteHasHistory') }}
                 </p>
               </div>
             </div>
@@ -119,14 +119,13 @@ const deleteGame = async (): Promise<void> => {
         <!-- Confirmation message if no withdraws -->
         <div v-else-if="canBeDeleted">
           <p class="text-sm text-gray-600 dark:text-gray-400">
-            Are you sure you want to delete
+            {{ t('admin.library.confirmDelete') }}
             <strong class="text-gray-900 dark:text-white">
               {{ selectedGame.game.name }}
             </strong>
-            from the library?
           </p>
           <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">
-            This action cannot be undone.
+            {{ t('admin.library.deleteWarning') }}
           </p>
         </div>
       </div>
@@ -138,7 +137,7 @@ const deleteGame = async (): Promise<void> => {
           class="rounded-md bg-white dark:bg-gray-700 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600"
           @click="emit('close')"
         >
-          Cancel
+          {{ t('common.cancel') }}
         </button>
         <button
           type="button"
@@ -146,8 +145,8 @@ const deleteGame = async (): Promise<void> => {
           :disabled="!canBeDeleted || isDeletingGame"
           @click="deleteGame"
         >
-          <span v-if="isDeletingGame">Deleting...</span>
-          <span v-else>Yes, delete it</span>
+          <span v-if="isDeletingGame">{{ t('common.loading') }}</span>
+          <span v-else>{{ t('common.delete') }}</span>
         </button>
       </div>
     </div>

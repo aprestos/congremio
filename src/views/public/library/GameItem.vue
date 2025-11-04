@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import type { LibraryGame } from '@/features/library/game.model.ts'
 import {
   getStatusColor,
@@ -9,29 +9,25 @@ import {
 } from '@/features/library/game.model.ts'
 import SkeletonLoader from '@/components/SkeletonLoader.vue'
 import { HandRaisedIcon } from '@heroicons/vue/24/outline'
-import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
 import CButton from '@/components/CButton.vue'
 import { editionStore } from '@/stores/edition.ts'
 
 interface Props {
   game?: LibraryGame
   loading?: boolean
-  isAuthenticated?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   loading: false,
   game: undefined,
-  isAuthenticated: false,
 })
 
 const emit = defineEmits<{
   'game-click': [gameId: number]
-  'add-to-bag-click': [gameId: number]
+  'reserve-game': [game: LibraryGame]
 }>()
 
-const router = useRouter()
-const showAuthDialog = ref(false)
+const { t } = useI18n()
 const imageLoaded = ref(false)
 const imageError = ref(false)
 
@@ -62,29 +58,18 @@ const handleGameClick = (): void => {
   }
 }
 
-const handleAddToBagClick = (event: Event): void => {
-  event.stopPropagation()
-
-  if (!props.game) return
-
-  // Check if user is authenticated
-  if (!props.isAuthenticated) {
-    showAuthDialog.value = true
-    return
+const reserveGame = (): void => {
+  if (props.game) {
+    emit('reserve-game', props.game)
   }
-
-  // User is authenticated, proceed with reservation
-  emit('add-to-bag-click', props.game.id)
 }
 
-const redirectToSignIn = (): void => {
-  showAuthDialog.value = false
-  void router.push('/auth/signin')
-}
-
-const closeAuthDialog = (): void => {
-  showAuthDialog.value = false
-}
+// Image height classes for responsive design
+// Grid layout: 2 cols (mobile) → 3 cols (sm) → 4 cols (lg)
+// Heights chosen to maintain roughly square aspect ratio at each breakpoint
+const imageHeightClasses = computed(() => {
+  return 'h-60 md:h-55 lg:h-55'
+})
 
 // Check if convention is currently happening
 const isConventionHappening = computed(() => {
@@ -111,7 +96,12 @@ const isConventionHappening = computed(() => {
     <!-- Loading SkeletonLoader -->
     <div v-if="loading">
       <div class="group relative">
-        <div class="relative size-50 w-full overflow-hidden rounded-lg">
+        <div
+          :class="[
+            'relative w-full overflow-hidden rounded-lg',
+            imageHeightClasses,
+          ]"
+        >
           <SkeletonLoader width="100%" height="100%" />
         </div>
         <div class="mt-4 space-y-2">
@@ -132,7 +122,10 @@ const isConventionHappening = computed(() => {
     <div v-else-if="game">
       <div class="group relative cursor-pointer" @click="handleGameClick">
         <div
-          class="relative h-72 md:h-60 lg:h-50 w-full overflow-hidden rounded-lg text-center"
+          :class="[
+            'relative w-full overflow-hidden rounded-lg text-center',
+            imageHeightClasses,
+          ]"
         >
           <!-- Image SkeletonLoader - shown while image is loading -->
           <SkeletonLoader
@@ -146,7 +139,7 @@ const isConventionHappening = computed(() => {
           <img
             v-if="!imageError"
             :src="game.game.image"
-            :alt="game.game.name + ' cover image'"
+            :alt="t('game.coverImage', { name: game.game.name })"
             :class="[
               'size-full object-cover transition-all duration-300 group-hover:scale-105',
               imageLoaded ? 'opacity-100' : 'opacity-0',
@@ -172,7 +165,7 @@ const isConventionHappening = computed(() => {
                   clip-rule="evenodd"
                 />
               </svg>
-              <p class="text-xs">Image unavailable</p>
+              <p class="text-xs">{{ t('game.imageUnavailable') }}</p>
             </div>
           </div>
         </div>
@@ -189,7 +182,10 @@ const isConventionHappening = computed(() => {
         </div>
         <div
           v-if="getStatus(game) !== 'available' && isConventionHappening"
-          class="absolute inset-x-0 top-0 flex h-72 md:h-60 lg:h-50 items-end justify-end overflow-hidden rounded-lg p-4"
+          :class="[
+            'absolute inset-x-0 top-0 flex items-end justify-end overflow-hidden rounded-lg p-4',
+            imageHeightClasses,
+          ]"
         >
           <div
             aria-hidden="true"
@@ -209,28 +205,11 @@ const isConventionHappening = computed(() => {
           :full-width="true"
           variant="tertiary"
           :disabled="getStatus(game) !== 'available'"
-          @click="handleAddToBagClick"
-          ><HandRaisedIcon class="size-4" />Reserve</CButton
+          @click="reserveGame"
+          ><HandRaisedIcon class="size-4" />{{ t('game.reserve') }}</CButton
         >
       </div>
     </div>
-
-    <!-- Authentication Required Dialog -->
-    <ConfirmationDialog
-      :open="showAuthDialog"
-      title="Authentication Required"
-      confirm-text="Sign In"
-      cancel-text="Cancel"
-      @confirm="redirectToSignIn"
-      @cancel="closeAuthDialog"
-      @close="closeAuthDialog"
-    >
-      <div class="space-y-3">
-        <p class="text-sm text-gray-600 dark:text-gray-300">
-          You need to be signed in to reserve games.
-        </p>
-      </div>
-    </ConfirmationDialog>
   </div>
 </template>
 

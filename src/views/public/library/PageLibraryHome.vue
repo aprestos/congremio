@@ -34,7 +34,7 @@
               >
                 <div class="flex items-center justify-between px-4">
                   <h2 class="text-lg font-medium text-gray-900 dark:text-white">
-                    Filters
+                    {{ t('library.filters') }}
                   </h2>
                   <button
                     type="button"
@@ -42,7 +42,7 @@
                     @click="mobileFiltersOpen = false"
                   >
                     <span class="absolute -inset-0.5" />
-                    <span class="sr-only">Close menu</span>
+                    <span class="sr-only">{{ t('library.closeMenu') }}</span>
                     <XMarkIcon class="size-6" aria-hidden="true" />
                   </button>
                 </div>
@@ -51,17 +51,17 @@
                 <form
                   class="mt-4 border-t border-gray-200 dark:border-gray-700"
                 >
-                  <h3 class="sr-only">Categories</h3>
+                  <h3 class="sr-only">{{ t('library.categories') }}</h3>
                   <ul
                     role="list"
                     class="px-2 py-3 font-medium text-gray-900 dark:text-white"
                   >
-                    <li v-for="category in subCategories" :key="category.name">
+                    <li v-for="category in subCategories" :key="category.id">
                       <label
                         class="flex items-center gap-2 px-2 py-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700"
                         :class="{
                           'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300':
-                            selectedTag === category.name,
+                            selectedTag === category.id,
                         }"
                       >
                         <component
@@ -69,11 +69,11 @@
                           class="h-5 w-5 text-gray-400 dark:text-gray-300"
                           :class="{
                             'text-indigo-600 dark:text-indigo-400':
-                              selectedTag === category.name,
+                              selectedTag === category.id,
                           }"
                         />
-                        <span class="flex-1" @click="selectTag(category.name)">
-                          {{ category.name }}
+                        <span class="flex-1" @click="selectTag(category.id)">
+                          {{ t(`library.${category.id}`) }}
                         </span>
                       </label>
                     </li>
@@ -177,7 +177,7 @@
               <input
                 v-model="searchQuery"
                 type="text"
-                placeholder="Search games..."
+                :placeholder="t('library.search')"
                 class="block w-full pl-12 pr-3 py-4 text-lg bg-gray-100 dark:border-gray-600 rounded-full dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:focus:ring-indigo-400 dark:focus:border-indigo-400"
               />
             </div>
@@ -190,9 +190,9 @@
                   class="group flex flex-col items-start bg-gray-100 dark:bg-gray-700 px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 min-w-[120px]"
                 >
                   <div class="flex items-center justify-between w-full">
-                    <span class="text-xs text-gray-500 dark:text-gray-400"
-                      >Sort by</span
-                    >
+                    <span class="text-xs text-gray-500 dark:text-gray-400">{{
+                      t('library.sortBy')
+                    }}</span>
                     <ChevronDownIcon
                       class="size-4 shrink-0 text-gray-400 dark:text-gray-300"
                       aria-hidden="true"
@@ -251,29 +251,31 @@
               class="-m-2 ml-4 p-2 text-gray-400 dark:text-gray-300 hover:text-gray-500 dark:hover:text-gray-200 sm:ml-6 lg:hidden"
               @click="mobileFiltersOpen = true"
             >
-              <span class="sr-only">Filters</span>
+              <span class="sr-only">{{ t('library.filters') }}</span>
               <FunnelIcon class="size-5" aria-hidden="true" />
             </button>
           </div>
         </div>
 
         <section aria-labelledby="products-heading" class="">
-          <h2 id="products-heading" class="sr-only">Products</h2>
+          <h2 id="products-heading" class="sr-only">
+            {{ t('library.games') }}
+          </h2>
 
           <div class="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-4">
             <!-- Filters -->
             <form class="hidden lg:block">
-              <h3 class="sr-only">Categories</h3>
+              <h3 class="sr-only">{{ t('library.categories') }}</h3>
               <ul
                 role="list"
                 class="space-y-4 border-b border-gray-200 dark:border-gray-700 pb-6 text-sm font-medium text-gray-900 dark:text-white"
               >
-                <li v-for="category in subCategories" :key="category.name">
+                <li v-for="category in subCategories" :key="category.id">
                   <label
                     class="flex items-center gap-2 cursor-pointer hover:text-indigo-200 dark:hover:text-indigo-300"
                     :class="{
                       'text-indigo-600 dark:text-indigo-400':
-                        selectedTag === category.name,
+                        selectedTag === category.id,
                     }"
                   >
                     <component
@@ -281,11 +283,11 @@
                       class="h-4 w-4 text-gray-400 dark:text-gray-300"
                       :class="{
                         'text-indigo-600 dark:text-indigo-400':
-                          selectedTag === category.name,
+                          selectedTag === category.id,
                       }"
                     />
-                    <span class="flex-1" @click="selectTag(category.name)">
-                      {{ category.name }}
+                    <span class="flex-1" @click="selectTag(category.id)">
+                      {{ t(`library.filter-options.${category.id}`) }}
                     </span>
                   </label>
                 </li>
@@ -389,7 +391,12 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { IconPlayCard2Filled, IconSearch } from '@tabler/icons-vue'
+import { useI18n } from 'vue-i18n'
+import {
+  IconMoodKidFilled,
+  IconPlayCard2Filled,
+  IconSearch,
+} from '@tabler/icons-vue'
 import GameList from '@/views/public/library/GameList.vue'
 import ReservationList from '@/views/public/library/ReservationList.vue'
 import type { FilterOptions } from '@/features/library/service.ts'
@@ -416,6 +423,8 @@ import {
   UserGroupIcon,
   TrophyIcon,
 } from '@heroicons/vue/20/solid'
+
+const { t } = useI18n()
 
 const searchQuery = ref('')
 const selectedFilters = ref<Record<string, string[]>>({})
@@ -444,20 +453,26 @@ const currentFilters = computed((): FilterOptions => {
 })
 
 const sortOptions = [
-  { name: 'Best Rating', id: 'rating', current: false },
-  { name: 'Newest', id: 'newest', current: false },
-  { name: 'Name', id: 'name', current: false },
+  { name: t('library.bestRating'), id: 'rating', current: false },
+  { name: t('library.newest'), id: 'newest', current: false },
+  { name: t('library.name'), id: 'name', current: false },
 ]
+
 const subCategories = [
-  { name: 'New arrivals', href: '#', icon: SparklesIcon },
-  { name: 'Family', href: '#', icon: UserGroupIcon },
-  { name: 'Classics', href: '#', icon: TrophyIcon },
-  { name: '2-player only', href: '#', icon: IconPlayCard2Filled },
+  { id: 'new-arrivals', href: '#', icon: SparklesIcon },
+  { id: 'family', href: '#', icon: UserGroupIcon },
+  { id: 'classics', href: '#', icon: TrophyIcon },
+  { id: 'children', href: '#', icon: IconMoodKidFilled },
+  {
+    id: 'two-player-only',
+    href: '#',
+    icon: IconPlayCard2Filled,
+  },
 ]
 const filters = [
   {
     id: 'players',
-    name: 'Number of Players',
+    name: t('library.numberOfPlayers'),
     options: [
       { value: '1', label: '1', checked: false },
       { value: '2', label: '2', checked: false },
@@ -473,7 +488,7 @@ const filters = [
   },
   {
     id: 'playtime',
-    name: 'Playtime',
+    name: t('library.playtime'),
     options: [
       { value: '15', label: '15 min', checked: false },
       { value: '30', label: '30 min', checked: false },

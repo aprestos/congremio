@@ -1,7 +1,7 @@
 <template>
   <DialogComponent
     :open="props.open"
-    title="Reservation Details"
+    :title="t('admin.library.reservationDetails')"
     @close="handleClose"
   >
     <div v-if="props.reservation" class="space-y-6">
@@ -13,7 +13,7 @@
       </div>
 
       <h2 class="text-2xl font-light text-gray-900 dark:text-white mb-4">
-        Reserved Game
+        {{ t('admin.library.reservedGame') }}
       </h2>
       <!-- Game Details -->
       <div class="p-6 rounded-lg bg-gray-100 dark:bg-gray-900">
@@ -30,7 +30,7 @@
             class="w-20 h-20 bg-gray-300 dark:bg-gray-600 rounded-lg shadow-sm flex items-center justify-center flex-shrink-0"
           >
             <span class="text-gray-500 dark:text-gray-400 text-xs">
-              No Image
+              {{ t('admin.library.noImage') }}
             </span>
           </div>
           <div class="flex-1">
@@ -41,14 +41,14 @@
               v-if="gameYear"
               class="text-sm text-gray-600 dark:text-gray-300 mt-1"
             >
-              Year: {{ gameYear }}
+              {{ t('admin.library.year') }}: {{ gameYear }}
             </p>
           </div>
         </div>
       </div>
 
       <h2 class="text-2xl font-light text-gray-900 dark:text-white mb-4">
-        Person
+        {{ t('admin.library.person') }}
       </h2>
       <!-- User Details - Loading State -->
       <div
@@ -76,7 +76,7 @@
           </div>
           <div class="flex-1 p-4">
             <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-              {{ user?.name || 'User' }}
+              {{ user?.name || t('admin.library.user') }}
             </h3>
             <p
               class="text-sm flex flex-row text-gray-600 dark:text-gray-300 mt-1"
@@ -96,7 +96,7 @@
           class="order-2 sm:order-1 w-full sm:w-auto rounded-md bg-white dark:bg-gray-700 px-4 py-2 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600"
           @click="handleClose"
         >
-          Close
+          {{ t('common.close') }}
         </button>
         <button
           type="button"
@@ -104,8 +104,8 @@
           :disabled="isWithdrawing"
           @click="handleReservationWithdraw"
         >
-          <span v-if="isWithdrawing">Withdrawing...</span>
-          <span v-else>Withdraw Game</span>
+          <span v-if="isWithdrawing">{{ t('admin.library.withdrawing') }}</span>
+          <span v-else>{{ t('admin.library.withdrawGame') }}</span>
         </button>
       </div>
     </div>
@@ -114,12 +114,15 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { toast } from 'vue-sonner'
 import DialogComponent from '@/components/DialogComponent.vue'
 import type { LibraryReservation } from '@/features/library/reservations/service'
 import { type User, userService } from '@/features/users/service.ts'
 import { IconMail } from '@tabler/icons-vue'
 import libraryWithdrawService from '@/features/library/withdraws/service.ts'
+
+const { t } = useI18n()
 
 interface LibraryGameWithDetails {
   game?: {
@@ -181,9 +184,9 @@ const gameName = computed(() => {
     'game' in props.reservation.library_game
   ) {
     const libraryGame = props.reservation.library_game as LibraryGameWithDetails
-    return libraryGame.game?.name || 'Unknown Game'
+    return libraryGame.game?.name || t('admin.library.unknownGame')
   }
-  return 'Unknown Game'
+  return t('admin.library.unknownGame')
 })
 
 const gameYear = computed(() => {
@@ -231,12 +234,12 @@ const handleReservationWithdraw = async (): Promise<void> => {
       props.reservation?.user_id,
     )
 
-    toast.success('Game withdrawn successfully')
+    toast.success(t('admin.library.withdrawSuccess', { name: gameName.value }))
 
     emit('close')
   } catch (error) {
     console.error('Failed to withdraw game: ', error)
-    toast.error('Failed to withdraw the game. Please try again.')
+    toast.error(t('admin.library.withdrawFailed'))
   } finally {
     isWithdrawing.value = false
   }
