@@ -57,7 +57,7 @@
                 <div class="absolute right-4 top-4 sm:right-6 sm:top-6">
                   <button
                     type="button"
-                    class="p-1 rounded-2xl bg-white dark:bg-gray-700 text-gray-400 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 hover:text-gray-500 dark:hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
+                    class="p-1 cursor-pointer transition-all rounded-2xl text-gray-400 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 hover:text-gray-500 dark:hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
                     @click="closeDialog"
                   >
                     <span class="sr-only">Close</span>

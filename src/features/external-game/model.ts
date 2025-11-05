@@ -6,6 +6,7 @@ export type Game = GameSummary & {
   min_age: number
   best_at: string
   recommended_at: string
+  language_dependence?: string
 }
 
 export interface GameSummary {

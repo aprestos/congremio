@@ -47,7 +47,7 @@ const router = createRouter({
         {
           path: 'confirm',
           name: RouteNames.auth.confirm,
-          component: () => import('../views/auth/ConfirmView.vue'),
+          component: () => import('../views/auth/SignInConfirmation.vue'),
         },
       ],
     },

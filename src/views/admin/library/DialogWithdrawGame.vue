@@ -66,61 +66,92 @@
           </div>
         </div>
       </div>
-
       <!-- Withdraw Form -->
       <form class="space-y-6" @submit.prevent="submit">
-        <div class="">
-          <CSelect2
-            v-if="!showCreateUser"
-            id="user"
-            v-model="formData.selectedUser"
-            :label="t('admin.library.withdrawTo')"
-            :placeholder="t('admin.library.searchAndSelectUser')"
-            :search-fn="
-              async (query) => {
-                const results = await userService.search(query)
-                return results.map((item) => ({
-                  value: item.id,
-                  label: item.name,
-                  secondaryLabel: item.email ? `(${item.email})` : undefined,
-                })) as Array<Option<string>>
-              }
-            "
-            :errors="r$.$errors.selectedUser"
-          />
+        <div class="w-full max-w-md py-4">
+          <TabGroup :selected-index="selectedTab" @change="changeTab">
+            <TabList
+              class="flex space-x-1 rounded-xl bg-indigo-50 dark:bg-gray-900 p-1"
+            >
+              <Tab
+                v-for="(tab, idx) in ['Search user', 'Create user']"
+                :key="idx"
+                v-slot="{ selected }"
+                as="template"
+              >
+                <button
+                  :class="[
+                    'flex flex-row justify-center w-full cursor-pointer rounded-lg py-2.5 text-sm font-medium leading-5',
+                    'bg-indigo-50 dark:bg-gray-900 ring-offset-2 ring-offset-indigo-50 dark:ring-offset-white/40',
+                    selected
+                      ? 'bg-indigo-600 dark:bg-indigo-700 text-white shadow'
+                      : 'text-gray-500 hover:bg-white hover:dark:bg-gray-800 ',
+                  ]"
+                >
+                  <IconUserPlus v-if="idx === 1" class="mr-2 size-5" />
+                  <IconSearch v-if="idx === 0" class="mr-2 size-5" />
+                  {{ tab }}
+                </button>
+              </Tab>
+            </TabList>
 
-          <!-- Create User Form -->
-          <div
-            v-if="showCreateUser"
-            class="mt-4 p-4 border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800"
-          >
-            <div class="space-y-4">
-              <CInput
-                id="new-user-email"
-                v-model="newUser.email"
-                :label="t('auth.email')"
-                type="email"
-                :placeholder="t('auth.enterEmailPlaceholder')"
-                :errors="newUserR$.$errors.email"
-              />
-            </div>
-          </div>
+            <TabPanels class="mt-2">
+              <TabPanel :class="[' px-1 py-3', '']">
+                <div class="">
+                  <CSelect2
+                    id="user"
+                    v-model="formData.selectedUser"
+                    :label="t('admin.library.withdrawTo')"
+                    :placeholder="t('admin.library.searchAndSelectUser')"
+                    :search-fn="
+                      async (query) => {
+                        const results = await userService.search(query)
+                        return results.map((item) => ({
+                          value: item.id,
+                          label: item.name,
+                          secondaryLabel: item.email
+                            ? `(${item.email})`
+                            : undefined,
+                        })) as Array<Option<string>>
+                      }
+                    "
+                    :errors="r$.$errors.selectedUser"
+                  />
+                </div>
+              </TabPanel>
+              <TabPanel
+                :class="[
+                  'px-1 py-3',
+                  'ring-white/60 ring-offset-2 ring-offset-blue-400 focus:outline-none focus:ring-2',
+                ]"
+              >
+                <!-- Create User Form -->
+                <div class="space-y-4">
+                  <div class="">
+                    <CInput
+                      id="new-user-name"
+                      v-model="newUser.name"
+                      :label="t('auth.displayName')"
+                      type="text"
+                      :placeholder="t('auth.enterDisplayName')"
+                      :errors="newUserR$.$errors.name"
+                    />
+                  </div>
+                  <div class="space-y-4">
+                    <CInput
+                      id="new-user-email"
+                      v-model="newUser.email"
+                      :label="t('auth.email')"
+                      type="email"
+                      :placeholder="t('auth.enterEmailPlaceholder')"
+                      :errors="newUserR$.$errors.email"
+                    />
+                  </div>
+                </div>
+              </TabPanel>
+            </TabPanels>
+          </TabGroup>
         </div>
-        <!-- Create New User Option -->
-        <div class="">
-          <button
-            type="button"
-            class="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300"
-            @click="showCreateUser = !showCreateUser"
-          >
-            {{
-              showCreateUser
-                ? t('admin.library.selectExistingUser')
-                : t('admin.library.createNewUser')
-            }}
-          </button>
-        </div>
-
         <!-- Action Buttons -->
         <div class="flex flex-col sm:flex-row gap-3 sm:gap-2 sm:justify-end">
           <CButton
@@ -138,7 +169,6 @@
             size="lg"
             class="order-1 sm:order-2 w-full sm:w-auto"
             :loading="isSubmitting"
-            :disabled="isCreatingUser"
             :loading-text="t('admin.library.withdrawing')"
           >
             <svg
@@ -164,11 +194,12 @@
 
 <script setup lang="ts">
 import { useRegle } from '@regle/core'
-import { required, email } from '@regle/rules'
+import { required, email, minLength } from '@regle/rules'
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { toast } from 'vue-sonner'
 import 'vue-sonner/style.css'
+import { TabGroup, TabList, Tab, TabPanels, TabPanel } from '@headlessui/vue'
 
 import DialogComponent from '@/components/DialogComponent.vue'
 import CButton from '@/components/CButton.vue'
@@ -179,6 +210,7 @@ import { userService } from '@/features/users/service.ts'
 import logger from '@/lib/logger.ts'
 import type { Option } from 'vue3-select-component'
 import CSelect2 from '@/CSelect2.vue'
+import { IconSearch, IconUserPlus } from '@tabler/icons-vue'
 
 const { t } = useI18n()
 
@@ -196,13 +228,16 @@ const emit = defineEmits<{
 const formData = ref({ selectedUser: undefined as string | undefined })
 
 const isSubmitting = ref(false)
-const showCreateUser = ref(false)
-const isCreatingUser = ref(false)
 
 const newUser = ref({
   email: '',
+  name: '',
 })
 
+const selectedTab = ref<number>(0)
+const changeTab = (index: number): void => {
+  selectedTab.value = index
+}
 // Main form validation
 const { r$ } = useRegle(formData, {
   selectedUser: { required },
@@ -211,12 +246,14 @@ const { r$ } = useRegle(formData, {
 // New user form validation
 const { r$: newUserR$ } = useRegle(newUser, {
   email: { required, email },
+  name: { required, minLength: minLength(2) },
 })
 
 const submit = async (): Promise<void> => {
   if (isSubmitting.value) return
 
-  if (showCreateUser.value) {
+  isSubmitting.value = true
+  if (selectedTab.value === 1) {
     await createUser()
   }
 
@@ -227,8 +264,6 @@ const submit = async (): Promise<void> => {
     logger.debug('Form has validation errors')
     return
   }
-
-  isSubmitting.value = true
 
   try {
     // Call the withdraw service
@@ -251,8 +286,6 @@ const submit = async (): Promise<void> => {
 }
 
 const createUser = async (): Promise<void> => {
-  if (isCreatingUser.value) return
-
   // Validate new user form
   const { valid, data } = await newUserR$.$validate()
 
@@ -261,11 +294,9 @@ const createUser = async (): Promise<void> => {
     return
   }
 
-  isCreatingUser.value = true
-
   try {
     //Call the user creation service
-    const response = await userService.create(data.email)
+    const response = await userService.create(data.name, data.email)
 
     toast.success(`User ${response.email} created successfully.`)
 
@@ -274,19 +305,15 @@ const createUser = async (): Promise<void> => {
 
     // Reset new user form and hide it
     newUser.value.email = ''
-    showCreateUser.value = false
+    newUser.value.name = ''
 
     // Reset validation state
     newUserR$.$reset()
   } catch (error) {
-    console.error('Error creating user:')
-    if (error instanceof Error) {
-      toast.error(error.message)
-    } else {
-      toast.error('An unknown error occurred')
-    }
-  } finally {
-    isCreatingUser.value = false
+    const message =
+      error instanceof Error ? error.message : 'Failed to create user'
+    toast.error(message)
+    isSubmitting.value = false
   }
 }
 

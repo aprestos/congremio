@@ -1,19 +1,20 @@
 <template>
-  <div
-    class="min-h-screen flex flex-col justify-center px-6 py-12 lg:px-8 bg-white dark:bg-gray-900"
-  >
-    <div class="mb-10">
-      <img
-        class="dark:hidden mx-auto h-10 w-auto"
-        src="@/assets/logo-horizontal-color.svg"
-        alt="congrem.io"
-      />
-      <img
-        class="hidden dark:block mx-auto h-10 w-auto"
-        src="@/assets/logo-horizontal-white.svg"
-        alt="congrem.io"
-      />
+  <div class="min-h-screen px-6 py-12 lg:px-8">
+    <div class="px-6 py-12 lg:px-8">
+      <div class="">
+        <img
+          class="dark:hidden mx-auto h-10 w-auto"
+          src="@/assets/logo-horizontal-color.svg"
+          alt="congrem.io"
+        />
+        <img
+          class="hidden dark:block mx-auto h-10 w-auto"
+          src="@/assets/logo-horizontal-white.svg"
+          alt="congrem.io"
+        />
+      </div>
     </div>
+
     <!-- Logo outside the card -->
 
     <div class="sm:mx-auto sm:w-full sm:max-w-md">

@@ -107,9 +107,7 @@
           disabled
           class="flex w-full items-center justify-center gap-3 rounded-md bg-white dark:bg-white/5 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-white/10 hover:bg-gray-50 dark:hover:bg-white/10 focus-visible:ring-transparent disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <svg class="h-5 w-5" viewBox="0 0 24 24">
-            <!-- ...existing SVG paths... -->
-          </svg>
+          <IconBrandGoogleFilled />
           <span>{{ t('auth.google') }}</span>
         </button>
 
@@ -117,9 +115,7 @@
           disabled
           class="flex w-full items-center justify-center gap-3 rounded-md bg-white dark:bg-white/5 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-white/10 hover:bg-gray-50 dark:hover:bg-white/10 focus-visible:ring-transparent disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-            <!-- ...existing SVG path... -->
-          </svg>
+          <IconBrandAppleFilled />
           <span>{{ t('auth.apple') }}</span>
         </button>
       </div>
@@ -135,6 +131,7 @@ import {
 } from '@heroicons/vue/24/outline'
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { IconBrandGoogleFilled, IconBrandAppleFilled } from '@tabler/icons-vue'
 
 const { t } = useI18n()
 

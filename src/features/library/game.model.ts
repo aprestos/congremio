@@ -19,6 +19,7 @@ export interface LibraryGame {
   game: Game
   status: LibraryGameStatus
   reserved_until?: string
+  language_dependence?: string
 }
 
 export const getStatus = (game: LibraryGame | null): string => {

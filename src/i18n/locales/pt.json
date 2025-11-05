@@ -70,6 +70,13 @@
     "coverImage": "Imagem de capa de {name}"
   },
   "library": {
+    "status": {
+      "reserved": "Reservado",
+      "available": "Disponível",
+      "unavailable": "Indisponível",
+      "notAvailable": "Não Disponível",
+      "withdrawn": "Requisitado"
+    },
     "title": "Ludoteca",
     "games": "Jogos",
     "search": "Pesquisar jogos...",
@@ -209,7 +216,7 @@
       "currentLocation": "Localização atual",
       "newLocation": "Nova Localização",
       "moving": "A mover...",
-      "withdrawTo": "Requisitar para",
+      "withdrawTo": "Emprestar a",
       "searchAndSelectUser": "Pesquisa e seleciona um utilizador...",
       "createNewUser": "+ Criar novo utilizador",
       "selectExistingUser": "Selecionar utilizador existente",

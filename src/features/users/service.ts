@@ -47,10 +47,11 @@ export const userService = {
     return data as User
   },
 
-  async create(email: string): Promise<User> {
+  async create(name: string, email: string): Promise<User> {
     const { data, error } = await supabase.functions.invoke('users', {
       body: {
-        email: email,
+        name,
+        email,
       },
       method: 'POST',
     })
@@ -58,7 +59,10 @@ export const userService = {
     if (data) return data as User
     else {
       logger.error('Unable to create user', { error })
-      throw new Error('Unable to create user')
+      if ((error as { message: string })?.message)
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        throw new Error(error.message as string)
+      else throw new Error('Unable to create user')
     }
   },
 }

@@ -84,7 +84,7 @@
               <div
                 class="flex items-center gap-2 text-gray-600 dark:text-gray-400"
               >
-                <UsersIcon class="h-5 w-5 text-gray-400" />
+                <IconUsers class="h-5 w-5 text-gray-400" />
                 <span
                   >{{ game?.game?.min_players }}-{{
                     game?.game?.max_players
@@ -144,6 +144,12 @@
               <CalendarIcon class="h-5 w-5 text-gray-400" />
               <span>Age {{ game?.game?.min_age }}+</span>
             </div>
+            <div
+              class="flex items-center gap-2 text-gray-600 dark:text-gray-400"
+            >
+              <IconWorld class="h-5 w-5 text-gray-400" />
+              <span>{{ game?.game?.language_dependence }}</span>
+            </div>
           </div>
 
           <!-- Description -->
@@ -173,6 +179,7 @@ import {
   CalendarIcon,
   DocumentTextIcon,
 } from '@heroicons/vue/20/solid'
+import { IconWorld, IconUsers } from '@tabler/icons-vue'
 import libraryService from '@/features/library/service.ts'
 import type { LibraryGame } from '@/features/library/game.model.ts'
 import SkeletonLoader from '@/components/SkeletonLoader.vue'

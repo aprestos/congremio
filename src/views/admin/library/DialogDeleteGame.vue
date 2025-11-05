@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import CButton from '@/components/CButton.vue'
 import DialogComponent from '@/components/DialogComponent.vue'
 import type { LibraryGame } from '@/features/library/game.model.ts'
 import libraryWithdrawService from '@/features/library/withdraws/service.ts'
@@ -132,22 +133,18 @@ const deleteGame = async (): Promise<void> => {
 
       <!-- Actions -->
       <div class="flex gap-3 justify-end pt-4">
-        <button
-          type="button"
-          class="rounded-md bg-white dark:bg-gray-700 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600"
-          @click="emit('close')"
-        >
+        <CButton variant="secondary" @click="emit('close')">
           {{ t('common.cancel') }}
-        </button>
-        <button
-          type="button"
-          class="rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
-          :disabled="!canBeDeleted || isDeletingGame"
+        </CButton>
+        <CButton
+          variant="danger"
+          :disabled="!canBeDeleted"
+          :loading="isDeletingGame"
+          :loading-text="t('common.loading')"
           @click="deleteGame"
         >
-          <span v-if="isDeletingGame">{{ t('common.loading') }}</span>
-          <span v-else>{{ t('common.delete') }}</span>
-        </button>
+          {{ t('common.delete') }}
+        </CButton>
       </div>
     </div>
   </DialogComponent>

@@ -13,7 +13,7 @@
       ref="formRef"
       @submit="handleSubmit"
     />
-    <SignInSuccess
+    <SignInVerify
       v-else
       key="success"
       :email="email"
@@ -26,7 +26,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import SignInForm from '@/views/auth/SignInForm.vue'
-import SignInSuccess from '@/views/auth/SignInSuccess.vue'
+import SignInVerify from '@/views/auth/SignInVerify.vue'
 import { authService } from '@/features/auth/service'
 import { toast } from 'vue-sonner'
 import router from '@/router'
