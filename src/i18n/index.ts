@@ -1,10 +1,10 @@
 import { createI18n } from 'vue-i18n'
-import en from './locales/en.json'
-import pt from './locales/pt.json'
+import en from './locales/en'
+import pt from './locales/pt'
 import { DEFAULT_LOCALE, FALLBACK_LOCALE } from './types'
-import type { LocaleCode } from './types'
+import type { LocaleCode, TranslationSchema } from './types'
 
-export type MessageSchema = typeof en
+export type MessageSchema = TranslationSchema
 
 // Load saved locale (this needs to be done before createI18n)
 function getInitialLocale(): LocaleCode {

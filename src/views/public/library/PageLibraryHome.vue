@@ -34,7 +34,7 @@
               >
                 <div class="flex items-center justify-between px-4">
                   <h2 class="text-lg font-medium text-gray-900 dark:text-white">
-                    {{ t('library.filters') }}
+                    {{ t('library.filters.title') }}
                   </h2>
                   <button
                     type="button"
@@ -51,7 +51,7 @@
                 <form
                   class="mt-4 border-t border-gray-200 dark:border-gray-700"
                 >
-                  <h3 class="sr-only">{{ t('library.categories') }}</h3>
+                  <h3 class="sr-only">{{ t('library.filters.title') }}</h3>
                   <ul
                     role="list"
                     class="px-2 py-3 font-medium text-gray-900 dark:text-white"
@@ -73,7 +73,7 @@
                           }"
                         />
                         <span class="flex-1" @click="selectTag(category.id)">
-                          {{ t(`library.filter-options.${category.id}`) }}
+                          {{ t(`library.filters.${category.id}`) }}
                         </span>
                       </label>
                     </li>
@@ -92,7 +92,7 @@
                       >
                         <span
                           class="font-medium text-gray-900 dark:text-white"
-                          >{{ section.name }}</span
+                          >{{ $t(`library.filters.${section.id}`) }}</span
                         >
                         <span class="ml-6 flex items-center">
                           <PlusIcon
@@ -191,7 +191,7 @@
                 >
                   <div class="flex items-center justify-between w-full">
                     <span class="text-xs text-gray-500 dark:text-gray-400">{{
-                      t('library.sortBy')
+                      t('library.sort.sortBy')
                     }}</span>
                     <ChevronDownIcon
                       class="size-4 shrink-0 text-gray-400 dark:text-gray-300"
@@ -203,8 +203,7 @@
                   >
                     {{
                       selectedSort
-                        ? sortOptions.find((opt) => opt.id === selectedSort)
-                            ?.name
+                        ? sortOptions.find((opt) => opt.id === selectedSort)?.id
                         : 'Best Rating'
                     }}
                   </span>
@@ -237,7 +236,7 @@
                             'block px-4 py-2 text-sm cursor-pointer',
                           ]"
                         >
-                          {{ option.name }}
+                          {{ t('library.sort.' + option.id) }}
                         </div>
                       </ListboxOption>
                     </div>
@@ -265,7 +264,7 @@
           <div class="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-4">
             <!-- Filters -->
             <form class="hidden lg:block">
-              <h3 class="sr-only">{{ t('library.categories') }}</h3>
+              <h3 class="sr-only">{{ t('library.filters.title') }}</h3>
               <ul
                 role="list"
                 class="space-y-4 border-b border-gray-200 dark:border-gray-700 pb-6 text-sm font-medium text-gray-900 dark:text-white"
@@ -287,7 +286,7 @@
                       }"
                     />
                     <span class="flex-1" @click="selectTag(category.id)">
-                      {{ t(`library.filter-options.${category.id}`) }}
+                      {{ t(`library.filters.${category.id}`) }}
                     </span>
                   </label>
                 </li>
@@ -305,7 +304,7 @@
                     class="flex w-full items-center justify-between bg-white dark:bg-gray-900 py-3 text-sm text-gray-400 dark:text-gray-300 hover:text-gray-500 dark:hover:text-gray-200"
                   >
                     <span class="font-medium text-gray-900 dark:text-white">{{
-                      section.name
+                      t('library.filters.' + section.id)
                     }}</span>
                     <span class="ml-6 flex items-center">
                       <PlusIcon
@@ -453,9 +452,9 @@ const currentFilters = computed((): FilterOptions => {
 })
 
 const sortOptions = [
-  { name: t('library.bestRating'), id: 'rating', current: false },
-  { name: t('library.newest'), id: 'newest', current: false },
-  { name: t('library.name'), id: 'name', current: false },
+  { id: 'bestRating', current: false },
+  { id: 'newest', current: false },
+  { id: 'name', current: false },
 ]
 
 const subCategories = [
@@ -472,7 +471,6 @@ const subCategories = [
 const filters = [
   {
     id: 'players',
-    name: t('library.numberOfPlayers'),
     options: [
       { value: '1', label: '1', checked: false },
       { value: '2', label: '2', checked: false },
@@ -488,7 +486,6 @@ const filters = [
   },
   {
     id: 'playtime',
-    name: t('library.playtime'),
     options: [
       { value: '15', label: '15 min', checked: false },
       { value: '30', label: '30 min', checked: false },
