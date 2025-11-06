@@ -202,9 +202,11 @@
                     class="text-sm font-medium text-gray-900 dark:text-white"
                   >
                     {{
-                      selectedSort
-                        ? sortOptions.find((opt) => opt.id === selectedSort)?.id
-                        : 'Best Rating'
+                      t(
+                        'library.sort.' +
+                          (sortOptions.find((opt) => opt.id === selectedSort)
+                            ?.id || 'bestRating'),
+                      )
                     }}
                   </span>
                 </ListboxButton>
