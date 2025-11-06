@@ -1,5 +1,92 @@
 <template>
   <div class="flex flex-col min-h-screen">
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 mb-4">
+      <!-- Loading skeletons -->
+      <template v-if="loading">
+        <div
+          v-for="i in 4"
+          :key="i"
+          class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 ring-1 ring-gray-200 dark:ring-gray-700"
+        >
+          <div class="flex items-center justify-between">
+            <div class="flex-1">
+              <SkeletonLoader class="h-4 w-24 mb-3" />
+              <SkeletonLoader class="h-8 w-16" />
+            </div>
+            <SkeletonLoader class="size-8 rounded-full" />
+          </div>
+        </div>
+      </template>
+
+      <!-- Actual statistics -->
+      <template v-else>
+        <div
+          class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 ring-1 ring-gray-200 dark:ring-gray-700"
+        >
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
+                {{ t('admin.library.stats.total', 'Total Games') }}
+              </p>
+              <p class="text-2xl font-bold text-gray-900 dark:text-white">
+                {{ statistics.total }}
+              </p>
+            </div>
+            <IconDice class="size-8 text-gray-900 dark:text-gray-400" />
+          </div>
+        </div>
+
+        <div
+          class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 ring-1 ring-gray-200 dark:ring-gray-700"
+        >
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
+                {{ t('admin.library.stats.available', 'Available') }}
+              </p>
+              <p class="text-2xl font-bold text-green-600 dark:text-green-400">
+                {{ statistics.available }}
+              </p>
+            </div>
+            <IconCircleCheck class="size-8 text-green-500" />
+          </div>
+        </div>
+
+        <div
+          class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 ring-1 ring-gray-200 dark:ring-gray-700"
+        >
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
+                {{ t('admin.library.stats.withdrawn', 'Withdrawn') }}
+              </p>
+              <p class="text-2xl font-bold text-amber-600 dark:text-amber-400">
+                {{ statistics.withdrawn }}
+              </p>
+            </div>
+            <IconHandGrab class="size-8 text-amber-500" />
+          </div>
+        </div>
+
+        <div
+          class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 ring-1 ring-gray-200 dark:ring-gray-700"
+        >
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
+                {{ t('admin.library.stats.reserved', 'Reserved') }}
+              </p>
+              <p class="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                {{ statistics.reserved }}
+              </p>
+            </div>
+            <IconBookmark class="size-8 text-blue-500" />
+          </div>
+        </div>
+      </template>
+    </div>
+
     <DataTable
       :items="filteredGames"
       :columns="tableColumns"
@@ -187,15 +274,23 @@
 </template>
 
 <script setup lang="ts">
-import { IconPlus } from '@tabler/icons-vue'
+import {
+  IconPlus,
+  IconDice,
+  IconCircleCheck,
+  IconHandGrab,
+  IconBookmark,
+  IconSearch,
+  IconNumber,
+} from '@tabler/icons-vue'
 import { onMounted, onUnmounted, ref, computed, watch } from 'vue'
 import { useDebounceFn } from '@vueuse/core'
 import { toast } from 'vue-sonner'
-import { IconSearch, IconNumber } from '@tabler/icons-vue'
 import { useI18n } from 'vue-i18n'
 
 import DataTable from '@/components/DataTable.vue'
 import CInput from '@/components/CInput.vue'
+import SkeletonLoader from '@/components/SkeletonLoader.vue'
 import { getStatus, type LibraryGame } from '@/features/library/game.model.ts'
 import type { DataTableColumn } from '@/components/DataTable.vue'
 import libraryReservationService from '@/features/library/reservations/service.ts'
@@ -231,10 +326,32 @@ const allGames = ref<LibraryGame[]>([])
 const selectedGame = ref<LibraryGame | null>(null)
 const searchInput = ref('')
 const reservationInput = ref('')
+const loading = ref(true)
 const loadingReservation = ref(false)
 const searchQuery = ref('')
 const selectedReservation = ref<LibraryReservation | null>(null)
 let unsubscribe: (() => void) | null = null
+
+// Statistics
+const statistics = computed(() => {
+  const total = allGames.value.length
+  const available = allGames.value.filter(
+    (game) => getStatus(game) === 'available',
+  ).length
+  const withdrawn = allGames.value.filter(
+    (game) => getStatus(game) === 'withdrawn',
+  ).length
+  const reserved = allGames.value.filter(
+    (game) => getStatus(game) === 'reserved',
+  ).length
+
+  return {
+    total,
+    available,
+    withdrawn,
+    reserved,
+  }
+})
 
 // Table column definitions
 const tableColumns = computed((): DataTableColumn<LibraryGame>[] => [
@@ -358,6 +475,7 @@ onMounted(() => {
   // subscribe to service updates
   unsubscribe = libraryService.subscribeToUpdates((updatedGames) => {
     allGames.value = updatedGames || []
+    loading.value = false
   })
 })
 

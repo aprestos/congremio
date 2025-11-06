@@ -3,6 +3,7 @@ export interface Settings {
   tournaments?: Setting<unknown>
   events?: Setting<unknown>
   flea?: Setting<Flea>
+  tickets?: Setting<Tickets>
 }
 
 export interface Setting<T> {
@@ -19,5 +20,9 @@ export interface Library {
 }
 
 export interface Flea {
+  commission?: number
+}
+
+export interface Tickets {
   commission?: number
 }

@@ -11,4 +11,5 @@ export enum Type {
   tournaments = 'tournaments',
   events = 'events',
   flea = 'flea',
+  tickets = 'tickets',
 }

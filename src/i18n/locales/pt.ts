@@ -277,6 +277,12 @@ const pt = {
       hours: 'horas',
       returned: 'Devolvido',
       active: 'Ativo',
+      stats: {
+        total: 'Total',
+        available: 'Disponíveis',
+        withdrawn: 'Requisitados',
+        reserved: 'Reservados',
+      },
     },
   },
 }
