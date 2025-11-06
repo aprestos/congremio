@@ -269,6 +269,12 @@ const en: TranslationSchema = {
       gameNotWithdrawn: 'This game has not been withdrawn by any user',
       unknownUser: 'Unknown user',
       hours: 'hours',
+      stats: {
+        total: 'Total Games',
+        available: 'Available',
+        withdrawn: 'Withdrawn',
+        reserved: 'Reserved',
+      },
       returned: 'Returned',
       active: 'Active',
     },

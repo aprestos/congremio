@@ -25,6 +25,11 @@ const mapToSettings = (entities: Array<SettingEntity> | null): Settings => {
           enabled: setting?.enabled || false,
         }
         break
+      case Type.tickets:
+        settings.tickets = {
+          enabled: setting?.enabled || false,
+        }
+        break
     }
   })
   return settings
@@ -52,6 +57,9 @@ export const settingsService = {
         enabled: false,
       },
       flea: {
+        enabled: false,
+      },
+      tickets: {
         enabled: false,
       },
     }

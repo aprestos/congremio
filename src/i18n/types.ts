@@ -307,6 +307,12 @@ export interface AdminTranslationSchema {
     returnFailed: string
     addFailed: string
     editFailed: string
+    stats: {
+      total: string
+      available: string
+      withdrawn: string
+      reserved: string
+    }
   }
 }
 

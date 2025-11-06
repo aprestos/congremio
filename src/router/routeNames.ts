@@ -3,6 +3,7 @@ enum Admin {
   library = 'admin.library',
   events = 'admin.events',
   tournaments = 'admin.tournaments',
+  tickets = 'admin.tickets',
   settings = 'admin.settings',
   settingsGeneral = 'admin.settings.general',
   settingsLibrary = 'admin.settings.library',

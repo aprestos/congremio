@@ -226,7 +226,7 @@ const handleSubmit = async (): Promise<void> => {
       console.error('OTP verification error:', error)
       toast.error('Unable to verify OTP. Please try again.')
     } finally {
-      otpDigits.value = [...Array.from({ length: OTP_LENGTH }, () => '')]
+      otpDigits.value = Array.from({ length: OTP_LENGTH }, () => '')
       isLoading.value = false
     }
   }

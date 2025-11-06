@@ -31,6 +31,7 @@ import {
   IconHome,
   IconTrophy,
   IconSettings,
+  IconTicket,
 } from '@tabler/icons-vue'
 import type { User } from '@/features/auth/user.model.ts'
 
@@ -65,6 +66,12 @@ const navigation = ref([
     routeName: RouteNames.admin.tournaments as string,
     icon: IconTrophy,
     enabled: settingsStore?.value?.tournaments?.enabled ?? false,
+  },
+  {
+    id: 'tickets',
+    routeName: RouteNames.admin.tickets as string,
+    icon: IconTicket,
+    enabled: settingsStore?.value?.tickets?.enabled ?? false,
   },
 ])
 

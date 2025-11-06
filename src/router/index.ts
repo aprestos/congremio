@@ -81,6 +81,11 @@ const router = createRouter({
           component: () => import('../views/admin/tournaments/HomeView.vue'),
         },
         {
+          path: 'tickets',
+          name: RouteNames.admin.tickets,
+          component: () => import('../views/admin/tickets/PageTicketsHome.vue'),
+        },
+        {
           path: 'settings',
           component: () => import('../views/admin/settings/SettingsView.vue'),
           children: [
