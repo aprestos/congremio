@@ -88,7 +88,9 @@
               >
                 <IconUsers class="h-5 w-5 text-gray-400" />
                 <span
-                  >{{ game?.game?.min_players }}-{{ game?.game?.max_players }}
+                  >{{
+                    getRange(game?.game?.min_players, game?.game?.max_players)
+                  }}
                   {{ t('game.detail.players') }}</span
                 >
               </div>
@@ -132,7 +134,9 @@
             >
               <ClockIcon class="h-5 w-5 text-gray-400" />
               <span
-                >{{ game?.game?.min_playtime }}-{{ game?.game?.max_playtime }}
+                >{{
+                  getRange(game?.game?.min_playtime, game?.game?.max_playtime)
+                }}
                 {{ t('game.detail.min') }}</span
               >
             </div>
@@ -170,7 +174,11 @@
           <!-- BGG Link -->
           <div class="mt-4">
             <a
-              :href="game?.game?.bgg_id ? `https://boardgamegeek.com/boardgame/${game.game.bgg_id}` : 'https://boardgamegeek.com/'"
+              :href="
+                game?.game?.bgg_id
+                  ? `https://boardgamegeek.com/boardgame/${game.game.bgg_id}`
+                  : 'https://boardgamegeek.com/'
+              "
               target="_blank"
               rel="noopener noreferrer"
               class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-md transition-colors"
@@ -252,6 +260,16 @@ onMounted(async () => {
 const closeModal = (): void => {
   open.value = false
   emit('close')
+}
+
+const getRange = (min: number, max: number): string => {
+  if (!min) return String(max)
+  if (!max) return String(min)
+  if (min === max) {
+    return `${min}`
+  } else {
+    return `${min} - ${max}`
+  }
 }
 
 // Player count visualization helpers
