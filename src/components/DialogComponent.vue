@@ -31,7 +31,7 @@
             >
               <DialogPanel
                 :class="[
-                  'relative transform overflow-y-auto max-h-full w-full sm:h-auto sm:w-auto sm:rounded-lg bg-white dark:bg-gray-800 text-left shadow-2xl transition-all sm:my-8 sm:overflow-visible',
+                  'relative transform overflow-y-auto max-h-full w-full sm:h-auto sm:w-auto rounded-tl-2xl rounded-tr-2xl sm:rounded-lg bg-white dark:bg-gray-800 text-left shadow-2xl transition-all sm:my-8 sm:overflow-visible',
                   dialogSizeClasses,
                 ]"
               >

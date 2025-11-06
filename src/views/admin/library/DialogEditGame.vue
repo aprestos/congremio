@@ -104,10 +104,18 @@ onMounted(async () => {
     }
   })
 })
+
+const handleClose = (): void => {
+  emit('close')
+}
 </script>
 
 <template>
-  <DialogComponent :title="t('admin.library.editGame')" :open="props.open">
+  <DialogComponent
+    :title="t('admin.library.editGame')"
+    :open="props.open"
+    @close="handleClose"
+  >
     <form>
       <div class="space-y-12 mx-auto max-w-7xl">
         <div class="">
@@ -206,7 +214,7 @@ onMounted(async () => {
           variant="secondary"
           size="lg"
           class="order-2 sm:order-1 w-full sm:w-auto"
-          @click="emit('close')"
+          @click="handleClose"
         >
           {{ t('common.cancel') }}
         </CButton>
