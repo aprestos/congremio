@@ -15,11 +15,29 @@
         />
 
         <CInput
+          id="start-time"
+          v-model="formData.startTime"
+          label="Start Time"
+          type="time"
+          name="start-time"
+          class="sm:col-span-3"
+        />
+
+        <CInput
           id="end-date"
           v-model="formData.endDate"
           label="End Date"
           type="date"
           name="end-date"
+          class="sm:col-span-3"
+        />
+
+        <CInput
+          id="end-time"
+          v-model="formData.endTime"
+          label="End Time"
+          type="time"
+          name="end-time"
           class="sm:col-span-3"
         />
 
@@ -262,7 +280,9 @@ interface DailySchedule {
 // Form data
 const formData = ref({
   startDate: '',
+  startTime: '09:00',
   endDate: '',
+  endTime: '18:00',
   name: '',
   locationTitle: '',
   locationUrl: '',
@@ -308,13 +328,18 @@ const handlePosterUploadError = (error: any): void => {
 // Load initial data from eventStore
 onMounted(() => {
   if (editionStore.value) {
-    // Format dates to YYYY-MM-DD for input type="date"
+    // Parse start_date (ISO datetime) into date and time
     if (editionStore.value.start_date) {
-      formData.value.startDate =
-        editionStore.value.start_date.split('T')[0] ?? ''
+      const startDateTime = new Date(editionStore.value.start_date)
+      formData.value.startDate = startDateTime.toISOString().split('T')[0] ?? ''
+      formData.value.startTime =
+        startDateTime.toTimeString().slice(0, 5) ?? '09:00'
     }
+    // Parse end_date (ISO datetime) into date and time
     if (editionStore.value.end_date) {
-      formData.value.endDate = editionStore.value.end_date.split('T')[0] ?? ''
+      const endDateTime = new Date(editionStore.value.end_date)
+      formData.value.endDate = endDateTime.toISOString().split('T')[0] ?? ''
+      formData.value.endTime = endDateTime.toTimeString().slice(0, 5) ?? '18:00'
     }
     if (editionStore.value.name) {
       formData.value.name = editionStore.value.name
@@ -390,9 +415,19 @@ const saveEdition = async (): Promise<void> => {
         : null,
     }
 
+    // Combine date and time into ISO datetime strings
+    const startDateTime =
+      editionData.startDate && editionData.startTime
+        ? `${editionData.startDate}T${editionData.startTime}:00`
+        : undefined
+    const endDateTime =
+      editionData.endDate && editionData.endTime
+        ? `${editionData.endDate}T${editionData.endTime}:00`
+        : undefined
+
     await editionService.save(tenantStore.value?.id, editionStore.value?.id, {
-      ...(editionData.startDate && { start_date: editionData.startDate }),
-      ...(editionData.endDate && { end_date: editionData.endDate }),
+      ...(startDateTime && { start_date: startDateTime }),
+      ...(endDateTime && { end_date: endDateTime }),
       ...(editionData.name && { name: editionData.name }),
       ...(editionData.description && { description: editionData.description }),
       ...(editionData.longDescription && {
@@ -409,8 +444,8 @@ const saveEdition = async (): Promise<void> => {
     if (editionStore.value) {
       editionStore.value = {
         ...editionStore.value,
-        ...(editionData.startDate && { start_date: editionData.startDate }),
-        ...(editionData.endDate && { end_date: editionData.endDate }),
+        ...(startDateTime && { start_date: startDateTime }),
+        ...(endDateTime && { end_date: endDateTime }),
         ...(editionData.name && { name: editionData.name }),
         ...(editionData.description && {
           description: editionData.description,

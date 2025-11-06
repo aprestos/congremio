@@ -75,7 +75,9 @@
         </h2>
 
         <section aria-labelledby="information-heading" class="mt-3">
-          <h3 id="information-heading" class="sr-only">Product information</h3>
+          <h3 id="information-heading" class="sr-only">
+            {{ t('game.detail.productInformation') }}
+          </h3>
 
           <!-- Game Stats with Icons -->
           <div class="space-y-3">
@@ -86,10 +88,10 @@
               >
                 <IconUsers class="h-5 w-5 text-gray-400" />
                 <span
-                  >{{ game?.game?.min_players }}-{{
-                    game?.game?.max_players
+                  >{{
+                    getRange(game?.game?.min_players, game?.game?.max_players)
                   }}
-                  players</span
+                  {{ t('game.detail.players') }}</span
                 >
               </div>
 
@@ -114,14 +116,14 @@
                     class="flex items-center gap-1"
                   >
                     <div class="w-2 h-2 rounded-sm bg-green-500"></div>
-                    <span>Best</span>
+                    <span>{{ t('game.detail.best') }}</span>
                   </div>
                   <div
                     v-if="game?.game?.recommended_at"
                     class="flex items-center gap-1"
                   >
                     <div class="w-2 h-2 rounded-sm bg-blue-300"></div>
-                    <span>Good</span>
+                    <span>{{ t('game.detail.good') }}</span>
                   </div>
                 </div>
               </div>
@@ -132,37 +134,71 @@
             >
               <ClockIcon class="h-5 w-5 text-gray-400" />
               <span
-                >{{ game?.game?.min_playtime }}-{{
-                  game?.game?.max_playtime
+                >{{
+                  getRange(game?.game?.min_playtime, game?.game?.max_playtime)
                 }}
-                min</span
+                {{ t('game.detail.min') }}</span
               >
             </div>
             <div
               class="flex items-center gap-2 text-gray-600 dark:text-gray-400"
             >
               <CalendarIcon class="h-5 w-5 text-gray-400" />
-              <span>Age {{ game?.game?.min_age }}+</span>
+              <span>{{ t('game.detail.age') }} {{ game?.game?.min_age }}+</span>
             </div>
             <div
               class="flex items-center gap-2 text-gray-600 dark:text-gray-400"
             >
               <IconWorld class="h-5 w-5 text-gray-400" />
-              <span>{{ game?.game?.language_dependence }}</span>
+              <span>{{
+                t(
+                  'game.detail.languageDependence.' +
+                    game?.game?.language_dependence,
+                )
+              }}</span>
             </div>
           </div>
 
           <!-- Description -->
-          <div class="mt-6">
+          <div class="mt-6 hidden">
             <h4
               class="flex items-center gap-2 font-medium text-gray-900 dark:text-white mb-2"
             >
               <DocumentTextIcon class="h-5 w-5 text-gray-400" />
-              Description
+              {{ t('game.detail.description') }}
             </h4>
             <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-              N/A
+              {{ t('game.detail.notAvailable') }}
             </p>
+          </div>
+          <!-- BGG Link -->
+          <div class="mt-4">
+            <a
+              :href="
+                game?.game?.bgg_id
+                  ? `https://boardgamegeek.com/boardgame/${game.game.bgg_id}`
+                  : 'https://boardgamegeek.com/'
+              "
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-md transition-colors"
+            >
+              <IconWorld class="h-4 w-4" />
+              <span>{{ t('game.detail.viewOnBGG') }}</span>
+              <svg
+                class="h-4 w-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                />
+              </svg>
+            </a>
           </div>
         </section>
       </div>
@@ -172,6 +208,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import DialogComponent from '@/components/DialogComponent.vue'
 import {
   UsersIcon,
@@ -183,6 +220,8 @@ import { IconWorld, IconUsers } from '@tabler/icons-vue'
 import libraryService from '@/features/library/service.ts'
 import type { LibraryGame } from '@/features/library/game.model.ts'
 import SkeletonLoader from '@/components/SkeletonLoader.vue'
+
+const { t } = useI18n()
 
 interface Props {
   gameId: string
@@ -223,6 +262,16 @@ const closeModal = (): void => {
   emit('close')
 }
 
+const getRange = (min: number, max: number): string => {
+  if (!min) return String(max)
+  if (!max) return String(min)
+  if (min === max) {
+    return `${min}`
+  } else {
+    return `${min} - ${max}`
+  }
+}
+
 // Player count visualization helpers
 const getPlayerCountRange = (): number[] => {
   if (!game.value?.game) return []
@@ -247,17 +296,17 @@ const getPlayerCountClass = (count: number): string => {
 }
 
 const getPlayerCountTooltip = (count: number): string => {
-  if (!game.value?.game) return `${count} players`
+  if (!game.value?.game) return `${count} ${t('game.detail.players')}`
 
   const bestAt = parseBestAt(game.value.game.best_at)
   const recommendedAt = parseRecommendedAt(game.value.game.recommended_at)
 
   if (bestAt.includes(count)) {
-    return `${count} players - Best`
+    return `${count} ${t('game.detail.players')} - ${t('game.detail.best')}`
   } else if (recommendedAt.includes(count)) {
-    return `${count} players - Recommended`
+    return `${count} ${t('game.detail.players')} - ${t('game.detail.recommended')}`
   } else {
-    return `${count} players - Playable`
+    return `${count} ${t('game.detail.players')} - ${t('game.detail.playable')}`
   }
 }
 

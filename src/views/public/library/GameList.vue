@@ -298,7 +298,7 @@ onUnmounted(() => {
     >
       <div class="space-y-3">
         <p class="text-sm text-gray-600 dark:text-gray-300">
-          {{ t('library.areYouSureReserve') }}
+          {{ t('reservation.areYouSureReserve') }}
           <strong>{{ selectedGameForReservation?.game.name }}</strong
           >?
         </p>
@@ -306,14 +306,14 @@ onUnmounted(() => {
           class="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-md p-3"
         >
           <div class="text-sm text-purple-800 dark:text-purple-200">
-            <p class="font-medium mb-1">{{ t('library.important') }}</p>
+            <p class="font-medium mb-1">{{ t('reservation.important') }}</p>
             <ul class="list-disc list-inside space-y-1">
               <li>
-                {{ t('library.reservationValid') }}
-                <strong>4 {{ t('library.minutes') }}</strong>
+                {{ t('reservation.reservationValid') }}
+                <strong>4 {{ t('reservation.minutes') }}</strong>
               </li>
               <li>
-                {{ t('library.oneReservationPerUser') }}
+                {{ t('reservation.oneReservationPerUser') }}
               </li>
             </ul>
           </div>

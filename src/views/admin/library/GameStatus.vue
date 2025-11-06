@@ -11,6 +11,7 @@ import libraryWithdrawService, {
 } from '@/features/library/withdraws/service.ts'
 import { userService, type User } from '@/features/users/service.ts'
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import {
   CheckCircleIcon,
   XCircleIcon,
@@ -25,6 +26,8 @@ import {
 } from '@tabler/icons-vue'
 import { useTimeAgo } from '@vueuse/core'
 import SkeletonLoader from '@/components/SkeletonLoader.vue'
+
+const { t } = useI18n()
 
 const props = defineProps<{ data: LibraryGame }>()
 
@@ -140,10 +143,10 @@ const fetchWithdrawDetails = async (): Promise<void> => {
               <CheckCircleIcon
                 class="h-5 w-5 inline-block mr-1.5 text-green-500"
               />
-              Available for borrowing
+              {{ t('game.status.availableForBorrowing') }}
             </h3>
             <p class="mt-2 text-xs text-gray-500">
-              You can withdraw this game from the library.
+              {{ t('game.status.canWithdrawFromLibrary') }}
             </p>
           </div>
 
@@ -154,7 +157,7 @@ const fetchWithdrawDetails = async (): Promise<void> => {
           >
             <div v-if="withdraw" class="text-sm">
               <h3 class="text-sm font-semibold text-gray-900">
-                Withdrawn from the library
+                {{ t('game.status.withdrawnFromLibrary') }}
               </h3>
               <p class="text-gray-600 mb-2"></p>
 
@@ -187,7 +190,7 @@ const fetchWithdrawDetails = async (): Promise<void> => {
               </div>
             </div>
             <div v-else class="text-sm text-gray-600">
-              <p>This game is currently withdrawn from the library.</p>
+              <p>{{ t('game.status.currentlyWithdrawn') }}</p>
             </div>
           </div>
 
@@ -198,10 +201,10 @@ const fetchWithdrawDetails = async (): Promise<void> => {
           >
             <p>
               <XCircleIcon class="h-5 w-5 inline-block mr-1.5 text-red-500" />
-              This game is currently not available.
+              {{ t('game.status.currentlyNotAvailable') }}
             </p>
             <p class="mt-2 text-xs text-gray-500">
-              The game may be under maintenance or temporarily unavailable.
+              {{ t('game.status.underMaintenanceOrUnavailable') }}
             </p>
           </div>
 
@@ -212,16 +215,16 @@ const fetchWithdrawDetails = async (): Promise<void> => {
           >
             <p>
               <ClockIcon class="h-5 w-5 inline-block mr-1.5 text-blue-500" />
-              This game has been reserved by another user.
+              {{ t('game.status.reservedByAnotherUser') }}
             </p>
             <p class="mt-2 text-xs text-gray-500">
-              Please check back later when the reservation expires.
+              {{ t('game.status.checkBackLater') }}
             </p>
           </div>
 
           <div class="border-t border-gray-200 pt-3">
             <p class="text-xs text-gray-500">
-              Last updated: {{ useTimeAgo(new Date()) }}
+              {{ t('game.status.lastUpdated') }}: {{ useTimeAgo(new Date()) }}
             </p>
           </div>
         </div>
