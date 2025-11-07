@@ -140,6 +140,8 @@ const isConventionHappening = computed(() => {
             v-if="!imageError"
             :src="game.game.image"
             :alt="t('game.coverImage', { name: game.game.name })"
+            loading="lazy"
+            decoding="async"
             :class="[
               'size-full object-cover transition-all duration-300 group-hover:scale-105',
               imageLoaded ? 'opacity-100' : 'opacity-0',

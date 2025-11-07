@@ -282,6 +282,10 @@ const submit = async (): Promise<void> => {
     toast.error(t('admin.library.withdrawFailed'))
   } finally {
     isSubmitting.value = false
+    newUser.value = {
+      email: '',
+      name: '',
+    }
   }
 }
 
