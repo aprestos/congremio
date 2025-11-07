@@ -463,7 +463,7 @@ const handleReservationChange = useDebounceFn(
       reservationInput.value = ''
     }
   },
-  300,
+  1000,
 )
 
 watch(reservationInput, (newVal) => {
