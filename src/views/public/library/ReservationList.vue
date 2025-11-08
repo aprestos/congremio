@@ -32,7 +32,7 @@
             <div class="flex flex-col items-end space-y-1">
               <CircularCountdown
                 :time="getTimeRemaining(reservation.expires_at)"
-                :total-time="4 * 60 * 1000"
+                :total-time-minutes="15"
                 :size="60"
                 :stroke-width="6"
                 :show-label="false"

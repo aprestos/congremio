@@ -58,7 +58,7 @@ import { computed, ref, watch, onUnmounted } from 'vue'
 
 interface Props {
   time: number // Time remaining in milliseconds
-  totalTime?: number // Total time for calculating percentage (default: 4 minutes)
+  totalTimeMinutes?: number // Total time in minutes for calculating percentage
   size?: number // SVG size in pixels
   strokeWidth?: number // Stroke width of the circle
   showLabel?: boolean // Show label below time
@@ -67,13 +67,16 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  totalTime: 4 * 60 * 1000, // 4 minutes in milliseconds
+  totalTimeMinutes: 15, // Default: 15 minutes
   size: 80,
   strokeWidth: 8,
   showLabel: true,
   label: 'remaining',
   format: 'auto',
 })
+
+// Convert minutes to milliseconds for internal calculations
+const totalTimeMs = computed(() => props.totalTimeMinutes * 60 * 1000)
 
 const timeRemaining = ref(Math.max(0, props.time))
 let intervalId: number | null = null
@@ -84,10 +87,10 @@ const circumference = computed(() => 2 * Math.PI * radius.value)
 
 // Calculate progress percentage (0-100)
 const progressPercentage = computed(() => {
-  if (props.totalTime <= 0) return 0
+  if (totalTimeMs.value <= 0) return 0
   return Math.max(
     0,
-    Math.min(100, (timeRemaining.value / props.totalTime) * 100),
+    Math.min(100, (timeRemaining.value / totalTimeMs.value) * 100),
   )
 })
 

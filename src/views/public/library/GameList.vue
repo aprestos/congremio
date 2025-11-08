@@ -310,7 +310,8 @@ onUnmounted(() => {
             <ul class="list-disc list-inside space-y-1">
               <li>
                 {{ t('reservation.reservationValid') }}
-                <strong>4 {{ t('reservation.minutes') }}</strong>
+                <strong>15 {{ t('reservation.minutes') }}</strong>
+                <!--                TODO load this value from settings-->
               </li>
               <li>
                 {{ t('reservation.oneReservationPerUser') }}
