@@ -66,9 +66,18 @@
           class="flex flex-col sm:flex-row gap-3 sm:gap-2 sm:justify-end pt-4"
         >
           <CButton
+            variant="danger"
+            size="lg"
+            class="order-1 w-full sm:w-auto"
+            :loading="cancellingReservation"
+            @click="confirmCancel"
+          >
+            Cancel Reservation
+          </CButton>
+          <CButton
             variant="secondary"
             size="lg"
-            class="order-2 sm:order-1 w-full sm:w-auto"
+            class="order-2 w-full sm:w-auto"
             @click="closeReservationDetail"
           >
             Close
@@ -76,15 +85,34 @@
         </div>
       </div>
     </DialogComponent>
+
+    <!-- Cancel Confirmation Dialog -->
+    <ConfirmationDialog
+      :open="showCancelConfirmation"
+      title="Cancel Reservation"
+      message="Are you sure you want to cancel this reservation? This action cannot be undone."
+      confirm-text="Yes, Cancel"
+      cancel-text="No, Keep It"
+      variant="danger"
+      @confirm="confirmCancel"
+      @cancel="showCancelConfirmation = false"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { type LibraryReservation } from '@/features/library/reservations/service.ts'
+import {
+  default as libraryReservationService,
+  type LibraryReservation,
+} from '@/features/library/reservations/service.ts'
 import CButton from '@/components/CButton.vue'
 import DialogComponent from '@/components/DialogComponent.vue'
 import CircularCountdown from '@/components/CircularCountdown.vue'
+import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
+import { toast } from 'vue-sonner'
+import libraryService from '@/features/library/service.ts'
+import { LibraryGameStatus } from '@/features/library/game.model.ts'
 
 interface Props {
   reservation: LibraryReservation | null
@@ -93,6 +121,7 @@ interface Props {
 
 interface Emits {
   (e: 'close'): void
+  (e: 'cancelled'): void
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -102,10 +131,40 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<Emits>()
 
 const cancellingReservation = ref(false)
+const showCancelConfirmation = ref(false)
 
 const closeReservationDetail = (): void => {
   cancellingReservation.value = false
+  showCancelConfirmation.value = false
   emit('close')
+}
+
+const confirmCancel = async (): Promise<void> => {
+  if (!props.reservation) return
+
+  try {
+    cancellingReservation.value = true
+    showCancelConfirmation.value = false
+
+    await libraryReservationService.delete(props.reservation.id)
+    await libraryService.updateGame(
+      props.reservation.library_game.id as number,
+      {
+        status: LibraryGameStatus.available,
+        reserved_until: undefined,
+      },
+    )
+
+    toast.success('Reservation cancelled successfully')
+    emit('cancelled')
+    closeReservationDetail()
+  } catch (error) {
+    toast.error(
+      error instanceof Error ? error.message : 'Failed to cancel reservation',
+    )
+  } finally {
+    cancellingReservation.value = false
+  }
 }
 
 const getTimeRemaining = (expiresAt: string): number => {

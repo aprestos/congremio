@@ -94,6 +94,20 @@ export const libraryReservationService = {
     }
   },
 
+  async delete(reservationId: number): Promise<void> {
+    const { error } = await supabase
+      .from('library_reservations')
+      .update({ status: 'cancelled' })
+      .eq('id', reservationId)
+      .eq('tenant_id', tenantStore.value?.id)
+      .eq('edition_id', editionStore.value?.id)
+
+    if (error) {
+      logger.error('Error cancelling reservation', { error })
+      throw new Error('Failed to cancel reservation')
+    }
+  },
+
   subscribeToUpdates(
     userId: string,
     onUpdate: ReservationUpdateCallback,
