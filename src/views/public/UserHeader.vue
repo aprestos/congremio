@@ -11,7 +11,9 @@ defineProps<Props>()
 </script>
 
 <template>
-  <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
+  <div
+    class="md:bg-white md:dark:bg-gray-800 md:rounded-2xl md:shadow-lg overflow-hidden"
+  >
     <div class="bg-gradient-to-r from-indigo-600 to-indigo-400 h-32"></div>
     <div class="px-6 pb-6 -mt-16 relative z-10">
       <div class="flex flex-col sm:flex-row sm:items-end sm:gap-6">

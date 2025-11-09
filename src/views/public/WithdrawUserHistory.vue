@@ -90,7 +90,9 @@ function getDurationHours(
 </script>
 
 <template>
-  <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
+  <div
+    class="md:bg-white md:dark:bg-gray-800 md:rounded-2xl md:shadow-lg overflow-hidden"
+  >
     <div class="px-6 py-8 border-b border-gray-200 dark:border-gray-700">
       <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
         {{ t('withdraw.history') }}

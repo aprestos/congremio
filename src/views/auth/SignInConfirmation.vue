@@ -84,9 +84,17 @@ const updateDisplayName = async (): Promise<void> => {
   isUpdatingDisplayName.value = true
 
   try {
-    await authService.updateUserMetadata({
-      display_name: displayName.value.trim(),
-    })
+    const user = await authService.getUser()
+
+    await Promise.all([
+      authService.updateUserMetadata({
+        display_name: displayName.value.trim(),
+      }),
+      authService.updateProfile(user?.id as string, {
+        name: displayName.value.trim(),
+        email: user?.email,
+      }),
+    ])
 
     // Update completed, show success state
     needsDisplayName.value = false
