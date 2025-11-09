@@ -37,12 +37,24 @@
             <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
               {{ gameName }}
             </h3>
-            <p
-              v-if="gameYear"
-              class="text-sm text-gray-600 dark:text-gray-300 mt-1"
+            <div
+              class="mt-1 flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400"
             >
-              {{ t('admin.library.year') }}: {{ gameYear }}
-            </p>
+              <span class="flex items-center">
+                <IconCalendar class="mr-1 size-4" />
+                {{
+                  props.reservation?.library_game?.game?.year ||
+                  t('admin.library.unknown')
+                }}
+              </span>
+              <span
+                v-if="props.reservation.library_game?.location?.name"
+                class="flex items-center"
+              >
+                <IconMapPinFilled class="size-4 mr-1" />
+                {{ props.reservation?.library_game?.location?.name }}
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -119,7 +131,7 @@ import { toast } from 'vue-sonner'
 import DialogComponent from '@/components/DialogComponent.vue'
 import type { LibraryReservation } from '@/features/library/reservations/service'
 import { type User, userService } from '@/features/users/service.ts'
-import { IconMail } from '@tabler/icons-vue'
+import { IconMail, IconCalendar, IconMapPinFilled } from '@tabler/icons-vue'
 import libraryWithdrawService from '@/features/library/withdraws/service.ts'
 
 const { t } = useI18n()
@@ -130,6 +142,10 @@ interface LibraryGameWithDetails {
     year?: number
     image?: string
     image_url?: string
+  }
+  location?: {
+    id?: number
+    name?: string
   }
 }
 
@@ -187,18 +203,6 @@ const gameName = computed(() => {
     return libraryGame.game?.name || t('admin.library.unknownGame')
   }
   return t('admin.library.unknownGame')
-})
-
-const gameYear = computed(() => {
-  if (
-    props.reservation?.library_game &&
-    typeof props.reservation.library_game === 'object' &&
-    'game' in props.reservation.library_game
-  ) {
-    const libraryGame = props.reservation.library_game as LibraryGameWithDetails
-    return libraryGame.game?.year
-  }
-  return undefined
 })
 
 const gameImage = computed(() => {

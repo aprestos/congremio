@@ -115,6 +115,24 @@ export const authService = {
     }
   },
 
+  async updateProfile(
+    userId: string,
+    updates: Partial<User>,
+  ): Promise<User | undefined> {
+    const { data, error } = await supabase
+      .schema('public')
+      .from('profiles')
+      .upsert({ id: userId, ...updates })
+      .select()
+      .single<User>()
+
+    if (error) {
+      logger.error('Unable to upsert user profile', { userId, error })
+      throw new Error('Unable to upsert user profile')
+    }
+    return data
+  },
+
   hasAnyOfTheRoles(user: User, roles: string[]): boolean {
     if (!roles || !user?.access?.role) return false
 

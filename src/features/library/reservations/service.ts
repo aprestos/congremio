@@ -24,7 +24,7 @@ export const libraryReservationService = {
     const { data, error } = await supabase
       .from('library_reservations')
       .select(
-        'id,display_id,user_id,expires_at,library_game:library_games(id,game:games(name,year,image))',
+        'id,display_id,user_id,expires_at,library_game:library_games(id,game:games(name,year,image),location:locations(id,name))',
       )
       .eq('tenant_id', tenantStore.value?.id)
       .eq('edition_id', editionStore.value?.id)
@@ -46,7 +46,7 @@ export const libraryReservationService = {
     const { data, error } = await supabase
       .from('library_reservations')
       .select(
-        'id,status,display_id,expires_at,user_id,library_game:library_games(game:games(name,year,image))',
+        'id,status,display_id,expires_at,user_id,library_game:library_games(id,game:games(name,year,image),location:locations(id,name))',
       )
       .eq('tenant_id', tenantStore.value?.id)
       .eq('edition_id', editionStore.value?.id)

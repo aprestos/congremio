@@ -17,6 +17,22 @@
           </p>
         </div>
 
+        <!-- Location - Prominent Display -->
+        <div
+          class="text-center py-6 px-8 rounded-xl bg-gradient-to-br from-primary to-primary-600 shadow-lg"
+        >
+          <p
+            class="text-sm font-medium text-primary-100 uppercase tracking-wider mb-2"
+          >
+            Game Location
+          </p>
+          <div class="text-5xl font-bold text-white drop-shadow-lg">
+            {{
+              props.reservation?.library_game.location?.name || 'No Location'
+            }}
+          </div>
+        </div>
+
         <!-- Game Info with Image -->
         <div
           class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-6 flex items-center gap-6"
@@ -70,7 +86,7 @@
             size="lg"
             class="order-1 w-full sm:w-auto"
             :loading="cancellingReservation"
-            @click="confirmCancel"
+            @click="handleCancelReservation"
           >
             Cancel Reservation
           </CButton>
@@ -137,6 +153,10 @@ const closeReservationDetail = (): void => {
   cancellingReservation.value = false
   showCancelConfirmation.value = false
   emit('close')
+}
+
+const handleCancelReservation = (): void => {
+  showCancelConfirmation.value = true
 }
 
 const confirmCancel = async (): Promise<void> => {

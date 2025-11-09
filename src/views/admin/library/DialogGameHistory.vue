@@ -11,6 +11,8 @@ import { useTimeAgo } from '@vueuse/core'
 import { userService } from '@/features/users/service.ts'
 import WithdrawTimeline from '../../public/WithdrawTimeline.vue'
 import type { LibraryGame } from '@/features/library/game.model.ts'
+import { RouteNames } from '@/router/routeNames.ts'
+import { IconExternalLink } from '@tabler/icons-vue'
 
 const { t } = useI18n()
 
@@ -130,12 +132,21 @@ function getDurationHours(
                   ></div>
                 </div>
                 <div v-else>
-                  <h5
-                    v-if="users && users.has(withdraw.user_id)"
-                    class="font-semibold text-gray-900 dark:text-white truncate"
-                  >
-                    {{ users.get(withdraw.user_id) }}
-                  </h5>
+                  <div v-if="users && users.has(withdraw.user_id)">
+                    <RouterLink
+                      class="flex flex-row text-gray-900 dark:text-white"
+                      target="_blank"
+                      :to="{
+                        name: RouteNames.public.user,
+                        params: { id: withdraw.user_id },
+                      }"
+                    >
+                      <h5 class="font-semibold truncate">
+                        {{ users.get(withdraw.user_id) }}
+                      </h5>
+                      <IconExternalLink class="ml-1" />
+                    </RouterLink>
+                  </div>
                   <h5
                     v-else
                     class="font-normal text-gray-600 dark:text-gray-300 truncate"
