@@ -202,6 +202,7 @@ export interface AdminTranslationSchema {
   }
   library: {
     title: string
+    description: string
     search: string
     name: string
     status: string
@@ -313,6 +314,44 @@ export interface AdminTranslationSchema {
       withdrawn: string
       reserved: string
     }
+  }
+  tickets: {
+    title: string
+    description: string
+    addTicket: string
+    totalTickets: string
+    revenuePotential: string
+    totalCapacity: string
+    activeStatus: string
+    active: string
+    inactive: string
+    soldOut: string
+    currentlyOnSale: string
+    basedOnQuantityPrice: string
+    totalAvailableSlots: string
+    noTicketsYet: string
+    getStartedCreating: string
+    createFirstTicket: string
+    name: string
+    price: string
+    quantity: string
+    status: string
+    salePeriod: string
+    validPeriod: string
+    actions: string
+    general: string
+    vip: string
+    earlyBird: string
+    view: string
+    edit: string
+    delete: string
+    confirmDelete: string
+    deleteSuccess: string
+    deleteFailed: string
+    loadFailed: string
+    editFunctionalityComingSoon: string
+    viewDetailsFunctionalityComingSoon: string
+    addTicketFunctionalityComingSoon: string
   }
 }
 

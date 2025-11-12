@@ -49,35 +49,62 @@
 
       <!-- Table body -->
       <tbody class="divide-y divide-gray-200 dark:divide-white/5">
-        <!-- Data rows -->
-        <tr
-          v-for="(item, rowIndex) in displayedItems"
-          :key="getRowKey(item, rowIndex)"
-        >
-          <td
-            v-for="(column, colIndex) in columns"
-            :key="column.key"
-            :class="getCellClasses(column, colIndex)"
-          >
-            <slot
-              :name="`cell-${column.key}`"
-              :item="item"
-              :value="getNestedValue(item, column.key)"
-              :column="column"
-              :index="rowIndex"
+        <!-- Loading skeleton rows -->
+        <template v-if="props.loading">
+          <tr v-for="i in 5" :key="`skeleton-${i}`">
+            <td
+              v-for="(column, colIndex) in columns"
+              :key="column.key"
+              :class="getCellClasses(column, colIndex)"
             >
-              <!-- Default cell content -->
-              {{ getNestedValue(item, column.key) }}
-            </slot>
-          </td>
-          <!-- Actions column -->
-          <td
-            v-if="$slots.actions"
-            class="py-4 pr-4 sm:pr-6 lg:pr-8 pl-3 text-right text-sm font-medium"
+              <div class="animate-pulse">
+                <div
+                  class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"
+                ></div>
+              </div>
+            </td>
+            <td v-if="$slots.actions" class="py-4 pr-4 sm:pr-6 lg:pr-8 pl-3">
+              <div class="animate-pulse">
+                <div
+                  class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-16"
+                ></div>
+              </div>
+            </td>
+          </tr>
+        </template>
+
+        <!-- Data rows -->
+        <template v-else>
+          <tr
+            v-for="(item, rowIndex) in displayedItems"
+            :key="getRowKey(item, rowIndex)"
+            class="hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors"
           >
-            <slot name="actions" :item="item" :index="rowIndex" />
-          </td>
-        </tr>
+            <td
+              v-for="(column, colIndex) in columns"
+              :key="column.key"
+              :class="getCellClasses(column, colIndex)"
+            >
+              <slot
+                :name="`cell-${column.key}`"
+                :item="item"
+                :value="getNestedValue(item, column.key)"
+                :column="column"
+                :index="rowIndex"
+              >
+                <!-- Default cell content -->
+                {{ getNestedValue(item, column.key) }}
+              </slot>
+            </td>
+            <!-- Actions column -->
+            <td
+              v-if="$slots.actions"
+              class="py-4 pr-4 sm:pr-6 lg:pr-8 pl-3 text-right text-sm font-medium"
+            >
+              <slot name="actions" :item="item" :index="rowIndex" />
+            </td>
+          </tr>
+        </template>
       </tbody>
     </table>
 
@@ -93,14 +120,6 @@
 
     <!-- Scroll trigger element for infinite scroll -->
     <div v-if="hasMoreItems" ref="scrollTrigger" class="h-px w-full"></div>
-
-    <!-- End of results indicator -->
-    <div
-      v-if="!hasMoreItems && displayedItems.length > 0"
-      class="flex justify-center items-center py-4 text-sm text-gray-500 dark:text-gray-400"
-    >
-      {{ displayedItems.length }} of {{ totalItems }} items loaded
-    </div>
   </div>
 </template>
 
@@ -154,6 +173,10 @@ const props = defineProps({
       string | ((item: T, index: number) => string | number)
     >,
     default: 'id',
+  },
+  loading: {
+    type: Boolean,
+    default: false,
   },
 })
 

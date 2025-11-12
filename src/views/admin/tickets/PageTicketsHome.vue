@@ -1,21 +1,31 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, computed } from 'vue'
-import { IconPlus, IconTicket } from '@tabler/icons-vue'
+import { onMounted, ref, computed } from 'vue'
+import {
+  IconPlus,
+  IconTicket,
+  IconEdit,
+  IconTrash,
+  IconEye,
+  IconCurrencyEuro,
+  IconUsers,
+  IconCalendar,
+} from '@tabler/icons-vue'
 import { useI18n } from 'vue-i18n'
 import { toast } from 'vue-sonner'
 import { editionStore } from '@/stores/edition'
-import DataTable from '@/components/DataTable.vue'
-import type { DataTableColumn } from '@/components/DataTable.vue'
-import CBadge from '@/components/CBadge.vue'
-import SkeletonLoader from '@/components/SkeletonLoader.vue'
 import ticketService from '@/features/tickets/service'
 import {
   type Ticket,
+  TicketGroup,
   TicketStatus,
-  getTicketStatusLabel,
-  getTicketTypeLabel,
-  calculateAvailability,
 } from '@/features/tickets/ticket.model'
+import { tenantStore } from '@/stores/tenant.ts'
+import logger from '@/lib/logger.ts'
+import CBadge from '@/components/CBadge.vue'
+import PageHeader from '@/components/PageHeader.vue'
+import DataTable from '@/components/DataTable.vue'
+import StatisticCard from '@/components/StatisticCard.vue'
+import type { DataTableColumn } from '@/components/DataTable.vue'
 
 const { t } = useI18n()
 
@@ -23,361 +33,357 @@ const { t } = useI18n()
 const tickets = ref<Ticket[]>([])
 const loading = ref(false)
 const selectedTicket = ref<Ticket | null>(null)
-const statistics = ref({
-  totalTickets: 0,
-  totalSold: 0,
-  totalRevenue: 0,
-  activeTickets: 0,
+const shownDialog = ref<string>('')
+
+// Table columns definition
+const tableColumns: DataTableColumn<Ticket>[] = [
+  { key: 'name', label: t('admin.tickets.name'), sortable: true },
+  { key: 'price', label: t('admin.tickets.price'), sortable: true },
+  { key: 'quantity', label: t('admin.tickets.quantity'), sortable: true },
+  { key: 'status', label: t('admin.tickets.status'), sortable: true },
+  {
+    key: 'sale_period',
+    label: t('admin.tickets.salePeriod'),
+    sortable: false,
+    breakpoint: 'lg',
+  },
+  {
+    key: 'valid_period',
+    label: t('admin.tickets.validPeriod'),
+    sortable: false,
+    breakpoint: 'lg',
+  },
+]
+
+// Computed - Statistics
+const statistics = computed(() => {
+  const total = tickets.value.length
+  const active = tickets.value.filter(
+    (t) => t.status === TicketStatus.ACTIVE,
+  ).length
+  const totalRevenue = tickets.value.reduce(
+    (sum, t) => sum + t.price * (t.quantity || 0),
+    0,
+  )
+  const totalQuantity = tickets.value.reduce(
+    (sum, t) => sum + (t.quantity || 0),
+    0,
+  )
+
+  return {
+    total,
+    active,
+    inactive: tickets.value.filter((t) => t.status === TicketStatus.INACTIVE)
+      .length,
+    soldOut: tickets.value.filter((t) => t.status === TicketStatus.SOLD_OUT)
+      .length,
+    totalRevenue,
+    totalQuantity,
+  }
 })
 
-let unsubscribe: (() => void) | null = null
+// Computed - Group tickets by TicketGroup
+const ticketsByGroup = computed(() => {
+  const grouped: Record<TicketGroup, Ticket[]> = {
+    [TicketGroup.GENERAL]: [],
+    [TicketGroup.ADMIN]: [],
+  }
 
-// Table columns
-const tableColumns = computed((): DataTableColumn<Ticket>[] => [
-  {
-    key: 'name',
-    label: t('admin.tickets.name', 'Name'),
-    sortable: true,
-    sortFn: (a: Ticket, b: Ticket): number => {
-      return a.name.localeCompare(b.name)
-    },
-  },
-  {
-    key: 'type',
-    label: t('admin.tickets.type', 'Type'),
-    sortable: true,
-  },
-  {
-    key: 'price',
-    label: t('admin.tickets.price', 'Price'),
-    sortable: true,
-    sortFn: (a: Ticket, b: Ticket): number => {
-      return a.price - b.price
-    },
-  },
-  {
-    key: 'availability',
-    label: t('admin.tickets.availability', 'Availability'),
-    sortable: true,
-    sortFn: (a: Ticket, b: Ticket): number => {
-      return calculateAvailability(a) - calculateAvailability(b)
-    },
-  },
-  {
-    key: 'status',
-    label: t('admin.tickets.status', 'Status'),
-    sortable: true,
-  },
-])
+  tickets.value.forEach((ticket) => {
+    if (ticket.group in grouped) {
+      grouped[ticket.group].push(ticket)
+    }
+  })
 
-// Computed
-const formattedTickets = computed(() => {
-  return tickets.value.map((ticket) => ({
-    ...ticket,
-    formattedPrice: `${ticket.price.toFixed(2)} ${ticket.currency}`,
-    availabilityPercent: calculateAvailability(ticket),
-  }))
+  return grouped
 })
+
+// Helper functions
+const getGroupName = (group: TicketGroup): string => {
+  const names: Record<TicketGroup, string> = {
+    [TicketGroup.GENERAL]: t('admin.tickets.general'),
+    [TicketGroup.ADMIN]: t('admin.tickets.vip'),
+  }
+  return names[group]
+}
+
+const getStatusBadgeVariant = (
+  status: TicketStatus,
+): 'success' | 'warning' | 'danger' => {
+  const variants: Record<TicketStatus, 'success' | 'warning' | 'danger'> = {
+    [TicketStatus.ACTIVE]: 'success',
+    [TicketStatus.INACTIVE]: 'warning',
+    [TicketStatus.SOLD_OUT]: 'danger',
+  }
+  return variants[status]
+}
+
+const formatPrice = (price: number): string => {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'EUR',
+  }).format(price)
+}
+
+const formatDate = (dateStr?: string): string => {
+  if (!dateStr) return '-'
+  return new Date(dateStr).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  })
+}
+
+const formatDateRange = (from?: string, until?: string): string => {
+  if (!from && !until) return '-'
+  if (from && until) {
+    const fromDate = new Date(from).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+    })
+    const untilDate = new Date(until).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    })
+    return `${fromDate} - ${untilDate}`
+  }
+  if (from) return `From ${formatDate(from)}`
+  return `Until ${formatDate(until)}`
+}
+
+// Actions
+const handleEdit = (ticket: Ticket): void => {
+  selectedTicket.value = ticket
+  shownDialog.value = 'edit'
+  toast.info(t('admin.tickets.editFunctionalityComingSoon'))
+}
+
+const handleDelete = async (ticket: Ticket): Promise<void> => {
+  if (!confirm(t('admin.tickets.confirmDelete', { name: ticket.name }))) return
+
+  try {
+    await ticketService.delete(ticket.id)
+    toast.success(t('admin.tickets.deleteSuccess'))
+    await loadTickets()
+  } catch (error) {
+    logger.error('Error deleting ticket:', { error })
+    toast.error(t('admin.tickets.deleteFailed'))
+  }
+}
+
+const handleView = (ticket: Ticket): void => {
+  selectedTicket.value = ticket
+  shownDialog.value = 'view'
+  toast.info(t('admin.tickets.viewDetailsFunctionalityComingSoon'))
+}
+
+const handleAdd = (): void => {
+  shownDialog.value = 'add'
+  toast.info(t('admin.tickets.addTicketFunctionalityComingSoon'))
+}
 
 // Methods
 async function loadTickets(): Promise<void> {
-  if (!editionStore.value?.id) {
-    console.warn('No edition selected')
+  if (!tenantStore.value?.id || !editionStore.value?.id) {
+    logger.warn('No edition selected')
     return
   }
 
   loading.value = true
   try {
-    tickets.value = await ticketService.getByEdition(editionStore.value.id)
-    await loadStatistics()
+    tickets.value = await ticketService.get(
+      tenantStore.value.id,
+      editionStore.value.id,
+    )
   } catch (error) {
-    console.error('Error loading tickets:', error)
-    toast.error(t('admin.tickets.error.load', 'Failed to load tickets'))
+    logger.error('Error loading tickets:', { error })
+    toast.error(t('admin.tickets.loadFailed'))
   } finally {
     loading.value = false
-  }
-}
-
-async function loadStatistics(): Promise<void> {
-  if (!editionStore.value?.id) return
-
-  try {
-    statistics.value = await ticketService.getStatistics(editionStore.value.id)
-  } catch (error) {
-    console.error('Error loading statistics:', error)
-  }
-}
-
-function openCreateDialog(): void {
-  // TODO: Implement create dialog
-  toast.info(
-    t('admin.tickets.info.createDialog', 'Create ticket dialog - Coming soon'),
-  )
-}
-
-function handleEdit(ticket: Ticket): void {
-  selectedTicket.value = ticket
-  // TODO: Implement edit dialog
-  toast.info(
-    t('admin.tickets.info.editDialog', 'Edit ticket dialog - Coming soon'),
-  )
-}
-
-function handleDelete(ticket: Ticket): void {
-  selectedTicket.value = ticket
-  // TODO: Implement delete confirmation dialog
-  toast.info(
-    t('admin.tickets.info.deleteDialog', 'Delete ticket dialog - Coming soon'),
-  )
-}
-
-async function handleStatusToggle(ticket: Ticket): Promise<void> {
-  try {
-    const newStatus =
-      ticket.status === TicketStatus.ACTIVE
-        ? TicketStatus.INACTIVE
-        : TicketStatus.ACTIVE
-
-    await ticketService.updateStatus(ticket.id, newStatus)
-    toast.success(
-      t('admin.tickets.success.statusUpdated', 'Ticket status updated'),
-    )
-    await loadTickets()
-  } catch (error) {
-    console.error('Error updating ticket status:', error)
-    toast.error(
-      t('admin.tickets.error.statusUpdate', 'Failed to update ticket status'),
-    )
-  }
-}
-
-function getStatusBadgeVariant(
-  status: TicketStatus,
-): 'success' | 'warning' | 'error' {
-  switch (status) {
-    case TicketStatus.ACTIVE:
-      return 'success'
-    case TicketStatus.SOLD_OUT:
-      return 'error'
-    default:
-      return 'warning'
   }
 }
 
 // Lifecycle
 onMounted(async () => {
   await loadTickets()
-
-  // Subscribe to real-time updates
-  if (editionStore.value?.id) {
-    unsubscribe = ticketService.subscribe(editionStore.value.id, () => {
-      void loadTickets()
-    })
-  }
-})
-
-onUnmounted(() => {
-  if (unsubscribe) {
-    unsubscribe()
-  }
 })
 </script>
 
 <template>
-  <div class="flex flex-col min-h-screen">
+  <div class="flex flex-col space-y-6 p-0 sm:p-6">
+    <!-- Page Header -->
+    <PageHeader
+      :title="t('admin.tickets.title')"
+      :description="t('admin.tickets.description')"
+      :action-label="t('admin.tickets.addTicket')"
+      class="p-6 sm:p-0"
+      @action="handleAdd"
+    >
+      <template #action-icon>
+        <IconPlus class="size-5" stroke="2" />
+      </template>
+    </PageHeader>
+
     <!-- Statistics Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 mb-4">
-      <!-- Loading skeletons -->
-      <template v-if="loading">
-        <div
-          v-for="i in 4"
-          :key="i"
-          class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 ring-1 ring-gray-200 dark:ring-gray-700"
-        >
-          <div class="flex items-center justify-between">
-            <div class="flex-1">
-              <SkeletonLoader class="h-4 w-24 mb-3" />
-              <SkeletonLoader class="h-8 w-16" />
-            </div>
-            <SkeletonLoader class="size-8 rounded-full" />
-          </div>
-        </div>
-      </template>
+    <div class="grid grid-cols-2 md:grid-cols-4 sm:gap-6">
+      <StatisticCard
+        :label="t('admin.tickets.totalTickets')"
+        :value="statistics.total"
+        :icon="IconTicket"
+        icon-color="text-blue-600 dark:text-blue-400"
+        :subtitle="`${t('admin.tickets.active')}: ${statistics.active} • ${t('admin.tickets.inactive')}: ${statistics.inactive}`"
+      />
 
-      <!-- Actual statistics -->
-      <template v-else>
-        <div
-          class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 ring-1 ring-gray-200 dark:ring-gray-700"
-        >
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
-                {{ t('admin.tickets.stats.total', 'Total Tickets') }}
-              </p>
-              <p class="text-2xl font-bold text-gray-900 dark:text-white">
-                {{ statistics.totalTickets }}
-              </p>
-            </div>
-            <IconTicket class="size-8 text-primary-500" />
-          </div>
-        </div>
+      <StatisticCard
+        :label="t('admin.tickets.revenuePotential')"
+        :value="formatPrice(statistics.totalRevenue)"
+        :icon="IconCurrencyEuro"
+        icon-color="text-green-600 dark:text-green-400"
+        :subtitle="t('admin.tickets.basedOnQuantityPrice')"
+      />
 
-        <div
-          class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 ring-1 ring-gray-200 dark:ring-gray-700"
-        >
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
-                {{ t('admin.tickets.stats.sold', 'Sold') }}
-              </p>
-              <p class="text-2xl font-bold text-gray-900 dark:text-white">
-                {{ statistics.totalSold }}
-              </p>
-            </div>
-          </div>
-        </div>
+      <StatisticCard
+        :label="t('admin.tickets.totalCapacity')"
+        :value="statistics.totalQuantity"
+        :icon="IconUsers"
+        icon-color="text-purple-600 dark:text-purple-400"
+        :subtitle="t('admin.tickets.totalAvailableSlots')"
+      />
 
-        <div
-          class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 ring-1 ring-gray-200 dark:ring-gray-700"
-        >
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
-                {{ t('admin.tickets.stats.revenue', 'Revenue') }}
-              </p>
-              <p class="text-2xl font-bold text-gray-900 dark:text-white">
-                {{ statistics.totalRevenue.toFixed(2) }} €
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div
-          class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 ring-1 ring-gray-200 dark:ring-gray-700"
-        >
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
-                {{ t('admin.tickets.stats.active', 'Active Tickets') }}
-              </p>
-              <p class="text-2xl font-bold text-gray-900 dark:text-white">
-                {{ statistics.activeTickets }}
-              </p>
-            </div>
-          </div>
-        </div>
-      </template>
+      <StatisticCard
+        :label="t('admin.tickets.activeStatus')"
+        :value="statistics.active"
+        :icon="IconCalendar"
+        icon-color="text-emerald-600 dark:text-emerald-400"
+        :subtitle="t('admin.tickets.currentlyOnSale')"
+      />
     </div>
 
-    <!-- Tickets Table -->
-    <DataTable
-      :items="formattedTickets"
-      :columns="tableColumns"
-      :items-per-page="25"
-      :loading="loading"
-    >
-      <!-- Custom cell for name -->
-      <template #cell-name="{ item }">
-        <div>
-          <div class="font-medium text-gray-900 dark:text-white">
-            {{ item.name }}
-          </div>
-          <div
-            v-if="item.description"
-            class="mt-1 text-sm text-gray-500 dark:text-gray-400"
-          >
-            {{ item.description }}
-          </div>
-        </div>
-      </template>
+    <!-- Loading State -->
+    <div v-if="loading" class="flex items-center justify-center py-12">
+      <div
+        class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"
+      ></div>
+    </div>
 
-      <!-- Custom cell for type -->
-      <template #cell-type="{ item }">
-        <span class="text-gray-900 dark:text-gray-200">
-          {{ getTicketTypeLabel(item.type) }}
-        </span>
-      </template>
-
-      <!-- Custom cell for price -->
-      <template #cell-price="{ item }">
-        <span class="font-medium text-gray-900 dark:text-white">
-          {{ item.formattedPrice }}
-        </span>
-      </template>
-
-      <!-- Custom cell for availability -->
-      <template #cell-availability="{ item }">
-        <div class="space-y-1">
-          <div class="flex items-center justify-between text-sm">
-            <span class="text-gray-600 dark:text-gray-400">
-              {{ item.quantity_available }} / {{ item.quantity_total }}
-            </span>
-            <span class="text-gray-600 dark:text-gray-400">
-              {{ item.availabilityPercent }}%
-            </span>
-          </div>
-          <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-            <div
-              class="h-2 rounded-full transition-all"
-              :class="{
-                'bg-green-500': item.availabilityPercent > 50,
-                'bg-yellow-500':
-                  item.availabilityPercent > 20 &&
-                  item.availabilityPercent <= 50,
-                'bg-red-500': item.availabilityPercent <= 20,
-              }"
-              :style="{ width: `${item.availabilityPercent}%` }"
-            />
-          </div>
-        </div>
-      </template>
-
-      <!-- Custom cell for status -->
-      <template #cell-status="{ item }">
-        <CBadge :variant="getStatusBadgeVariant(item.status)">
-          {{ getTicketStatusLabel(item.status) }}
-        </CBadge>
-      </template>
-
-      <!-- Actions slot -->
-      <template #actions="{ item }">
-        <div class="flex items-center gap-2">
-          <button
-            class="text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
-            @click="handleEdit(item)"
-          >
-            {{ t('admin.tickets.actions.edit', 'Edit') }}
-          </button>
-          <button
-            class="text-sm text-gray-600 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-            @click="handleStatusToggle(item)"
-          >
-            {{
-              item.status === TicketStatus.ACTIVE
-                ? t('admin.tickets.actions.deactivate', 'Deactivate')
-                : t('admin.tickets.actions.activate', 'Activate')
-            }}
-          </button>
-          <button
-            class="text-sm text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
-            @click="handleDelete(item)"
-          >
-            {{ t('admin.tickets.actions.delete', 'Delete') }}
-          </button>
-        </div>
-      </template>
-    </DataTable>
-
-    <!-- Floating Add Button -->
+    <!-- Empty State -->
     <div
-      class="group fixed bottom-0 right-0 flex items-end justify-end w-24 h-24 p-1"
+      v-else-if="tickets.length === 0"
+      class="bg-white dark:bg-gray-800 rounded-xl p-12 text-center border border-gray-200 dark:border-gray-700"
     >
+      <IconTicket class="mx-auto h-16 w-16 text-gray-400" stroke="1.5" />
+      <h3 class="mt-4 text-lg font-semibold text-gray-900 dark:text-white">
+        {{ t('admin.tickets.noTicketsYet') }}
+      </h3>
+      <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+        {{ t('admin.tickets.getStartedCreating') }}
+      </p>
       <button
-        class="z-50 rounded-full text-gray-900 dark:text-gray-200 text-nowrap absolute mr-4 mb-4 py-4 px-4 font-semibold dark:bg-gray-800/90 backdrop-blur-2xl bg-gray-50/90 ring-1 ring-gray-200 dark:ring-gray-700 overflow-hidden shadow-2xl transition-colors hover:bg-gray-100 dark:hover:bg-gray-700"
-        @click="openCreateDialog"
+        class="mt-6 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-600"
+        @click="handleAdd"
       >
-        <IconPlus stroke="2.5" class="size-6 inline-block" />
+        <IconPlus class="size-4" />
+        {{ t('admin.tickets.createFirstTicket') }}
       </button>
+    </div>
+
+    <!-- Tickets Table by Group -->
+    <div v-else class="space-y-6">
+      <div
+        v-for="group in Object.values(TicketGroup)"
+        v-show="ticketsByGroup[group].length > 0"
+        :key="group"
+        class="bg-white dark:bg-gray-800 sm:rounded-xl shadow-sm sm:border border-gray-200 dark:border-gray-700 overflow-hidden"
+      >
+        <!-- Group Header -->
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+            {{ getGroupName(group) }}
+            <span
+              class="ml-2 text-sm font-normal text-gray-500 dark:text-gray-400"
+            >
+              ({{ ticketsByGroup[group].length }})
+            </span>
+          </h2>
+        </div>
+
+        <!-- DataTable -->
+        <DataTable
+          :items="ticketsByGroup[group as TicketGroup]"
+          :columns="tableColumns"
+          :items-per-page="10"
+        >
+          <!-- Custom cell for name -->
+          <template #cell-name="{ item }">
+            <div class="text-sm font-medium text-gray-900 dark:text-white">
+              {{ item.name }}
+            </div>
+          </template>
+
+          <!-- Custom cell for price -->
+          <template #cell-price="{ item }">
+            <div class="text-sm font-semibold text-gray-900 dark:text-white">
+              {{ formatPrice(item.price) }}
+            </div>
+          </template>
+
+          <!-- Custom cell for quantity -->
+          <template #cell-quantity="{ item }">
+            <div class="text-sm text-gray-900 dark:text-white">
+              {{ item.quantity || 0 }}
+            </div>
+          </template>
+
+          <!-- Custom cell for status -->
+          <template #cell-status="{ item }">
+            <CBadge :variant="getStatusBadgeVariant(item.status)">
+              {{ item.status }}
+            </CBadge>
+          </template>
+
+          <!-- Custom cell for sale period -->
+          <template #cell-sale_period="{ item }">
+            <div class="text-sm text-gray-500 dark:text-gray-400">
+              {{ formatDateRange(item.sale_from, item.sale_until) }}
+            </div>
+          </template>
+
+          <!-- Custom cell for valid period -->
+          <template #cell-valid_period="{ item }">
+            <div class="text-sm text-gray-500 dark:text-gray-400">
+              {{ formatDateRange(item.valid_from, item.valid_until) }}
+            </div>
+          </template>
+
+          <!-- Actions slot -->
+          <template #actions="{ item }">
+            <div class="flex items-center justify-end gap-2">
+              <button
+                class="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                title="View"
+                @click="handleView(item)"
+              >
+                <IconEye class="size-4" />
+              </button>
+              <button
+                class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 p-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
+                title="Edit"
+                @click="handleEdit(item)"
+              >
+                <IconEdit class="size-4" />
+              </button>
+              <button
+                class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
+                title="Delete"
+                @click="handleDelete(item)"
+              >
+                <IconTrash class="size-4" />
+              </button>
+            </div>
+          </template>
+        </DataTable>
+      </div>
     </div>
   </div>
 </template>
