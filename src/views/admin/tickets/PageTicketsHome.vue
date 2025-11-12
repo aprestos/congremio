@@ -92,6 +92,11 @@ const ticketsByGroup = computed(() => {
   tickets.value.forEach((ticket) => {
     if (ticket.group in grouped) {
       grouped[ticket.group].push(ticket)
+    } else {
+      logger.warn(
+        `[ticketsByGroup] Unexpected ticket group: "${ticket.group}" for ticket:`,
+        ticket,
+      )
     }
   })
 
@@ -167,7 +172,7 @@ const handleDelete = async (ticket: Ticket): Promise<void> => {
     toast.success(t('admin.tickets.deleteSuccess'))
     await loadTickets()
   } catch (error) {
-    logger.error('Error deleting ticket:', { error })
+    logger.error('Error deleting ticket:', { error, ticketId: ticket.id, ticketName: ticket.name })
     toast.error(t('admin.tickets.deleteFailed'))
   }
 }
@@ -197,7 +202,11 @@ async function loadTickets(): Promise<void> {
       editionStore.value.id,
     )
   } catch (error) {
-    logger.error('Error loading tickets:', { error })
+    logger.error('Error loading tickets:', {
+      error,
+      editionId: editionStore.value.id,
+      tenantId: tenantStore.value.id,
+    })
     toast.error(t('admin.tickets.loadFailed'))
   } finally {
     loading.value = false
@@ -264,7 +273,11 @@ onMounted(async () => {
     <div v-if="loading" class="flex items-center justify-center py-12">
       <div
         class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"
-      ></div>
+        role="status"
+        aria-label="Loading tickets"
+      >
+        <span class="sr-only">{{ t('common.loading') }}</span>
+      </div>
     </div>
 
     <!-- Empty State -->
