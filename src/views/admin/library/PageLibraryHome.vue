@@ -20,7 +20,7 @@
     </div>
 
     <!-- Statistics Cards -->
-    <div class="grid grid-cols-2 md:grid-cols-4 sm:gap-4 mb-4">
+    <div class="grid grid-cols-2 md:grid-cols-4 sm:gap-4 gap-0 mb-4">
       <!-- Loading skeletons -->
       <template v-if="loading">
         <div
