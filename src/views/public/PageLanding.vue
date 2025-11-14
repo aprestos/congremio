@@ -16,6 +16,7 @@ import {
 import { RouterLink } from 'vue-router'
 import { RouteNames } from '@/router/routeNames.ts'
 import { tenantStore } from '@/stores/tenant.ts'
+import { useI18n } from 'vue-i18n'
 
 // Set page-specific theme color
 const edition = computed(() => editionStore.value)
@@ -58,7 +59,8 @@ const getRandomImages = (images: string[], count: number): string[] => {
 // Format dates
 const formatDate = (dateString: string | undefined) => {
   if (!dateString) return 'TBA'
-  return new Date(dateString).toLocaleDateString('en-US', {
+  const locale = useI18n().locale.value
+  return new Date(dateString).toLocaleDateString(locale, {
     month: 'long',
     day: 'numeric',
   })

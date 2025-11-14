@@ -1,13 +1,32 @@
 <template>
-  <div class="flex flex-col min-h-screen">
+  <div class="flex flex-col min-h-screen sm:p-6 space-y-6 p-0">
+    <!-- Page Header -->
+    <div class="p-6 sm:p-0">
+      <PageHeader
+        :title="t('admin.library.title')"
+        :description="
+          t(
+            'admin.library.description',
+            'Manage games, locations, and reservations',
+          )
+        "
+        :action-label="t('admin.library.addGame')"
+        @action="() => openDialog(Dialog.add)"
+      >
+        <template #action-icon>
+          <IconPlus class="size-5" stroke="2" />
+        </template>
+      </PageHeader>
+    </div>
+
     <!-- Statistics Cards -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 mb-4">
+    <div class="grid grid-cols-2 md:grid-cols-4 sm:gap-4 gap-0 mb-4">
       <!-- Loading skeletons -->
       <template v-if="loading">
         <div
           v-for="i in 4"
           :key="i"
-          class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 ring-1 ring-gray-200 dark:ring-gray-700"
+          class="bg-white dark:bg-gray-800 sm:rounded-lg shadow p-4 sm:ring-1 sm:ring-gray-200 sm:dark:ring-gray-700"
         >
           <div class="flex items-center justify-between">
             <div class="flex-1">
@@ -21,210 +40,169 @@
 
       <!-- Actual statistics -->
       <template v-else>
-        <div
-          class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 ring-1 ring-gray-200 dark:ring-gray-700"
-        >
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
-                {{ t('admin.library.stats.total', 'Total Games') }}
-              </p>
-              <p class="text-2xl font-bold text-gray-900 dark:text-white">
-                {{ statistics.total }}
-              </p>
-            </div>
-            <IconDice class="size-8 text-gray-900 dark:text-gray-400" />
-          </div>
-        </div>
+        <StatisticCard
+          :label="t('admin.library.stats.total', 'Total Games')"
+          :value="statistics.total"
+          :icon="IconDice"
+        />
 
-        <div
-          class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 ring-1 ring-gray-200 dark:ring-gray-700"
-        >
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
-                {{ t('admin.library.stats.available', 'Available') }}
-              </p>
-              <p class="text-2xl font-bold text-green-600 dark:text-green-400">
-                {{ statistics.available }}
-              </p>
-            </div>
-            <IconCircleCheck class="size-8 text-green-500" />
-          </div>
-        </div>
+        <StatisticCard
+          :label="t('admin.library.stats.available', 'Available')"
+          :value="statistics.available"
+          :icon="IconCircleCheck"
+          icon-color="text-green-500"
+          value-color="text-green-600 dark:text-green-400"
+        />
 
-        <div
-          class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 ring-1 ring-gray-200 dark:ring-gray-700"
-        >
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
-                {{ t('admin.library.stats.withdrawn', 'Withdrawn') }}
-              </p>
-              <p class="text-2xl font-bold text-amber-600 dark:text-amber-400">
-                {{ statistics.withdrawn }}
-              </p>
-            </div>
-            <IconHandGrab class="size-8 text-amber-500" />
-          </div>
-        </div>
+        <StatisticCard
+          :label="t('admin.library.stats.withdrawn', 'Withdrawn')"
+          :value="statistics.withdrawn"
+          :icon="IconHandGrab"
+          icon-color="text-amber-500"
+          value-color="text-amber-600 dark:text-amber-400"
+        />
 
-        <div
-          class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 ring-1 ring-gray-200 dark:ring-gray-700"
-        >
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
-                {{ t('admin.library.stats.reserved', 'Reserved') }}
-              </p>
-              <p class="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                {{ statistics.reserved }}
-              </p>
-            </div>
-            <IconBookmark class="size-8 text-blue-500" />
-          </div>
-        </div>
+        <StatisticCard
+          :label="t('admin.library.stats.reserved', 'Reserved')"
+          :value="statistics.reserved"
+          :icon="IconBookmark"
+          icon-color="text-blue-500"
+          value-color="text-blue-600 dark:text-blue-400"
+        />
       </template>
     </div>
 
-    <DataTable
-      :items="filteredGames"
-      :columns="tableColumns"
-      :items-per-page="25"
+    <div
+      class="sm:bg-white dark:bg-gray-800 rounded-0 sm:rounded-xl shadow-sm sm:border sm:border-gray-200 dark:border-gray-700"
     >
-      <template #header>
-        <div class="grid grid-cols-6 px-4 py-3 gap-4">
-          <div class="col-span-5">
-            <CInput
-              id="search"
-              v-model="searchInput"
-              :placeholder="t('admin.library.search')"
-              type="text"
-              name="search"
-            >
-              <template #icon-left>
-                <IconSearch
-                  class="size-5 text-gray-400 dark:text-gray-500"
-                  aria-hidden="true"
-                />
-              </template>
-            </CInput>
-          </div>
-          <div class="col-span-1">
-            <CInput
-              id="reservation"
-              v-model="reservationInput"
-              type="text"
-              name="reservation"
-              :placeholder="t('admin.library.reservation')"
-            >
-              <template #icon-left>
-                <IconNumber
-                  class="size-5 text-gray-400 dark:text-gray-500"
-                  aria-hidden="true"
-                />
-              </template>
-            </CInput>
-          </div>
-        </div>
-      </template>
-
-      <!-- Custom cell for game name with image -->
-      <template #cell-name="{ item }">
-        <div class="flex items-center">
-          <div class="size-11 shrink-0">
-            <img
-              class="size-11 rounded-sm object-cover bg-gray-200 dark:bg-gray-700"
-              :src="item.game.image"
-              alt=""
-              @error="handleImageError"
-              @load="handleImageLoad"
-            />
-          </div>
-          <div class="ml-4">
-            <div class="font-medium text-gray-900 dark:text-white">
-              {{ (item as LibraryGame).game.name }}
+      <DataTable
+        :items="filteredGames"
+        :columns="tableColumns"
+        :items-per-page="25"
+        :loading="loading"
+      >
+        <template #header>
+          <div class="grid grid-cols-6 px-4 py-3 gap-4">
+            <div class="col-span-5">
+              <CInput
+                id="search"
+                v-model="searchInput"
+                :placeholder="t('admin.library.search')"
+                type="text"
+                name="search"
+              >
+                <template #icon-left>
+                  <IconSearch
+                    class="size-5 text-gray-400 dark:text-gray-500"
+                    aria-hidden="true"
+                  />
+                </template>
+              </CInput>
             </div>
-            <div class="mt-1 text-gray-500 dark:text-gray-400">
-              {{ (item as LibraryGame).game.year }}
+            <div class="col-span-1">
+              <CInput
+                id="reservation"
+                v-model="reservationInput"
+                type="text"
+                name="reservation"
+                :placeholder="t('admin.library.reservation')"
+              >
+                <template #icon-left>
+                  <IconNumber
+                    class="size-5 text-gray-400 dark:text-gray-500"
+                    aria-hidden="true"
+                  />
+                </template>
+              </CInput>
             </div>
           </div>
-        </div>
-      </template>
+        </template>
 
-      <!-- Custom cell for status -->
-      <template #cell-status="{ item }">
-        <GameStatus :data="item" />
-      </template>
+        <!-- Custom cell for game name with image -->
+        <template #cell-name="{ item }">
+          <div class="flex items-center">
+            <div class="size-11 shrink-0">
+              <img
+                class="size-11 rounded-sm object-cover bg-gray-200 dark:bg-gray-700"
+                :src="item.game.image"
+                alt=""
+                @error="handleImageError"
+                @load="handleImageLoad"
+              />
+            </div>
+            <div class="ml-4">
+              <div class="font-medium text-gray-900 dark:text-white">
+                {{ (item as LibraryGame).game.name }}
+              </div>
+              <div class="mt-1 text-gray-500 dark:text-gray-400">
+                {{ (item as LibraryGame).game.year }}
+              </div>
+            </div>
+          </div>
+        </template>
 
-      <!-- Custom cell for location -->
-      <template #cell-location="{ item }">
-        <span class="text-gray-500 dark:text-gray-200">{{
-          getLocationName(item)
-        }}</span>
-      </template>
+        <!-- Custom cell for status -->
+        <template #cell-status="{ item }">
+          <GameStatus :data="item" />
+        </template>
 
-      <!-- Custom cell for players -->
-      <template #cell-players="{ item }">
-        <span class="text-gray-500 dark:text-gray-200">{{
-          getRange(
-            (item as LibraryGame).game.min_players,
-            (item as LibraryGame).game.max_players,
-          )
-        }}</span>
-      </template>
+        <!-- Custom cell for location -->
+        <template #cell-location="{ item }">
+          <span class="text-gray-500 dark:text-gray-200">{{
+            getLocationName(item)
+          }}</span>
+        </template>
 
-      <!-- Custom cell for playtime -->
-      <template #cell-playtime="{ item }">
-        <span class="text-gray-500 dark:text-gray-200">{{
-          getRange(
-            (item as LibraryGame).game.min_playtime,
-            (item as LibraryGame).game.max_playtime,
-          )
-        }}</span>
-      </template>
+        <!-- Custom cell for players -->
+        <template #cell-players="{ item }">
+          <span class="text-gray-500 dark:text-gray-200">{{
+            getRange(
+              (item as LibraryGame).game.min_players,
+              (item as LibraryGame).game.max_players,
+            )
+          }}</span>
+        </template>
 
-      <!-- Custom cell for age -->
-      <template #cell-age="{ item }">
-        <span class="text-gray-500 dark:text-gray-200">{{
-          (item as LibraryGame).game.min_age
-            ? (item as LibraryGame).game.min_age + '+'
-            : '-'
-        }}</span>
-      </template>
+        <!-- Custom cell for playtime -->
+        <template #cell-playtime="{ item }">
+          <span class="text-gray-500 dark:text-gray-200">{{
+            getRange(
+              (item as LibraryGame).game.min_playtime,
+              (item as LibraryGame).game.max_playtime,
+            )
+          }}</span>
+        </template>
 
-      <!-- Custom cell for owner -->
-      <template #cell-owner="{ item }">
-        <span class="text-gray-500 dark:text-gray-200">{{
-          (item as LibraryGame).owner
-        }}</span>
-      </template>
+        <!-- Custom cell for age -->
+        <template #cell-age="{ item }">
+          <span class="text-gray-500 dark:text-gray-200">{{
+            (item as LibraryGame).game.min_age
+              ? (item as LibraryGame).game.min_age + '+'
+              : '-'
+          }}</span>
+        </template>
 
-      <!-- Actions slot -->
-      <template #actions="{ item }">
-        <GameActions
-          :data="item"
-          @edit="(game) => openDialog(Dialog.edit, game)"
-          @move="(game) => openDialog(Dialog.move, game)"
-          @withdraw="(game) => openDialog(Dialog.withdraw, game)"
-          @return="(game) => openDialog(Dialog.return, game)"
-          @delete="(game) => openDialog(Dialog.delete, game)"
-          @history="(game) => openDialog(Dialog.history, game)"
-        />
-      </template>
-    </DataTable>
-  </div>
+        <!-- Custom cell for owner -->
+        <template #cell-owner="{ item }">
+          <span class="text-gray-500 dark:text-gray-200">{{
+            (item as LibraryGame).owner
+          }}</span>
+        </template>
 
-  <!-- Floating Add Button -->
-  <div
-    class="group fixed bottom-0 right-0 flex items-end justify-end w-24 h-24 p-1"
-  >
-    <button
-      class="z-50 rounded-full text-gray-900 dark:text-gray-200 text-nowrap absolute mr-4 mb-4 py-4 px-4 font-semibold dark:bg-gray-800/90 backdrop-blur-2xl bg-gray-50/90 ring-1 ring-gray-200 dark:ring-gray-700 overflow-hidden shadow-2xl transition-colors"
-      @click="() => openDialog(Dialog.add)"
-    >
-      <IconPlus stroke="2.5" class="size-6 inline-block" />
-    </button>
+        <!-- Actions slot -->
+        <template #actions="{ item }">
+          <GameActions
+            :data="item"
+            @edit="(game) => openDialog(Dialog.edit, game)"
+            @move="(game) => openDialog(Dialog.move, game)"
+            @withdraw="(game) => openDialog(Dialog.withdraw, game)"
+            @return="(game) => openDialog(Dialog.return, game)"
+            @delete="(game) => openDialog(Dialog.delete, game)"
+            @history="(game) => openDialog(Dialog.history, game)"
+          />
+        </template>
+      </DataTable>
+    </div>
   </div>
 
   <!-- Dialogs -->
@@ -291,6 +269,7 @@ import { useI18n } from 'vue-i18n'
 import DataTable from '@/components/DataTable.vue'
 import CInput from '@/components/CInput.vue'
 import SkeletonLoader from '@/components/SkeletonLoader.vue'
+import StatisticCard from '@/components/StatisticCard.vue'
 import { getStatus, type LibraryGame } from '@/features/library/game.model.ts'
 import type { DataTableColumn } from '@/components/DataTable.vue'
 import libraryReservationService from '@/features/library/reservations/service.ts'
@@ -306,6 +285,7 @@ import DialogAddGame from '@/views/admin/library/DialogAddGame.vue'
 import DialogGameHistory from '@/views/admin/library/DialogGameHistory.vue'
 import DialogEditGame from '@/views/admin/library/DialogEditGame.vue'
 import libraryService from '@/features/library/service.ts'
+import PageHeader from '@/components/PageHeader.vue'
 
 const { t } = useI18n()
 

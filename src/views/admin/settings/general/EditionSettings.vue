@@ -268,6 +268,7 @@ import { editionService } from '@/features/events/service.ts'
 import { tenantStore } from '@/stores/tenant.ts'
 import { editionStore } from '@/stores/edition.ts'
 import logger from '@/lib/logger.ts'
+import { useI18n } from 'vue-i18n'
 
 interface DailySchedule {
   date: string
@@ -379,9 +380,10 @@ const generateDailySchedules = (startDate: string, endDate: string): void => {
 
   const currentDate = new Date(start)
   while (currentDate <= end) {
+    const locale = useI18n().locale.value
     const dateStr = currentDate.toISOString().split('T')[0] ?? ''
-    const dayName = currentDate.toLocaleDateString('en-US', { weekday: 'long' })
-    const dateLabel = currentDate.toLocaleDateString('en-US', {
+    const dayName = currentDate.toLocaleDateString(locale, { weekday: 'long' })
+    const dateLabel = currentDate.toLocaleDateString(locale, {
       month: 'short',
       day: 'numeric',
     })
