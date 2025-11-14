@@ -51,7 +51,10 @@
       <tbody class="divide-y divide-gray-200 dark:divide-white/5">
         <!-- Loading skeleton rows -->
         <template v-if="props.loading">
-          <tr v-for="i in 5" :key="`skeleton-${i}`">
+          <tr
+            v-for="i in Math.min(props.itemsPerPage, 10)"
+            :key="`skeleton-${i}`"
+          >
             <td
               v-for="(column, colIndex) in columns"
               :key="column.key"
@@ -63,7 +66,7 @@
                 ></div>
               </div>
             </td>
-            <td v-if="$slots.actions" class="py-4 pr-4 sm:pr-6 lg:pr-8 pl-3">
+            <td class="py-4 pr-4 sm:pr-6 lg:pr-8 pl-3">
               <div class="animate-pulse">
                 <div
                   class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-16"

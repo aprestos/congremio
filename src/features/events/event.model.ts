@@ -9,4 +9,5 @@ export interface Edition {
     url?: string
   }
   poster_url?: string
+  currency?: string
 }

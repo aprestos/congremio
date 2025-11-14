@@ -5,11 +5,15 @@ interface Props {
   actionLabel?: string
 }
 
+withDefaults(defineProps<Props>(), {
+  description: '',
+  actionLabel: '',
+})
+
 interface Emits {
   (e: 'action'): void
 }
 
-defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 const handleAction = (): void => {

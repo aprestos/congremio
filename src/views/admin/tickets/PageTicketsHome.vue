@@ -124,15 +124,17 @@ const getStatusBadgeVariant = (
 }
 
 const formatPrice = (price: number): string => {
-  return new Intl.NumberFormat('en-US', {
+  const locale = useI18n().locale.value
+  return new Intl.NumberFormat(locale, {
     style: 'currency',
-    currency: 'EUR',
+    currency: editionStore.value?.currency,
   }).format(price)
 }
 
 const formatDate = (dateStr?: string): string => {
   if (!dateStr) return '-'
-  return new Date(dateStr).toLocaleDateString('en-US', {
+  const locale = useI18n().locale.value
+  return new Date(dateStr).toLocaleDateString(locale, {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
@@ -141,12 +143,13 @@ const formatDate = (dateStr?: string): string => {
 
 const formatDateRange = (from?: string, until?: string): string => {
   if (!from && !until) return '-'
+  const locale = useI18n().locale.value
   if (from && until) {
-    const fromDate = new Date(from).toLocaleDateString('en-US', {
+    const fromDate = new Date(from).toLocaleDateString(locale, {
       month: 'short',
       day: 'numeric',
     })
-    const untilDate = new Date(until).toLocaleDateString('en-US', {
+    const untilDate = new Date(until).toLocaleDateString(locale, {
       month: 'short',
       day: 'numeric',
       year: 'numeric',
@@ -165,14 +168,16 @@ const handleEdit = (ticket: Ticket): void => {
 }
 
 const handleDelete = async (ticket: Ticket): Promise<void> => {
-  if (!confirm(t('admin.tickets.confirmDelete', { name: ticket.name }))) return
-
   try {
     await ticketService.delete(ticket.id)
     toast.success(t('admin.tickets.deleteSuccess'))
     await loadTickets()
   } catch (error) {
-    logger.error('Error deleting ticket:', { error, ticketId: ticket.id, ticketName: ticket.name })
+    logger.error('Error deleting ticket:', {
+      error,
+      ticketId: ticket.id,
+      ticketName: ticket.name,
+    })
     toast.error(t('admin.tickets.deleteFailed'))
   }
 }
@@ -212,6 +217,10 @@ async function loadTickets(): Promise<void> {
     loading.value = false
   }
 }
+
+const groups = computed(() => {
+  return Object.values(TicketGroup)
+})
 
 // Lifecycle
 onMounted(async () => {
@@ -304,7 +313,7 @@ onMounted(async () => {
     <!-- Tickets Table by Group -->
     <div v-else class="space-y-6">
       <div
-        v-for="group in Object.values(TicketGroup)"
+        v-for="group in groups"
         v-show="ticketsByGroup[group].length > 0"
         :key="group"
         class="bg-white dark:bg-gray-800 sm:rounded-xl shadow-sm sm:border border-gray-200 dark:border-gray-700 overflow-hidden"
@@ -323,7 +332,7 @@ onMounted(async () => {
 
         <!-- DataTable -->
         <DataTable
-          :items="ticketsByGroup[group as TicketGroup]"
+          :items="ticketsByGroup[group]"
           :columns="tableColumns"
           :items-per-page="10"
         >
@@ -375,6 +384,7 @@ onMounted(async () => {
               <button
                 class="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                 title="View"
+                aria-label="View"
                 @click="handleView(item)"
               >
                 <IconEye class="size-4" />
@@ -382,6 +392,7 @@ onMounted(async () => {
               <button
                 class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 p-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
                 title="Edit"
+                aria-label="Edit"
                 @click="handleEdit(item)"
               >
                 <IconEdit class="size-4" />
@@ -389,6 +400,7 @@ onMounted(async () => {
               <button
                 class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
                 title="Delete"
+                aria-label="Delete"
                 @click="handleDelete(item)"
               >
                 <IconTrash class="size-4" />
