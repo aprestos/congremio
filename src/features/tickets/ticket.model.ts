@@ -1,9 +1,3 @@
-export enum TicketStatus {
-  ACTIVE = 'active',
-  INACTIVE = 'inactive',
-  SOLD_OUT = 'sold_out',
-}
-
 export enum TicketGroup {
   GENERAL = 'general',
   ADMIN = 'admin',
@@ -16,10 +10,10 @@ export interface Ticket {
   name: string
   group: TicketGroup
   price: number
-  status: TicketStatus
+  active: boolean
   quantity: number
-  valid_from?: string
-  valid_until?: string
+  valid_from: string
+  valid_until: string
   sale_from?: string
   sale_until?: string
   created_at: string

@@ -9,7 +9,6 @@ import { Popover, PopoverButton, PopoverPanel } from '@headlessui/vue'
 import libraryWithdrawService, {
   type LibraryWithdraw,
 } from '@/features/library/withdraws/service.ts'
-import { userService, type User } from '@/features/users/service.ts'
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import {
@@ -32,10 +31,7 @@ const { t } = useI18n()
 const props = defineProps<{ data: LibraryGame }>()
 
 const withdraw = ref<LibraryWithdraw | null>(null)
-const withdrawUser = ref<User | null | undefined>(undefined)
-const createdByUser = ref<User | null | undefined>(undefined)
 const isLoadingWithdraw = ref(false)
-const isLoadingUsers = ref(false)
 
 const status = computed(() => getStatus(props.data))
 
@@ -45,12 +41,6 @@ const withdrawDate = computed(() => {
   return useTimeAgo(withdraw.value.started_at)
 })
 
-const withdrawnByDisplay = computed(() => {
-  if (withdrawUser.value?.name) return withdrawUser.value.name
-  if (withdrawUser.value?.email) return withdrawUser.value.email
-  return withdraw.value?.user_id || 'Unknown'
-})
-
 const fetchWithdrawDetails = async (): Promise<void> => {
   if (!withdraw.value) {
     isLoadingWithdraw.value = true
@@ -58,35 +48,6 @@ const fetchWithdrawDetails = async (): Promise<void> => {
       props.data.id,
     )
     isLoadingWithdraw.value = false
-  }
-
-  if (withdraw.value) {
-    // Fetch user information for the withdraw user
-    isLoadingUsers.value = true
-    try {
-      withdrawUser.value = await userService.getById(withdraw.value.user_id)
-    } catch (error) {
-      console.error('Failed to fetch withdraw user:', error)
-      withdrawUser.value = null
-    }
-    isLoadingUsers.value = false
-
-    // Fetch user information for created_by if different from user_id
-    if (
-      withdraw.value.created_by &&
-      withdraw.value.created_by !== withdraw.value.user_id
-    ) {
-      isLoadingUsers.value = true
-      try {
-        createdByUser.value = await userService.getById(
-          withdraw.value.created_by,
-        )
-      } catch (error) {
-        console.error('Failed to fetch created_by user:', error)
-        createdByUser.value = null
-      }
-      isLoadingUsers.value = false
-    }
   }
 }
 </script>
@@ -163,21 +124,15 @@ const fetchWithdrawDetails = async (): Promise<void> => {
 
               <div class="space-y-2 text-sm">
                 <div class="flex flex-row">
-                  <IconClockFilled
-                    v-if="!isLoadingWithdraw"
-                    class="mr-2"
-                    size="18"
-                  />
+                  <IconClockFilled class="mr-2" size="18" />
                   <span v-if="!isLoadingWithdraw">{{ withdrawDate }}</span>
                   <SkeletonLoader v-else class="inline-block w-20 h-4" />
                 </div>
                 <div class="flex flex-row">
-                  <IconUserFilled
-                    v-if="!isLoadingUsers"
-                    class="mr-2"
-                    size="18"
-                  />
-                  <span v-if="!isLoadingUsers">{{ withdrawnByDisplay }}</span>
+                  <IconUserFilled class="mr-2" size="18" />
+                  <span v-if="!isLoadingWithdraw">{{
+                    withdraw.user?.name
+                  }}</span>
                   <SkeletonLoader v-else class="inline-block w-24 h-4" />
                 </div>
               </div>

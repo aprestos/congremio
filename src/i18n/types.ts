@@ -319,6 +319,7 @@ export interface AdminTranslationSchema {
     title: string
     description: string
     addTicket: string
+    createTicket: string
     totalTickets: string
     revenuePotential: string
     totalCapacity: string
@@ -342,13 +343,32 @@ export interface AdminTranslationSchema {
     general: string
     vip: string
     earlyBird: string
+    group: string
+    selectGroup: string
+    selectStatus: string
+    saleFrom: string
+    saleUntil: string
+    validFrom: string
+    validUntil: string
+    validDate: string
+    singleDay: string
+    multipleDays: string
+    singleDayValidity: string
+    multiDayValidityStart: string
+    multiDayValidityEnd: string
+    optional: string
+    submitting: string
+    submit: string
     view: string
     edit: string
     delete: string
     confirmDelete: string
     deleteSuccess: string
     deleteFailed: string
+    createSuccess: string
+    createFailed: string
     loadFailed: string
+    missingTenantOrEdition: string
     editFunctionalityComingSoon: string
     viewDetailsFunctionalityComingSoon: string
     addTicketFunctionalityComingSoon: string

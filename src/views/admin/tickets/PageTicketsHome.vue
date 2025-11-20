@@ -14,11 +14,7 @@ import { useI18n } from 'vue-i18n'
 import { toast } from 'vue-sonner'
 import { editionStore } from '@/stores/edition'
 import ticketService from '@/features/tickets/service'
-import {
-  type Ticket,
-  TicketGroup,
-  TicketStatus,
-} from '@/features/tickets/ticket.model'
+import { type Ticket, TicketGroup } from '@/features/tickets/ticket.model'
 import { tenantStore } from '@/stores/tenant.ts'
 import logger from '@/lib/logger.ts'
 import CBadge from '@/components/CBadge.vue'
@@ -26,6 +22,7 @@ import PageHeader from '@/components/PageHeader.vue'
 import DataTable from '@/components/DataTable.vue'
 import StatisticCard from '@/components/StatisticCard.vue'
 import type { DataTableColumn } from '@/components/DataTable.vue'
+import DialogCreateTicket from '@/views/admin/tickets/DialogCreateTicket.vue'
 
 const { t } = useI18n()
 
@@ -34,6 +31,8 @@ const tickets = ref<Ticket[]>([])
 const loading = ref(false)
 const selectedTicket = ref<Ticket | null>(null)
 const shownDialog = ref<string>('')
+// Pre-selected group for the create dialog
+const preSelectedGroup = ref<TicketGroup | null>(null)
 
 // Table columns definition
 const tableColumns: DataTableColumn<Ticket>[] = [
@@ -58,9 +57,7 @@ const tableColumns: DataTableColumn<Ticket>[] = [
 // Computed - Statistics
 const statistics = computed(() => {
   const total = tickets.value.length
-  const active = tickets.value.filter(
-    (t) => t.status === TicketStatus.ACTIVE,
-  ).length
+  const active = tickets.value.filter((t) => t.active === true).length
   const totalRevenue = tickets.value.reduce(
     (sum, t) => sum + t.price * (t.quantity || 0),
     0,
@@ -73,10 +70,8 @@ const statistics = computed(() => {
   return {
     total,
     active,
-    inactive: tickets.value.filter((t) => t.status === TicketStatus.INACTIVE)
-      .length,
-    soldOut: tickets.value.filter((t) => t.status === TicketStatus.SOLD_OUT)
-      .length,
+    inactive: tickets.value.filter((t) => t.active === true).length,
+    soldOut: 0,
     totalRevenue,
     totalQuantity,
   }
@@ -113,22 +108,19 @@ const getGroupName = (group: TicketGroup): string => {
 }
 
 const getStatusBadgeVariant = (
-  status: TicketStatus,
+  ticket: Ticket,
 ): 'success' | 'warning' | 'danger' => {
-  const variants: Record<TicketStatus, 'success' | 'warning' | 'danger'> = {
-    [TicketStatus.ACTIVE]: 'success',
-    [TicketStatus.INACTIVE]: 'warning',
-    [TicketStatus.SOLD_OUT]: 'danger',
-  }
-  return variants[status]
+  return ticket.active ? 'success' : 'danger'
 }
 
 const formatPrice = (price: number): string => {
   const locale = useI18n().locale.value
-  return new Intl.NumberFormat(locale, {
-    style: 'currency',
-    currency: editionStore.value?.currency,
-  }).format(price)
+  return editionStore.value?.currency
+    ? new Intl.NumberFormat(locale, {
+        style: 'currency',
+        currency: editionStore.value?.currency,
+      }).format(price)
+    : 'NaN'
 }
 
 const formatDate = (dateStr?: string): string => {
@@ -189,8 +181,17 @@ const handleView = (ticket: Ticket): void => {
 }
 
 const handleAdd = (): void => {
+  preSelectedGroup.value = null
   shownDialog.value = 'add'
-  toast.info(t('admin.tickets.addTicketFunctionalityComingSoon'))
+}
+
+const handleAddForGroup = (group: TicketGroup): void => {
+  preSelectedGroup.value = group
+  shownDialog.value = 'add'
+}
+
+const handleTicketCreated = async (): Promise<void> => {
+  await loadTickets()
 }
 
 // Methods
@@ -229,7 +230,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="flex flex-col space-y-6 p-0 sm:p-6">
+  <div class="flex flex-col space-y-6">
     <!-- Page Header -->
     <PageHeader
       :title="t('admin.tickets.title')"
@@ -314,20 +315,28 @@ onMounted(async () => {
     <div v-else class="space-y-6">
       <div
         v-for="group in groups"
-        v-show="ticketsByGroup[group].length > 0"
         :key="group"
         class="bg-white dark:bg-gray-800 sm:rounded-xl shadow-sm sm:border border-gray-200 dark:border-gray-700 overflow-hidden"
       >
         <!-- Group Header -->
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-          <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-            {{ getGroupName(group) }}
-            <span
-              class="ml-2 text-sm font-normal text-gray-500 dark:text-gray-400"
+          <div class="flex items-center justify-between gap-4">
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+              {{ getGroupName(group) }}
+              <span
+                class="ml-2 text-sm font-normal text-gray-500 dark:text-gray-400"
+              >
+                ({{ ticketsByGroup[group].length }})
+              </span>
+            </h2>
+            <button
+              class="inline-flex items-center gap-1 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-white hover:bg-primary-600"
+              @click="handleAddForGroup(group)"
             >
-              ({{ ticketsByGroup[group].length }})
-            </span>
-          </h2>
+              <IconPlus class="size-4" />
+              <span>{{ t('admin.tickets.addTicket') }}</span>
+            </button>
+          </div>
         </div>
 
         <!-- DataTable -->
@@ -359,8 +368,12 @@ onMounted(async () => {
 
           <!-- Custom cell for status -->
           <template #cell-status="{ item }">
-            <CBadge :variant="getStatusBadgeVariant(item.status)">
-              {{ item.status }}
+            <CBadge :variant="getStatusBadgeVariant(item)">
+              {{
+                item.active
+                  ? t('admin.tickets.active')
+                  : t('admin.tickets.inactive')
+              }}
             </CBadge>
           </template>
 
@@ -411,6 +424,19 @@ onMounted(async () => {
       </div>
     </div>
   </div>
+
+  <!-- Dialogs -->
+  <DialogCreateTicket
+    :open="shownDialog === 'add'"
+    :group="TicketGroup.GENERAL"
+    @close="
+      (() => {
+        shownDialog = ''
+        preSelectedGroup = null
+      })()
+    "
+    @created="handleTicketCreated"
+  />
 </template>
 
 <style scoped></style>

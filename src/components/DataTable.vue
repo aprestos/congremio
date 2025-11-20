@@ -40,7 +40,7 @@
           <th
             v-if="$slots.actions"
             scope="col"
-            class="relative py-4 pr-4 sm:pr-6 lg:pr-8 pl-3"
+            class="relative py-4 pr-4 sm:pr-6 pl-3"
           >
             <span class="sr-only">Actions</span>
           </th>
@@ -66,7 +66,7 @@
                 ></div>
               </div>
             </td>
-            <td class="py-4 pr-4 sm:pr-6 lg:pr-8 pl-3">
+            <td class="py-4 pr-4 sm:pr-6 pl-3">
               <div class="animate-pulse">
                 <div
                   class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-16"
@@ -102,7 +102,7 @@
             <!-- Actions column -->
             <td
               v-if="$slots.actions"
-              class="py-4 pr-4 sm:pr-6 lg:pr-8 pl-3 text-right text-sm font-medium"
+              class="py-4 pr-4 sm:pr-6 pl-3 text-right text-sm font-medium"
             >
               <slot name="actions" :item="item" :index="rowIndex" />
             </td>
@@ -287,7 +287,7 @@ const getHeaderClasses = (
 ): string => {
   const baseClasses = 'py-3 text-xs text-gray-500 dark:text-gray-400 uppercase'
 
-  const paddingClasses = index === 0 ? 'pl-4 sm:pl-6 lg:pl-8 pr-3' : 'px-3'
+  const paddingClasses = index === 0 ? 'pl-4 sm:pl-6 pr-3' : 'px-3'
 
   const headerExtraClasses = column.headerClass || ''
 
@@ -314,7 +314,7 @@ const getHeaderClasses = (
 const getCellClasses = (column: DataTableColumn<T>, index: number): string => {
   const baseClasses = 'py-4 text-sm'
 
-  const paddingClasses = index === 0 ? 'pl-4 sm:pl-6 lg:pl-8 pr-3' : 'px-3'
+  const paddingClasses = index === 0 ? 'pl-4 sm:pl-6 pr-3' : 'px-3'
 
   const cellClasses = column.cellClass || 'text-gray-500 dark:text-gray-400'
 
