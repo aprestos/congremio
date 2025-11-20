@@ -297,6 +297,8 @@ const en: TranslationSchema = {
       noTicketsYet: 'No tickets yet',
       getStartedCreating: 'Get started by creating your first ticket type.',
       createFirstTicket: 'Create First Ticket',
+      noTicketsInGroup: 'No tickets in this group',
+      clickAddToCreate: 'Click the "Add Ticket" button above to create one.',
       name: 'Name',
       price: 'Price',
       quantity: 'Quantity',

@@ -3,26 +3,24 @@ import { onMounted, ref, computed } from 'vue'
 import {
   IconPlus,
   IconTicket,
-  IconEdit,
-  IconTrash,
-  IconEye,
   IconCurrencyEuro,
   IconUsers,
   IconCalendar,
+  IconChevronDown,
 } from '@tabler/icons-vue'
 import { useI18n } from 'vue-i18n'
 import { toast } from 'vue-sonner'
+import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue'
 import { editionStore } from '@/stores/edition'
 import ticketService from '@/features/tickets/service'
 import { type Ticket, TicketGroup } from '@/features/tickets/ticket.model'
 import { tenantStore } from '@/stores/tenant.ts'
 import logger from '@/lib/logger.ts'
-import CBadge from '@/components/CBadge.vue'
+import CButton from '@/components/CButton.vue'
 import PageHeader from '@/components/PageHeader.vue'
-import DataTable from '@/components/DataTable.vue'
 import StatisticCard from '@/components/StatisticCard.vue'
-import type { DataTableColumn } from '@/components/DataTable.vue'
 import DialogCreateTicket from '@/views/admin/tickets/DialogCreateTicket.vue'
+import TicketGroupTable from '@/views/admin/tickets/TicketGroupTable.vue'
 
 const { t } = useI18n()
 
@@ -33,26 +31,6 @@ const selectedTicket = ref<Ticket | null>(null)
 const shownDialog = ref<string>('')
 // Pre-selected group for the create dialog
 const preSelectedGroup = ref<TicketGroup | null>(null)
-
-// Table columns definition
-const tableColumns: DataTableColumn<Ticket>[] = [
-  { key: 'name', label: t('admin.tickets.name'), sortable: true },
-  { key: 'price', label: t('admin.tickets.price'), sortable: true },
-  { key: 'quantity', label: t('admin.tickets.quantity'), sortable: true },
-  { key: 'status', label: t('admin.tickets.status'), sortable: true },
-  {
-    key: 'sale_period',
-    label: t('admin.tickets.salePeriod'),
-    sortable: false,
-    breakpoint: 'lg',
-  },
-  {
-    key: 'valid_period',
-    label: t('admin.tickets.validPeriod'),
-    sortable: false,
-    breakpoint: 'lg',
-  },
-]
 
 // Computed - Statistics
 const statistics = computed(() => {
@@ -105,12 +83,6 @@ const getGroupName = (group: TicketGroup): string => {
     [TicketGroup.ADMIN]: t('admin.tickets.vip'),
   }
   return names[group]
-}
-
-const getStatusBadgeVariant = (
-  ticket: Ticket,
-): 'success' | 'warning' | 'danger' => {
-  return ticket.active ? 'success' : 'danger'
 }
 
 const formatPrice = (price: number): string => {
@@ -230,18 +202,14 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="flex flex-col space-y-6">
+  <div class="flex flex-col space-y-6 p-6">
     <!-- Page Header -->
     <PageHeader
       :title="t('admin.tickets.title')"
       :description="t('admin.tickets.description')"
-      :action-label="t('admin.tickets.addTicket')"
       class="p-6 sm:p-0"
       @action="handleAdd"
     >
-      <template #action-icon>
-        <IconPlus class="size-5" stroke="2" />
-      </template>
     </PageHeader>
 
     <!-- Statistics Cards -->
@@ -302,126 +270,70 @@ onMounted(async () => {
       <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
         {{ t('admin.tickets.getStartedCreating') }}
       </p>
-      <button
-        class="mt-6 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-600"
-        @click="handleAdd"
-      >
-        <IconPlus class="size-4" />
+      <CButton variant="primary" class="mt-6" @click="handleAdd">
+        <template #icon-left>
+          <IconPlus class="size-4" />
+        </template>
         {{ t('admin.tickets.createFirstTicket') }}
-      </button>
+      </CButton>
     </div>
 
     <!-- Tickets Table by Group -->
     <div v-else class="space-y-6">
-      <div
+      <Disclosure
         v-for="group in groups"
         :key="group"
+        v-slot="{ open }"
+        as="div"
+        default-open
         class="bg-white dark:bg-gray-800 sm:rounded-xl shadow-sm sm:border border-gray-200 dark:border-gray-700 overflow-hidden"
       >
         <!-- Group Header -->
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
           <div class="flex items-center justify-between gap-4">
-            <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-              {{ getGroupName(group) }}
-              <span
-                class="ml-2 text-sm font-normal text-gray-500 dark:text-gray-400"
+            <div class="flex items-center gap-3">
+              <DisclosureButton
+                class="flex items-center justify-center text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
               >
-                ({{ ticketsByGroup[group].length }})
-              </span>
-            </h2>
-            <button
-              class="inline-flex items-center gap-1 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-white hover:bg-primary-600"
+                <IconChevronDown
+                  class="size-5 cursor-pointer transition-transform duration-200"
+                  :class="{ 'rotate-180': open }"
+                />
+              </DisclosureButton>
+              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+                {{ getGroupName(group) }}
+                <span
+                  class="ml-2 text-sm font-normal text-gray-500 dark:text-gray-400"
+                >
+                  ({{ ticketsByGroup[group].length }})
+                </span>
+              </h2>
+            </div>
+            <CButton
+              variant="transparent"
+              size="sm"
               @click="handleAddForGroup(group)"
             >
-              <IconPlus class="size-4" />
-              <span>{{ t('admin.tickets.addTicket') }}</span>
-            </button>
+              <template #icon-left>
+                <IconPlus class="size-4" />
+              </template>
+              {{ t('admin.tickets.addTicket') }}
+            </CButton>
           </div>
         </div>
 
-        <!-- DataTable -->
-        <DataTable
-          :items="ticketsByGroup[group]"
-          :columns="tableColumns"
-          :items-per-page="10"
-        >
-          <!-- Custom cell for name -->
-          <template #cell-name="{ item }">
-            <div class="text-sm font-medium text-gray-900 dark:text-white">
-              {{ item.name }}
-            </div>
-          </template>
-
-          <!-- Custom cell for price -->
-          <template #cell-price="{ item }">
-            <div class="text-sm font-semibold text-gray-900 dark:text-white">
-              {{ formatPrice(item.price) }}
-            </div>
-          </template>
-
-          <!-- Custom cell for quantity -->
-          <template #cell-quantity="{ item }">
-            <div class="text-sm text-gray-900 dark:text-white">
-              {{ item.quantity || 0 }}
-            </div>
-          </template>
-
-          <!-- Custom cell for status -->
-          <template #cell-status="{ item }">
-            <CBadge :variant="getStatusBadgeVariant(item)">
-              {{
-                item.active
-                  ? t('admin.tickets.active')
-                  : t('admin.tickets.inactive')
-              }}
-            </CBadge>
-          </template>
-
-          <!-- Custom cell for sale period -->
-          <template #cell-sale_period="{ item }">
-            <div class="text-sm text-gray-500 dark:text-gray-400">
-              {{ formatDateRange(item.sale_from, item.sale_until) }}
-            </div>
-          </template>
-
-          <!-- Custom cell for valid period -->
-          <template #cell-valid_period="{ item }">
-            <div class="text-sm text-gray-500 dark:text-gray-400">
-              {{ formatDateRange(item.valid_from, item.valid_until) }}
-            </div>
-          </template>
-
-          <!-- Actions slot -->
-          <template #actions="{ item }">
-            <div class="flex items-center justify-end gap-2">
-              <button
-                class="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                title="View"
-                aria-label="View"
-                @click="handleView(item)"
-              >
-                <IconEye class="size-4" />
-              </button>
-              <button
-                class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 p-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
-                title="Edit"
-                aria-label="Edit"
-                @click="handleEdit(item)"
-              >
-                <IconEdit class="size-4" />
-              </button>
-              <button
-                class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
-                title="Delete"
-                aria-label="Delete"
-                @click="handleDelete(item)"
-              >
-                <IconTrash class="size-4" />
-              </button>
-            </div>
-          </template>
-        </DataTable>
-      </div>
+        <!-- Ticket Group Table (Collapsible) -->
+        <DisclosurePanel>
+          <TicketGroupTable
+            :tickets="ticketsByGroup[group]"
+            :format-price="formatPrice"
+            :format-date-range="formatDateRange"
+            @view="handleView"
+            @edit="handleEdit"
+            @delete="handleDelete"
+          />
+        </DisclosurePanel>
+      </Disclosure>
     </div>
   </div>
 

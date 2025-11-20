@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col min-h-screen space-y-6">
+  <div class="flex flex-col min-h-screen space-y-6 p-6">
     <!-- Page Header -->
     <div class="p-6 sm:p-0">
       <PageHeader

@@ -9,7 +9,7 @@
   />
 
   <div class="lg:pl-72 dark:border-white/5 min-h-screen flex flex-col">
-    <div class="flex-1 overflow-auto min-h-0 p-0 sm:p-6">
+    <div class="flex-1 overflow-auto min-h-0 p-0">
       <router-view />
     </div>
   </div>
