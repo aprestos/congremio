@@ -372,6 +372,8 @@ export interface AdminTranslationSchema {
     editFunctionalityComingSoon: string
     viewDetailsFunctionalityComingSoon: string
     addTicketFunctionalityComingSoon: string
+    noTicketsInGroup: string
+    clickAddToCreate: string
   }
 }
 
