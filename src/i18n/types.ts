@@ -359,6 +359,7 @@ export interface AdminTranslationSchema {
     optional: string
     submitting: string
     submit: string
+    accessDay: string
     view: string
     edit: string
     delete: string

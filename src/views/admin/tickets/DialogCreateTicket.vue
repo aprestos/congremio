@@ -214,13 +214,13 @@ const { r$ } = useRegle(formData, {
   name: { required },
   price: { required, minValue: minValue(0) },
   quantity: { required, minValue: minValue(1) },
-  valid_from: { required, dateAfter: dateAfter(new Date()) },
+  valid_from: { required, dateAfter: dateAfter(DateTime.local().startOf('day').toJSDate()) },
   valid_until: {
     required: requiredIf(() => selectedTab.value === 1),
-    dateAfter: dateAfter(new Date()),
+    dateAfter: dateAfter(DateTime.local().startOf('day').toJSDate()),
   },
-  sale_from: { dateAfter: dateAfter(new Date()) },
-  sale_until: { dateAfter: dateAfter(new Date()) },
+  sale_from: { dateAfter: dateAfter(DateTime.local().startOf('day').toJSDate()) },
+  sale_until: { dateAfter: dateAfter(DateTime.local().startOf('day').toJSDate()) },
 })
 
 const submit = async (): Promise<void> => {

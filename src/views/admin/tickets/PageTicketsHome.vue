@@ -48,7 +48,7 @@ const statistics = computed(() => {
   return {
     total,
     active,
-    inactive: tickets.value.filter((t) => t.active === true).length,
+    inactive: tickets.value.filter((t) => t.active === false).length,
     soldOut: 0,
     totalRevenue,
     totalQuantity,
@@ -340,7 +340,7 @@ onMounted(async () => {
   <!-- Dialogs -->
   <DialogCreateTicket
     :open="shownDialog === 'add'"
-    :group="TicketGroup.GENERAL"
+    :group="preSelectedGroup || TicketGroup.GENERAL"
     @close="
       (() => {
         shownDialog = ''
