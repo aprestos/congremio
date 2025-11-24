@@ -92,7 +92,7 @@ const formatPrice = (price: number): string => {
         style: 'currency',
         currency: editionStore.value?.currency,
       }).format(price)
-    : 'NaN'
+    : '-'
 }
 
 const formatDate = (dateStr?: string): string => {
@@ -166,6 +166,10 @@ const handleTicketCreated = async (): Promise<void> => {
   await loadTickets()
 }
 
+const handleDialogClose = (): void => {
+  shownDialog.value = ''
+  preSelectedGroup.value = null
+}
 // Methods
 async function loadTickets(): Promise<void> {
   if (!tenantStore.value?.id || !editionStore.value?.id) {
@@ -341,12 +345,7 @@ onMounted(async () => {
   <DialogCreateTicket
     :open="shownDialog === 'add'"
     :group="preSelectedGroup || TicketGroup.GENERAL"
-    @close="
-      (() => {
-        shownDialog = ''
-        preSelectedGroup = null
-      })()
-    "
+    @close="handleDialogClose"
     @created="handleTicketCreated"
   />
 </template>

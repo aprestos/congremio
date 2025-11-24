@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { IconEdit, IconTrash, IconEye, IconTicket } from '@tabler/icons-vue'
+import { IconTicket } from '@tabler/icons-vue'
 import { useI18n } from 'vue-i18n'
 import CBadge from '@/components/CBadge.vue'
 import DataTable from '@/components/DataTable.vue'
@@ -13,14 +13,7 @@ interface Props {
   formatDateRange: (from?: string, until?: string) => string
 }
 
-interface Emits {
-  (e: 'view', ticket: Ticket): void
-  (e: 'edit', ticket: Ticket): void
-  (e: 'delete', ticket: Ticket): void
-}
-
 defineProps<Props>()
-const emit = defineEmits<Emits>()
 
 const { t } = useI18n()
 
@@ -29,7 +22,7 @@ const tableColumns = computed<DataTableColumn<Ticket>[]>(() => [
   { key: 'name', label: t('admin.tickets.name'), sortable: true },
   { key: 'price', label: t('admin.tickets.price'), sortable: true },
   { key: 'quantity', label: t('admin.tickets.quantity'), sortable: true },
-  { key: 'status', label: t('admin.tickets.status'), sortable: true },
+  { key: 'active', label: t('admin.tickets.status'), sortable: true },
   {
     key: 'sale_period',
     label: t('admin.tickets.salePeriod'),
@@ -48,18 +41,6 @@ const getStatusBadgeVariant = (
   ticket: Ticket,
 ): 'success' | 'warning' | 'danger' => {
   return ticket.active ? 'success' : 'danger'
-}
-
-const handleView = (ticket: Ticket): void => {
-  emit('view', ticket)
-}
-
-const handleEdit = (ticket: Ticket): void => {
-  emit('edit', ticket)
-}
-
-const handleDelete = (ticket: Ticket): void => {
-  emit('delete', ticket)
 }
 </script>
 
@@ -133,32 +114,9 @@ const handleDelete = (ticket: Ticket): void => {
     </template>
 
     <!-- Actions slot -->
-    <template #actions="{ item }">
+    <template #actions="">
       <div class="flex items-center justify-end gap-2">
-        <button
-          class="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-          title="View"
-          aria-label="View"
-          @click="handleView(item)"
-        >
-          <IconEye class="size-4" />
-        </button>
-        <button
-          class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 p-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
-          title="Edit"
-          aria-label="Edit"
-          @click="handleEdit(item)"
-        >
-          <IconEdit class="size-4" />
-        </button>
-        <button
-          class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
-          title="Delete"
-          aria-label="Delete"
-          @click="handleDelete(item)"
-        >
-          <IconTrash class="size-4" />
-        </button>
+        <!-- to be implemented later -->
       </div>
     </template>
   </DataTable>

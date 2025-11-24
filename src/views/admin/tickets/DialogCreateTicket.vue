@@ -288,6 +288,8 @@ const submit = async (): Promise<void> => {
       .toISO()
   }
 
+  if (!validUntil || !validFrom) return
+
   try {
     const input: CreateTicketInput = {
       tenant_id: tenantStore.value.id,
@@ -299,8 +301,8 @@ const submit = async (): Promise<void> => {
       active: true,
       sale_from: formData.value.sale_from || undefined,
       sale_until: formData.value.sale_until || undefined,
-      valid_from: validFrom as string,
-      valid_until: validUntil as string,
+      valid_from: validFrom,
+      valid_until: validUntil,
     }
 
     await ticketService.create(input)
