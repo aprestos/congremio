@@ -250,16 +250,18 @@ const submit = async (): Promise<void> => {
 
   let validFrom: string | null
   let validUntil: string | null
-  if (selectedTab.value === 0) {
-    validFrom = DateTime.fromISO(formData.value.valid_from)
-      .set({
-        hour: 0,
-        minute: 0,
-        second: 0,
-        millisecond: 0,
-      })
-      .toISO()
 
+  validFrom = DateTime.fromISO(formData.value.valid_from)
+    .set({
+      hour: 0,
+      minute: 0,
+      second: 0,
+      millisecond: 0,
+    })
+    .toISO()
+
+  // For single day tickets, set valid_until to the end of the valid_from day
+  if (selectedTab.value === 0) {
     validUntil = DateTime.fromISO(formData.value.valid_from)
       .set({
         hour: 23,
@@ -269,15 +271,6 @@ const submit = async (): Promise<void> => {
       })
       .toISO()
   } else {
-    // Normalize multi-day ticket dates to ISO format with explicit times and timezone
-    validFrom = DateTime.fromISO(formData.value.valid_from)
-      .set({
-        hour: 0,
-        minute: 0,
-        second: 0,
-        millisecond: 0,
-      })
-      .toISO()
     validUntil = DateTime.fromISO(formData.value.valid_until)
       .set({
         hour: 23,
