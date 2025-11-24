@@ -305,6 +305,7 @@ const en: TranslationSchema = {
       status: 'Status',
       salePeriod: 'Sale Period',
       validPeriod: 'Valid Period',
+      accessDay: 'Access Day',
       actions: 'Actions',
       general: 'General',
       vip: 'VIP',

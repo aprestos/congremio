@@ -16,11 +16,10 @@
             :errors="r$.$errors.name"
           />
 
-          <CInput
+          <CInputCurrency
             id="ticket-price"
             v-model="formData.price"
             :label="t('admin.tickets.price')"
-            type="currency"
             :errors="r$.$errors.price"
           />
 
@@ -146,6 +145,7 @@ import { IconCalendar, IconCalendarEvent } from '@tabler/icons-vue'
 import DialogComponent from '@/components/DialogComponent.vue'
 import CButton from '@/components/CButton.vue'
 import CInput from '@/components/CInput.vue'
+import CInputCurrency from '@/components/CInputCurrency.vue'
 import FormTabs from '@/components/FormTabs.vue'
 import type { TabConfig } from '@/components/FormTabs.vue'
 import ticketService from '@/features/tickets/service'
@@ -214,13 +214,20 @@ const { r$ } = useRegle(formData, {
   name: { required },
   price: { required, minValue: minValue(0) },
   quantity: { required, minValue: minValue(1) },
-  valid_from: { required, dateAfter: dateAfter(DateTime.local().startOf('day').toJSDate()) },
+  valid_from: {
+    required,
+    dateAfter: dateAfter(DateTime.local().startOf('day').toJSDate()),
+  },
   valid_until: {
     required: requiredIf(() => selectedTab.value === 1),
     dateAfter: dateAfter(DateTime.local().startOf('day').toJSDate()),
   },
-  sale_from: { dateAfter: dateAfter(DateTime.local().startOf('day').toJSDate()) },
-  sale_until: { dateAfter: dateAfter(DateTime.local().startOf('day').toJSDate()) },
+  sale_from: {
+    dateAfter: dateAfter(DateTime.local().startOf('day').toJSDate()),
+  },
+  sale_until: {
+    dateAfter: dateAfter(DateTime.local().startOf('day').toJSDate()),
+  },
 })
 
 const submit = async (): Promise<void> => {

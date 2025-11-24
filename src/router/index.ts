@@ -39,7 +39,7 @@ const router = createRouter({
           path: 'flea-market',
           name: RouteNames.public.fleaMarket,
           component: (): Promise<unknown> =>
-            import('@/views/public/library/PageLibraryHome.vue'),
+            import('@/views/public/flea-market/PageFleaMarketHome.vue'),
         },
       ],
     },
