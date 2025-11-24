@@ -269,9 +269,23 @@ const submit = async (): Promise<void> => {
       })
       .toISO()
   } else {
-    // TODO needs to apply timezone
-    validFrom = formData.value.valid_from
-    validUntil = formData.value.valid_until
+    // Normalize multi-day ticket dates to ISO format with explicit times and timezone
+    validFrom = DateTime.fromISO(formData.value.valid_from)
+      .set({
+        hour: 0,
+        minute: 0,
+        second: 0,
+        millisecond: 0,
+      })
+      .toISO()
+    validUntil = DateTime.fromISO(formData.value.valid_until)
+      .set({
+        hour: 23,
+        minute: 59,
+        second: 59,
+        millisecond: 999,
+      })
+      .toISO()
   }
 
   try {
