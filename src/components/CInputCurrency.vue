@@ -108,7 +108,10 @@ function onBlur(value: string): void {
     const num = parseFloat(value.replace(/,/g, '.'))
     if (!Number.isNaN(num)) {
       formattedValue = num.toFixed(2)
-      emit('update:modelValue', formattedValue)
+      // Only emit if value changed
+      if (formattedValue !== props.modelValue) {
+        emit('update:modelValue', formattedValue)
+      }
     }
   }
   emit('blur', formattedValue)
