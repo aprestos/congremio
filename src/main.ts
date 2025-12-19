@@ -1,6 +1,5 @@
 import './assets/main.css'
 import './index.css'
-import '@fontsource-variable/outfit'
 
 import { createPinia } from 'pinia'
 import { createApp } from 'vue'
