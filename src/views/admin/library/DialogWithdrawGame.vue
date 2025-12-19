@@ -168,11 +168,11 @@ const selectedTab = ref<number>(0)
 
 const tabs = computed<TabConfig[]>(() => [
   {
-    label: 'Search user',
+    label: t('admin.library.searchUser'),
     icon: IconSearch,
   },
   {
-    label: 'Create user',
+    label: t('admin.library.createUser'),
     icon: IconUserPlus,
   },
 ])

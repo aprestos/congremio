@@ -130,8 +130,8 @@ const fetchWithdrawDetails = async (): Promise<void> => {
                 </div>
                 <div class="flex flex-row">
                   <IconUserFilled class="mr-2" size="18" />
-                  <span v-if="!isLoadingWithdraw">{{
-                    withdraw.user?.name
+                  <span v-if="!isLoadingWithdraw && withdraw?.user?.name">{{
+                    withdraw.user.name
                   }}</span>
                   <SkeletonLoader v-else class="inline-block w-24 h-4" />
                 </div>

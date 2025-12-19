@@ -22,7 +22,7 @@ const tableColumns = computed<DataTableColumn<Ticket>[]>(() => [
   { key: 'name', label: t('admin.tickets.name'), sortable: true },
   { key: 'price', label: t('admin.tickets.price'), sortable: true },
   { key: 'quantity', label: t('admin.tickets.quantity'), sortable: true },
-  { key: 'active', label: t('admin.tickets.status'), sortable: true },
+  { key: 'status', label: t('admin.tickets.status'), sortable: true },
   {
     key: 'sale_period',
     label: t('admin.tickets.salePeriod'),
@@ -114,7 +114,7 @@ const getStatusBadgeVariant = (
     </template>
 
     <!-- Actions slot -->
-    <template #actions="">
+    <template #actions>
       <div class="flex items-center justify-end gap-2">
         <!-- to be implemented later -->
       </div>

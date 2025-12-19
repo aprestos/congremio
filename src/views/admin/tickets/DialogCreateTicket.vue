@@ -220,13 +220,21 @@ const { r$ } = useRegle(formData, {
   },
   valid_until: {
     required: requiredIf(() => selectedTab.value === 1),
-    dateAfter: dateAfter(DateTime.local().startOf('day').toJSDate()),
+    dateAfter: dateAfter(
+      DateTime.local().minus({ days: 1 }).startOf('day').toJSDate(),
+    ),
+    // must be after valid from, to be implemented later
   },
   sale_from: {
-    dateAfter: dateAfter(DateTime.local().startOf('day').toJSDate()),
+    dateAfter: dateAfter(
+      DateTime.local().minus({ days: 1 }).startOf('day').toJSDate(),
+    ),
   },
   sale_until: {
-    dateAfter: dateAfter(DateTime.local().startOf('day').toJSDate()),
+    dateAfter: dateAfter(
+      DateTime.local().minus({ days: 1 }).startOf('day').toJSDate(),
+    ),
+    // must be after sale from, to be implemented later
   },
 })
 
@@ -248,38 +256,32 @@ const submit = async (): Promise<void> => {
 
   isSubmitting.value = true
 
-  let validFrom: string | null
-  let validUntil: string | null
+  let validFrom: DateTime | null
+  let validUntil: DateTime | null
 
-  validFrom = DateTime.fromISO(formData.value.valid_from)
-    .set({
-      hour: 0,
-      minute: 0,
-      second: 0,
-      millisecond: 0,
-    })
-    .toISO()
+  validFrom = DateTime.fromISO(formData.value.valid_from).set({
+    hour: 0,
+    minute: 0,
+    second: 0,
+    millisecond: 0,
+  })
 
   // For single day tickets, set valid_until to the end of the valid_from day
-  if (selectedTab.value === 0) {
-    validUntil = DateTime.fromISO(formData.value.valid_from)
-      .set({
-        hour: 23,
-        minute: 59,
-        second: 59,
-        millisecond: 999,
-      })
-      .toISO()
-  } else {
-    validUntil = DateTime.fromISO(formData.value.valid_until)
-      .set({
-        hour: 23,
-        minute: 59,
-        second: 59,
-        millisecond: 999,
-      })
-      .toISO()
+  validUntil = DateTime.fromISO(
+    selectedTab.value === 0
+      ? formData.value.valid_from
+      : formData.value.valid_until,
+  )
+
+  if (!validUntil.isValid) {
+    return
   }
+  validUntil.set({
+    hour: 23,
+    minute: 59,
+    second: 59,
+    millisecond: 999,
+  })
 
   if (!validUntil || !validFrom) return
 
@@ -294,8 +296,8 @@ const submit = async (): Promise<void> => {
       active: true,
       sale_from: formData.value.sale_from || undefined,
       sale_until: formData.value.sale_until || undefined,
-      valid_from: validFrom,
-      valid_until: validUntil,
+      valid_from: validFrom.toISO() as string,
+      valid_until: validUntil.toISO() as string,
     }
 
     await ticketService.create(input)

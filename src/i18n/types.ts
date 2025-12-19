@@ -266,9 +266,8 @@ export interface AdminTranslationSchema {
     noWithdrawalsYet: string
     gameNotWithdrawn: string
     confirmWithdraw: string
-    searchAndSelectUser: string
-    createNewUser: string
-    selectExistingUser: string
+    searchUser: string
+    createUser: string
     // Return management
     return: string
     loan: string
