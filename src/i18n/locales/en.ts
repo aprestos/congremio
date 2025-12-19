@@ -1,6 +1,17 @@
-import type { TranslationSchema } from '../types'
+/**
+ * Helper type to convert literal string types to string
+ * This allows other locales to have different string values
+ */
+type StringifyValues<T> = {
+  [K in keyof T]: T[K] extends string
+    ? string
+    : T[K] extends object
+      ? StringifyValues<T[K]>
+      : T[K]
+}
 
-const en: TranslationSchema = {
+// English is the source of truth - all translations derive from this
+const en = {
   common: {
     cancel: 'Cancel',
     confirm: 'Confirm',
@@ -321,4 +332,6 @@ const en: TranslationSchema = {
   },
 }
 
-export default en
+export type TranslationSchema = StringifyValues<typeof en>
+
+export default en as TranslationSchema

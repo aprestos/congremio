@@ -1,5 +1,7 @@
-import type { TranslationSchema } from '../types'
-
+/**
+ * Portuguese translations
+ * This is a partial translation - missing keys will fall back to English
+ */
 const pt = {
   common: {
     cancel: 'Cancelar',
@@ -174,7 +176,6 @@ const pt = {
       dashboard: 'Painel',
       library: 'Ludoteca',
       events: 'Eventos',
-      tickets: 'Bilhetes',
       tournaments: 'Torneios',
       settings: 'Definições',
       fleaMarket: 'Feira de Usados',
@@ -329,4 +330,4 @@ const pt = {
   },
 }
 
-export default pt as TranslationSchema
+export default pt

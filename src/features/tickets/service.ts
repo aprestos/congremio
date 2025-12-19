@@ -44,7 +44,6 @@ export const ticketService = {
     const ticketData = {
       ...input,
       status: input.status || TicketStatus.INACTIVE,
-
     }
 
     const { data, error } = await supabase
