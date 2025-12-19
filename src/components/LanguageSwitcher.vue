@@ -30,7 +30,7 @@ const handleLocaleChange = (localeCode: string): void => {
           class="relative flex flex-row items-center w-full cursor-default py-1.5 pl-3 pr-10 text-base sm:text-sm/6 text-gray-900 dark:text-white focus:ring-0 bg-transparent outline-none"
         >
           <img
-            :alt="`image of ${currentLocale} locale`"
+            :alt="`image of ${currentLocale?.code} locale`"
             class="size-5 rounded-full mr-2"
             :src="`https://unpkg.com/language-icons/icons/${currentLocale?.code}.svg`"
           />
