@@ -84,7 +84,7 @@ export const authService = {
 
     return {
       email: data.claims.email || '',
-      name: data.claims.user_metadata?.display_name as string,
+      name: (data.claims.user_metadata?.display_name ?? '') as string,
       id: data.claims.sub,
       access,
     }
