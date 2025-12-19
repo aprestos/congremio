@@ -147,7 +147,8 @@ const confirmReservation = async (): Promise<void> => {
     selectedGameForReservation.value = null
     toast.success('Game reserved successfully!')
   } catch (error: unknown) {
-    toast.error(error as string)
+    if (error instanceof Error) toast.error(error.message)
+    else toast.error('Failed to reserve the game.')
   } finally {
     loadingReservation.value = false
   }

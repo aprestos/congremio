@@ -4,6 +4,7 @@ import { tenantStore } from '@/stores/tenant.ts'
 import type { LibraryGame } from '@/features/library/game.model.ts'
 import logger from '@/lib/logger.ts'
 import { DateTime } from 'luxon'
+import type { FunctionsHttpError } from '@supabase/supabase-js'
 
 export interface LibraryReservation {
   tenant_id: string
@@ -89,8 +90,13 @@ export const libraryReservationService = {
     })
 
     if (error) {
-      logger.error('Error creating reservation', { error })
-      throw new Error('Failed to reserve game')
+      const response = (error as FunctionsHttpError).context as Response
+      if (response.status === 409)
+        throw new Error('Only one active reservation is allowed per user')
+      else {
+        logger.error('Error reserving game', { error })
+        throw new Error('Failed to reserve game')
+      }
     }
   },
 
