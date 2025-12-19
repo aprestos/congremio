@@ -18,7 +18,6 @@ import { settingsStore } from '@/features/settings/useSettings.store.ts'
 import { settingsService } from '@/features/settings/service.ts'
 import type { Edition } from '@/features/events/event.model.ts'
 import i18n from '@/i18n'
-import 'vue3-flag-icons/styles'
 
 async function loadTenant(): Promise<Tenant | null> {
   const tenantId = LocalStorageService.getTenantId()
