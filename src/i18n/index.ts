@@ -71,15 +71,11 @@ export const AVAILABLE_LOCALE_CODES = availableLocaleCodes
 export const DEFAULT_LOCALE = 'en'
 export const FALLBACK_LOCALE = 'en'
 
-// Locale display names - add new languages here
+// Locale display names - keep in sync with available translation files in ./locales
 const LOCALE_NAMES: Record<string, { name: string; nativeName: string }> = {
   en: { name: 'English', nativeName: 'English' },
   pt: { name: 'Portuguese', nativeName: 'Português' },
-  es: { name: 'Spanish', nativeName: 'Español' },
-  fr: { name: 'French', nativeName: 'Français' },
-  de: { name: 'German', nativeName: 'Deutsch' },
-  it: { name: 'Italian', nativeName: 'Italiano' },
-  // Add more as needed - only locales with actual translation files will be shown
+  // Add new locales here when their ./locales/<code>.ts file is created
 }
 
 export interface LocaleInfo {
