@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col min-h-screen sm:p-6 space-y-6 p-0">
+  <div class="flex flex-col min-h-screen space-y-6 p-6">
     <!-- Page Header -->
     <div class="p-6 sm:p-0">
       <PageHeader
@@ -253,25 +253,25 @@
 
 <script setup lang="ts">
 import {
-  IconPlus,
-  IconDice,
-  IconCircleCheck,
-  IconHandGrab,
   IconBookmark,
-  IconSearch,
+  IconCircleCheck,
+  IconDice,
+  IconHandGrab,
   IconNumber,
+  IconPlus,
+  IconSearch,
 } from '@tabler/icons-vue'
-import { onMounted, onUnmounted, ref, computed, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useDebounceFn } from '@vueuse/core'
 import { toast } from 'vue-sonner'
 import { useI18n } from 'vue-i18n'
 
+import type { DataTableColumn } from '@/components/DataTable.vue'
 import DataTable from '@/components/DataTable.vue'
 import CInput from '@/components/CInput.vue'
 import SkeletonLoader from '@/components/SkeletonLoader.vue'
 import StatisticCard from '@/components/StatisticCard.vue'
 import { getStatus, type LibraryGame } from '@/features/library/game.model.ts'
-import type { DataTableColumn } from '@/components/DataTable.vue'
 import libraryReservationService from '@/features/library/reservations/service.ts'
 import GameActions from '@/views/admin/library/GameActions.vue'
 import GameStatus from '@/views/admin/library/GameStatus.vue'
@@ -431,10 +431,8 @@ const handleReservationChange = useDebounceFn(
     if (!reservationNumber.trim()) return
     loadingReservation.value = true
     try {
-      const result =
+      selectedReservation.value =
         await libraryReservationService.getByDisplayId(reservationNumber)
-
-      selectedReservation.value = result
       shownDialog.value = Dialog.reservation
     } catch {
       toast.error(t('admin.library.reservationNotFound'))

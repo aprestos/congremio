@@ -4,7 +4,6 @@ import type {
   CreateTicketInput,
   UpdateTicketInput,
 } from './ticket.model'
-import { TicketStatus } from './ticket.model'
 
 export const ticketService = {
   /**
@@ -43,8 +42,7 @@ export const ticketService = {
   async create(input: CreateTicketInput): Promise<Ticket> {
     const ticketData = {
       ...input,
-      status: input.status || TicketStatus.INACTIVE,
-
+      active: true,
     }
 
     const { data, error } = await supabase

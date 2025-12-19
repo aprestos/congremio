@@ -35,7 +35,13 @@
 import { computed } from 'vue'
 
 interface Props {
-  variant?: 'primary' | 'secondary' | 'tertiary' | 'yellow' | 'danger'
+  variant?:
+    | 'primary'
+    | 'secondary'
+    | 'tertiary'
+    | 'yellow'
+    | 'danger'
+    | 'transparent'
   size?: 'sm' | 'md' | 'lg' | 'xl'
   type?: 'button' | 'submit' | 'reset'
   disabled?: boolean
@@ -91,7 +97,7 @@ const buttonClasses = computed(() => {
       'text-white',
       'shadow-xs',
       'hover:bg-indigo-700',
-      'focus-visible:outline-indigo-700',
+      'focus-visible:outline-indigo-600',
       'dark:bg-indigo-500',
       'dark:shadow-none',
       'dark:hover:bg-indigo-400',
@@ -116,14 +122,12 @@ const buttonClasses = computed(() => {
     tertiary: [
       'bg-gray-100',
       'text-gray-900',
-      'bg-gray-100',
-      'dark:bg-gray-700',
       'hover:bg-gray-200',
-      'focus-visible:outline-indigo-600',
+      'focus-visible:outline-gray-500',
+      'dark:bg-gray-700',
       'dark:text-white',
-      'dark:hover:text-white',
       'dark:hover:bg-gray-600',
-      'dark:focus-visible:outline-indigo-500',
+      'dark:focus-visible:outline-gray-400',
     ],
     yellow: [
       'bg-amber-500',
@@ -141,11 +145,22 @@ const buttonClasses = computed(() => {
       'text-white',
       'shadow-xs',
       'hover:bg-red-700',
-      'focus-visible:outline-red-700',
+      'focus-visible:outline-red-600',
       'dark:bg-red-500',
       'dark:shadow-none',
       'dark:hover:bg-red-400',
       'dark:focus-visible:outline-red-500',
+    ],
+    transparent: [
+      'bg-transparent',
+      'text-gray-700',
+      'hover:bg-gray-200',
+      'active:bg-gray-300',
+      'focus-visible:outline-gray-500',
+      'dark:text-gray-300',
+      'dark:hover:bg-gray-700',
+      'dark:active:bg-gray-600',
+      'dark:focus-visible:outline-gray-400',
     ],
   }
 

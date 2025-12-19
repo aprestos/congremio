@@ -22,7 +22,8 @@ const router = createRouter({
     {
       path: '',
       name: RouteNames.public.home,
-      component: () => import('../views/public/PageLanding.vue'),
+      component: (): Promise<unknown> =>
+        import('../views/public/PageLanding.vue'),
     },
     {
       path: '',
@@ -31,63 +32,79 @@ const router = createRouter({
         {
           path: 'library',
           name: RouteNames.public.library,
-          component: () => import('@/views/public/library/PageLibraryHome.vue'),
+          component: (): Promise<unknown> =>
+            import('@/views/public/library/PageLibraryHome.vue'),
+        },
+        {
+          path: 'flea-market',
+          name: RouteNames.public.fleaMarket,
+          component: (): Promise<unknown> =>
+            import('@/views/public/flea-market/PageFleaMarketHome.vue'),
         },
       ],
     },
     {
       path: '/auth',
-      component: () => import('../views/auth/_templates/AuthTemplateView.vue'),
+      component: (): Promise<unknown> =>
+        import('../views/auth/_templates/AuthTemplateView.vue'),
       children: [
         {
           path: 'sign-in',
           name: RouteNames.auth.signIn,
-          component: () => import('../views/auth/SignInView.vue'),
+          component: (): Promise<unknown> =>
+            import('../views/auth/SignInView.vue'),
         },
         {
           path: 'confirm',
           name: RouteNames.auth.confirm,
-          component: () => import('../views/auth/SignInConfirmation.vue'),
+          component: (): Promise<unknown> =>
+            import('../views/auth/SignInConfirmation.vue'),
         },
       ],
     },
     {
       path: '/admin',
-      component: () => import('../views/admin/HomeView.vue'),
+      component: (): Promise<unknown> => import('../views/admin/HomeView.vue'),
       meta: {
         requiresAuth: true,
         permission: 'admin',
-        guard: () => hasAnyOfRoles(['admin', 'staff']),
+        guard: (): Promise<boolean> => hasAnyOfRoles(['admin', 'staff']),
       },
       children: [
         {
           path: '',
           name: RouteNames.admin.dashboard,
-          component: () => import('../views/admin/dashboard/DashboardHome.vue'),
+          component: (): Promise<unknown> =>
+            import('../views/admin/dashboard/DashboardHome.vue'),
         },
         {
           path: 'library',
           name: RouteNames.admin.library,
-          component: () => import('../views/admin/library/PageLibraryHome.vue'),
+          component: (): Promise<unknown> =>
+            import('../views/admin/library/PageLibraryHome.vue'),
         },
         {
           path: 'events',
           name: RouteNames.admin.events,
-          component: () => import('../views/admin/events/EventsHome.vue'),
+          component: (): Promise<unknown> =>
+            import('../views/admin/events/EventsHome.vue'),
         },
         {
           path: 'tournaments',
           name: RouteNames.admin.tournaments,
-          component: () => import('../views/admin/tournaments/HomeView.vue'),
+          component: (): Promise<unknown> =>
+            import('../views/admin/tournaments/HomeView.vue'),
         },
         {
           path: 'tickets',
           name: RouteNames.admin.tickets,
-          component: () => import('../views/admin/tickets/PageTicketsHome.vue'),
+          component: (): Promise<unknown> =>
+            import('../views/admin/tickets/PageTicketsHome.vue'),
         },
         {
           path: 'settings',
-          component: () => import('../views/admin/settings/SettingsView.vue'),
+          component: (): Promise<unknown> =>
+            import('../views/admin/settings/SettingsView.vue'),
           children: [
             {
               path: '',
@@ -96,13 +113,13 @@ const router = createRouter({
             {
               path: 'general',
               name: RouteNames.admin.settingsGeneral,
-              component: () =>
+              component: (): Promise<unknown> =>
                 import('../views/admin/settings/general/GeneralSettings.vue'),
             },
             {
               path: 'library',
               name: RouteNames.admin.settingsLibrary,
-              component: () =>
+              component: (): Promise<unknown> =>
                 import('../views/admin/settings/library/LibrarySettings.vue'),
             },
           ],
@@ -112,12 +129,13 @@ const router = createRouter({
     {
       path: '/users/:id',
       name: RouteNames.public.user,
-      component: () => import('../views/public/PageUserProfile.vue'),
+      component: (): Promise<unknown> =>
+        import('../views/public/PageUserProfile.vue'),
     },
     {
       path: '/not-found',
       name: RouteNames.error.notFound,
-      component: () => import('../views/NotFoundView.vue'),
+      component: (): Promise<unknown> => import('../views/NotFoundView.vue'),
     },
     {
       path: '/:pathMatch(.*)*',

@@ -14,6 +14,7 @@ export interface LibraryWithdraw {
   user_id: string
   created_by: string
   notes?: string
+  user?: { name?: string }
 }
 
 export const libraryWithdrawService = {
@@ -21,7 +22,9 @@ export const libraryWithdrawService = {
     try {
       const result = await supabase
         .from('library_withdraws')
-        .select('*,library_game:library_games(game:games(name,year,image))')
+        .select(
+          '*,user:profiles(name),library_game:library_games(game:games(name,year,image))',
+        )
         .eq('tenant_id', tenantStore.value?.id)
         .eq('edition_id', editionStore.value?.id)
 
@@ -69,7 +72,7 @@ export const libraryWithdrawService = {
     try {
       const result = await supabase
         .from('library_withdraws')
-        .select('*')
+        .select('*,user:profiles(name)')
         .eq('library_game_id', libraryGameId)
         .eq('tenant_id', tenantStore.value?.id)
         .eq('edition_id', editionStore.value?.id)
