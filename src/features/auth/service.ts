@@ -83,8 +83,8 @@ export const authService = {
     }
 
     return {
-      email: data.claims.email,
-      name: data.claims.user_metadata?.display_name, // eslint-disable-line @typescript-eslint/no-unsafe-member-access -- user_metadata is a dynamic object from auth provider
+      email: data.claims.email || '',
+      name: (data.claims.user_metadata?.display_name ?? '') as string,
       id: data.claims.sub,
       access,
     }
