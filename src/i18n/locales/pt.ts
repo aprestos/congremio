@@ -177,6 +177,7 @@ const pt = {
       library: 'Ludoteca',
       events: 'Eventos',
       tournaments: 'Torneios',
+      tickets: 'Bilhetes',
       settings: 'Definições',
       fleaMarket: 'Feira de Usados',
     },
