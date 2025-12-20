@@ -7,8 +7,6 @@ import {
   IconMapPin,
   IconClock,
   IconBooks,
-  IconTrophy,
-  IconDeviceGamepad2,
   IconUsers,
   IconClockHour4,
   IconCalendarEvent,
@@ -74,22 +72,6 @@ const features = [
     icon: IconBooks,
     enabled: settings.value?.library?.enabled ?? false,
     route: RouteNames.public.library,
-  },
-  {
-    name: 'Tournaments',
-    description:
-      'Compete in organized tournaments across various game categories. Win prizes and glory!',
-    icon: IconTrophy,
-    enabled: settings.value?.tournaments?.enabled ?? false,
-    route: RouteNames.admin.tournaments,
-  },
-  {
-    name: 'Flea Market',
-    description:
-      'Buy, sell, and trade board games with fellow enthusiasts. Find rare gems and expand your collection.',
-    icon: IconDeviceGamepad2,
-    enabled: settings.value?.flea?.enabled ?? false,
-    route: RouteNames.public.fleaMarket,
   },
 ]
 

@@ -91,12 +91,6 @@ const publicPages = [
     initial: 'L',
     enabled: settingsStore?.value?.library?.enabled ?? false,
   },
-  {
-    id: 'flea-market',
-    routeName: RouteNames.public.fleaMarket,
-    initial: 'FM',
-    enabled: settingsStore?.value?.flea?.enabled ?? false,
-  },
 ]
 
 const sidebarOpen = ref(false)

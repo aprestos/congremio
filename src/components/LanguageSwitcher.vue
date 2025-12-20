@@ -1,54 +1,108 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import { useLocale } from '@/composables/useLocale'
-import CButton from '@/components/CButton.vue'
-import { LanguageIcon } from '@heroicons/vue/24/outline'
-import type { LocaleCode } from '@/i18n/types'
-
-interface Props {
-  variant?: 'primary' | 'secondary' | 'tertiary' | 'yellow' | 'danger'
-  showIcon?: boolean
-}
-
-withDefaults(defineProps<Props>(), {
-  variant: 'secondary',
-  showIcon: true,
-})
+import {
+  Listbox,
+  ListboxButton,
+  ListboxOptions,
+  ListboxOption,
+  TransitionRoot,
+} from '@headlessui/vue'
+import { ChevronUpDownIcon } from '@heroicons/vue/20/solid'
+import { IconCheck } from '@tabler/icons-vue'
+import CAvatar from '@/components/CAvatar.vue'
 
 const { availableLocales, currentLocale, setLocale } = useLocale()
 
-const otherLocales = computed(() => {
-  const current = currentLocale.value
-  if (!current) return availableLocales
-  return availableLocales.filter((locale) => locale.code !== current.code)
-})
-
-const handleLocaleChange = (code: LocaleCode): void => {
-  setLocale(code)
+const handleLocaleChange = (localeCode: string): void => {
+  setLocale(localeCode)
 }
 </script>
 
 <template>
-  <div class="relative inline-block">
-    <div
-      v-if="otherLocales.length > 0 && otherLocales[0]"
-      class="flex items-center gap-2"
-    >
-      <CButton
-        :variant="variant"
-        size="sm"
-        @click="handleLocaleChange(otherLocales[0].code)"
+  <Listbox
+    :model-value="currentLocale?.code"
+    @update:model-value="handleLocaleChange"
+  >
+    <div class="relative w-40">
+      <div
+        class="relative w-full cursor-default overflow-hidden rounded-md bg-white dark:bg-white/5 text-left outline-1 -outline-offset-1 outline-gray-300 dark:outline-white/10 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600 dark:focus-within:outline-indigo-500"
       >
-        <LanguageIcon v-if="showIcon" class="size-4" />
-        <span>{{ otherLocales[0].nativeName }}</span>
-      </CButton>
-    </div>
+        <ListboxButton
+          class="relative flex flex-row items-center w-full cursor-default py-1.5 pl-3 pr-10 text-base sm:text-sm/6 text-gray-900 dark:text-white focus:ring-0 bg-transparent outline-none"
+        >
+          <CAvatar
+            :src="`https://unpkg.com/language-icons/icons/${currentLocale?.code}.svg`"
+            :alt="`${currentLocale?.code} locale`"
+            :initials="currentLocale?.code?.toUpperCase()"
+            size="xs"
+            shape="circle"
+            class="mr-2"
+          />
+          <span class="block truncate">
+            {{ currentLocale?.nativeName }}
+          </span>
+          <span
+            class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2"
+          >
+            <ChevronUpDownIcon
+              class="h-5 w-5 text-gray-400"
+              aria-hidden="true"
+            />
+          </span>
+        </ListboxButton>
+      </div>
 
-    <!-- For multiple locales, you could implement a dropdown menu here -->
-    <div v-else-if="currentLocale" class="flex items-center gap-2">
-      <span class="text-sm text-gray-500 dark:text-gray-400">
-        {{ currentLocale.nativeName }}
-      </span>
+      <TransitionRoot
+        leave="transition ease-in duration-100"
+        leave-from="opacity-100"
+        leave-to="opacity-0"
+      >
+        <ListboxOptions
+          class="absolute z-20 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white dark:bg-gray-800 py-1 text-base shadow-lg ring-1 ring-gray-200 dark:ring-white/10 focus:outline-none sm:text-sm"
+        >
+          <ListboxOption
+            v-for="locale in availableLocales"
+            v-slot="{ active, selected }"
+            :key="locale.code"
+            :value="locale.code"
+            as="template"
+          >
+            <li
+              class="group flex flex-row relative cursor-default select-none px-3 py-2"
+              :class="
+                active
+                  ? 'bg-indigo-600 text-white dark:bg-indigo-500'
+                  : 'text-gray-900 dark:text-gray-100'
+              "
+            >
+              <CAvatar
+                :src="`https://unpkg.com/language-icons/icons/${locale.code}.svg`"
+                :alt="`${locale.nativeName} flag`"
+                :initials="locale.code.toUpperCase()"
+                size="xs"
+                shape="circle"
+                class="mr-2"
+              />
+
+              <span
+                class="block truncate"
+                :class="selected ? 'font-medium' : 'font-normal'"
+              >
+                {{ locale.nativeName }}
+              </span>
+              <span
+                v-if="selected"
+                class="absolute inset-y-0 right-0 flex items-center pr-3"
+                :class="
+                  active ? 'text-white' : 'text-indigo-600 dark:text-indigo-500'
+                "
+              >
+                <IconCheck class="h-5 w-5" aria-hidden="true" />
+              </span>
+            </li>
+          </ListboxOption>
+        </ListboxOptions>
+      </TransitionRoot>
     </div>
-  </div>
+  </Listbox>
 </template>
