@@ -9,6 +9,7 @@ import {
 } from '@headlessui/vue'
 import { ChevronUpDownIcon } from '@heroicons/vue/20/solid'
 import { IconCheck } from '@tabler/icons-vue'
+import CAvatar from '@/components/CAvatar.vue'
 
 const { availableLocales, currentLocale, setLocale } = useLocale()
 
@@ -29,10 +30,13 @@ const handleLocaleChange = (localeCode: string): void => {
         <ListboxButton
           class="relative flex flex-row items-center w-full cursor-default py-1.5 pl-3 pr-10 text-base sm:text-sm/6 text-gray-900 dark:text-white focus:ring-0 bg-transparent outline-none"
         >
-          <img
-            :alt="`image of ${currentLocale?.code} locale`"
-            class="size-5 rounded-full mr-2"
+          <CAvatar
             :src="`https://unpkg.com/language-icons/icons/${currentLocale?.code}.svg`"
+            :alt="`${currentLocale?.code} locale`"
+            :initials="currentLocale?.code?.toUpperCase()"
+            size="xs"
+            shape="circle"
+            class="mr-2"
           />
           <span class="block truncate">
             {{ currentLocale?.nativeName }}
@@ -64,20 +68,22 @@ const handleLocaleChange = (localeCode: string): void => {
             as="template"
           >
             <li
-              class="group relative cursor-default select-none py-2 pl-10 pr-10"
+              class="group flex flex-row relative cursor-default select-none px-3 py-2"
               :class="
                 active
                   ? 'bg-indigo-600 text-white dark:bg-indigo-500'
                   : 'text-gray-900 dark:text-gray-100'
               "
             >
-              <span class="absolute inset-y-0 left-0 flex items-center pl-3">
-                <img
-                  :alt="`${locale.nativeName} flag`"
-                  class="size-5 rounded-full"
-                  :src="`https://unpkg.com/language-icons/icons/${locale.code}.svg`"
-                />
-              </span>
+              <CAvatar
+                :src="`https://unpkg.com/language-icons/icons/${locale.code}.svg`"
+                :alt="`${locale.nativeName} flag`"
+                :initials="locale.code.toUpperCase()"
+                size="xs"
+                shape="circle"
+                class="mr-2"
+              />
+
               <span
                 class="block truncate"
                 :class="selected ? 'font-medium' : 'font-normal'"

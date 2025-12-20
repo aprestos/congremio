@@ -11,7 +11,7 @@ const localeModules = import.meta.glob<{ default: Record<string, unknown> }>(
 // English is the base/fallback - import it directly for type safety
 import en from './locales/en'
 
-export type MessageSchema = TranslationSchema
+export type MessageSchema = TranslationSchema | Partial<TranslationSchema>
 
 // Extract locale code from file path (e.g., './locales/pt.ts' -> 'pt')
 function getLocaleCode(path: string): string {
@@ -19,34 +19,9 @@ function getLocaleCode(path: string): string {
   return match && match[1] ? match[1] : ''
 }
 
-// Deep merge utility to merge partial translations with the base (English)
-function mergeTranslations<T extends object>(base: T, partial: Partial<T>): T {
-  const result = { ...base }
-
-  for (const key in partial) {
-    const k = key as keyof T
-    const partialValue = partial[k]
-
-    if (
-      partialValue !== undefined &&
-      typeof partialValue === 'object' &&
-      partialValue !== null &&
-      !Array.isArray(partialValue)
-    ) {
-      result[k] = mergeTranslations(
-        base[k] as object,
-        partialValue as Partial<object>,
-      ) as T[keyof T]
-    } else if (partialValue !== undefined) {
-      result[k] = partialValue as T[keyof T]
-    }
-  }
-
-  return result
-}
-
 // Build messages object from all discovered locale files
-const messages: Record<string, TranslationSchema> = {}
+const messages: Record<string, TranslationSchema | Partial<TranslationSchema>> =
+  {}
 const availableLocaleCodes: string[] = []
 
 for (const [path, module] of Object.entries(localeModules)) {
@@ -58,10 +33,7 @@ for (const [path, module] of Object.entries(localeModules)) {
       messages[code] = en
     } else {
       // Merge other locales with English as fallback
-      messages[code] = mergeTranslations(
-        en,
-        module.default as Partial<TranslationSchema>,
-      )
+      messages[code] = module.default as Partial<TranslationSchema>
     }
   }
 }
