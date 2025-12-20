@@ -32,7 +32,7 @@ for (const [path, module] of Object.entries(localeModules)) {
       // English is the base, use as-is
       messages[code] = en
     } else {
-      // Merge other locales with English as fallback
+      // Use other locales as-is; vue-i18n will fall back to English at runtime for missing keys
       messages[code] = module.default as Partial<TranslationSchema>
     }
   }
