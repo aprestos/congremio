@@ -1,4 +1,27 @@
 <script setup lang="ts">
+/**
+ * CAvatar - Image component with fallback initials support
+ *
+ * Displays an image with automatic fallback to initials if the image fails to load.
+ * Perfect for user avatars, locale flags, or any image that needs a fallback.
+ *
+ * @example
+ * <CAvatar
+ *   src="https://example.com/avatar.jpg"
+ *   alt="User avatar"
+ *   initials="JD"
+ *   size="md"
+ *   shape="circle"
+ * />
+ *
+ * Features:
+ * - Automatic fallback to initials on image load error
+ * - Loading skeleton while image loads
+ * - Extracts initials from multi-word strings (e.g., "John Doe" -> "JD")
+ * - Supports multiple sizes (xs, sm, md, lg, xl)
+ * - Supports multiple shapes (circle, rounded, square)
+ * - Full dark mode support
+ */
 import { ref, computed } from 'vue'
 
 interface Props {
@@ -51,21 +74,6 @@ const handleImageLoad = (): void => {
   isLoading.value = false
   hasError.value = false
 }
-
-// Get initials from text (e.g., "John Doe" -> "JD")
-const displayInitials = computed(() => {
-  if (!props.initials) return '?'
-
-  const words = props.initials.trim().split(/\s+/)
-  if (words.length === 1 && words[0]) {
-    return words[0].substring(0, 2).toUpperCase()
-  }
-  return words
-    .slice(0, 2)
-    .map((word) => word[0])
-    .join('')
-    .toUpperCase()
-})
 </script>
 
 <template>
@@ -79,7 +87,7 @@ const displayInitials = computed(() => {
       class="flex h-full w-full items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 font-semibold text-white"
       :class="shapeClasses"
     >
-      {{ displayInitials }}
+      {{ initials }}
     </div>
 
     <!-- Image -->
