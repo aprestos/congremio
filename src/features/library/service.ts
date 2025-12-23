@@ -4,9 +4,17 @@ import { editionStore } from '@/stores/edition'
 import { tenantStore } from '@/stores/tenant.ts'
 import logger from '@/lib/logger.ts'
 
+export enum SortOption {
+  DEFAULT = 'lastUpdated',
+  BEST_RATING = 'bestRating',
+  NEWEST = 'newest',
+  NAME = 'name',
+}
+
 export interface FilterOptions {
   searchQuery?: string
   selectedFilters?: Record<string, string[]>
+  selectedSort?: SortOption | undefined
 }
 
 type GameUpdateCallback = (games: LibraryGame[]) => void
@@ -183,6 +191,26 @@ export const libraryService = {
           })
         })
       }
+    }
+
+    // Apply sorting
+    if (filters.selectedSort) {
+      filtered = [...filtered].sort((a, b) => {
+        switch (filters.selectedSort) {
+          case SortOption.BEST_RATING:
+            // Sort by best at player count (games with more "best at" recommendations)
+            // TODO: Replace with actual rating when available
+            return 0
+          case SortOption.NEWEST:
+            // Sort by newest year first
+            return parseInt(b.game.year) - parseInt(a.game.year)
+          case SortOption.NAME:
+            // Sort alphabetically by name
+            return a.game.name.localeCompare(b.game.name)
+          default:
+            return 0
+        }
+      })
     }
 
     return filtered

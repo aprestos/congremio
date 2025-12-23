@@ -48,116 +48,17 @@
                 </div>
 
                 <!-- Filters -->
-                <form
-                  class="mt-4 border-t border-gray-200 dark:border-gray-700"
-                >
-                  <h3 class="sr-only">{{ t('library.filters.title') }}</h3>
-                  <ul
-                    role="list"
-                    class="px-2 py-3 font-medium text-gray-900 dark:text-white"
-                  >
-                    <li v-for="category in subCategories" :key="category.id">
-                      <label
-                        class="flex items-center gap-2 px-2 py-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700"
-                        :class="{
-                          'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300':
-                            selectedTag === category.id,
-                        }"
-                      >
-                        <component
-                          :is="category.icon"
-                          class="h-5 w-5 text-gray-400 dark:text-gray-300"
-                          :class="{
-                            'text-indigo-600 dark:text-indigo-400':
-                              selectedTag === category.id,
-                          }"
-                        />
-                        <span class="flex-1" @click="selectTag(category.id)">
-                          {{ t(`library.filters.${category.id}`) }}
-                        </span>
-                      </label>
-                    </li>
-                  </ul>
-
-                  <Disclosure
-                    v-for="section in filters"
-                    :key="section.id"
-                    v-slot="{ open }"
-                    as="div"
-                    class="border-t border-gray-200 dark:border-gray-700 px-4 py-6"
-                  >
-                    <h3 class="-mx-2 -my-3 flow-root">
-                      <DisclosureButton
-                        class="flex w-full items-center justify-between bg-white dark:bg-gray-800 px-2 py-3 text-gray-400 dark:text-gray-300 hover:text-gray-500 dark:hover:text-gray-200"
-                      >
-                        <span
-                          class="font-medium text-gray-900 dark:text-white"
-                          >{{ $t(`library.filters.${section.id}`) }}</span
-                        >
-                        <span class="ml-6 flex items-center">
-                          <PlusIcon
-                            v-if="!open"
-                            class="size-5"
-                            aria-hidden="true"
-                          />
-                          <MinusIcon v-else class="size-5" aria-hidden="true" />
-                        </span>
-                      </DisclosureButton>
-                    </h3>
-                    <DisclosurePanel class="pt-6">
-                      <div class="space-y-6">
-                        <div
-                          v-for="(option, optionIdx) in section.options"
-                          :key="option.value"
-                          class="flex gap-3"
-                        >
-                          <div class="flex h-5 shrink-0 items-center">
-                            <div class="group grid size-4 grid-cols-1">
-                              <input
-                                :id="`filter-mobile-${section.id}-${optionIdx}`"
-                                :name="`${section.id}[]`"
-                                :value="option.value"
-                                type="checkbox"
-                                :checked="
-                                  isFilterSelected(section.id, option.value)
-                                "
-                                class="col-start-1 row-start-1 appearance-none rounded-sm border border-gray-300 bg-white checked:border-indigo-600 checked:bg-indigo-600 indeterminate:border-indigo-600 indeterminate:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto"
-                                @change="
-                                  toggleFilter(section.id, option.value, $event)
-                                "
-                              />
-                              <svg
-                                class="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-disabled:stroke-gray-950/25"
-                                viewBox="0 0 14 14"
-                                fill="none"
-                              >
-                                <path
-                                  class="opacity-0 group-has-checked:opacity-100"
-                                  d="M3 8L6 11L11 3.5"
-                                  stroke-width="2"
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                />
-                                <path
-                                  class="opacity-0 group-has-indeterminate:opacity-100"
-                                  d="M3 7H11"
-                                  stroke-width="2"
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                />
-                              </svg>
-                            </div>
-                          </div>
-                          <label
-                            :for="`filter-mobile-${section.id}-${optionIdx}`"
-                            class="min-w-0 flex-1 text-gray-500 dark:text-gray-400"
-                            >{{ option.label }}</label
-                          >
-                        </div>
-                      </div>
-                    </DisclosurePanel>
-                  </Disclosure>
-                </form>
+                <div class="mt-4 border-t border-gray-200 dark:border-gray-700">
+                  <LibraryFilters
+                    is-mobile
+                    :selected-tag="selectedTag"
+                    :selected-filters="selectedFilters"
+                    :sub-categories="subCategories"
+                    :filters="filters"
+                    @select-tag="selectTag"
+                    @toggle-filter="toggleFilter"
+                  />
+                </div>
               </DialogPanel>
             </TransitionChild>
           </div>
@@ -165,12 +66,12 @@
       </TransitionRoot>
 
       <main>
-        <div class="flex items-baseline justify-between pb-6">
+        <div class="flex items-center gap-4 pb-6">
           <!-- Search Input -->
-          <div class="flex-1 mr-6">
+          <div class="flex-1">
             <div class="relative">
               <div
-                class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"
               >
                 <IconSearch class="h-6 w-6 text-gray-400" aria-hidden="true" />
               </div>
@@ -178,34 +79,49 @@
                 v-model="searchQuery"
                 type="text"
                 :placeholder="t('library.search')"
-                class="block w-full pl-12 pr-3 py-4 text-lg bg-gray-100 dark:border-gray-600 rounded-full dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:focus:ring-indigo-400 dark:focus:border-indigo-400"
+                class="block w-full pl-14 pr-4 py-4 text-lg bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-full text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:focus:ring-indigo-400 dark:focus:border-indigo-400 shadow-sm"
               />
             </div>
           </div>
 
-          <div class="flex items-center">
-            <Listbox v-model="selectedSort" class="hidden">
-              <div class="relative">
+          <!-- Sort Combobox -->
+          <div class="flex-shrink-0 self-stretch">
+            <Listbox v-model="selectedSort" class="h-full">
+              <div class="relative h-full">
                 <ListboxButton
-                  class="group flex flex-col items-start bg-gray-100 dark:bg-gray-700 px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 min-w-[120px]"
+                  class="relative w-full h-full cursor-pointer rounded-full bg-gray-100 dark:bg-gray-700 pl-12 pr-10 text-left focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:focus:ring-indigo-400 dark:focus:border-indigo-400"
                 >
-                  <div class="flex items-center justify-between w-full">
-                    <span class="text-xs text-gray-500 dark:text-gray-400">{{
-                      t('library.sort.sortBy')
-                    }}</span>
-                    <ChevronDownIcon
-                      class="size-4 shrink-0 text-gray-400 dark:text-gray-300"
+                  <span
+                    class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"
+                  >
+                    <IconArrowsSort
+                      class="h-6 w-6 text-gray-200"
                       aria-hidden="true"
                     />
-                  </div>
+                  </span>
+                  <span class="hidden md:flex flex-col justify-center">
+                    <span
+                      class="text-xs text-gray-500 dark:text-gray-400 mb-0.5"
+                    >
+                      {{ t('library.sort.sortBy') }}
+                    </span>
+                    <span
+                      class="block truncate text-base font-medium text-gray-900 dark:text-white"
+                    >
+                      {{
+                        selectedSort
+                          ? t(`library.sort.${selectedSort}`)
+                          : t(`library.sort.${SortOption.DEFAULT}`)
+                      }}
+                    </span>
+                  </span>
                   <span
-                    class="text-sm font-medium text-gray-900 dark:text-white"
+                    class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4"
                   >
-                    {{
-                      selectedSort
-                        ? sortOptions.find((opt) => opt.id === selectedSort)?.id
-                        : 'Best Rating'
-                    }}
+                    <ChevronDownIcon
+                      class="h-5 w-5 text-gray-400"
+                      aria-hidden="true"
+                    />
                   </span>
                 </ListboxButton>
 
@@ -218,40 +134,56 @@
                   leave-to-class="transform opacity-0 scale-95"
                 >
                   <ListboxOptions
-                    class="absolute right-0 z-10 mt-2 w-40 origin-top-right rounded-md bg-white dark:bg-gray-800 shadow-2xl ring-1 ring-black/5 dark:ring-gray-700 focus:outline-none"
+                    class="absolute z-10 mt-1 max-h-60 w-60 overflow-auto rounded-md bg-white dark:bg-gray-800 py-1 text-base shadow-lg ring-1 ring-black/5 dark:ring-gray-700 focus:outline-none sm:text-sm"
                   >
-                    <div class="py-1">
-                      <ListboxOption
-                        v-for="option in sortOptions"
-                        :key="option.id"
-                        v-slot="{ active, selected }"
-                        :value="option.id"
+                    <ListboxOption
+                      v-for="option in Object.values(SortOption)"
+                      :key="option"
+                      v-slot="{ active, selected }"
+                      :value="option"
+                      as="template"
+                    >
+                      <li
+                        :class="[
+                          active
+                            ? 'bg-indigo-600 text-white'
+                            : 'text-gray-900 dark:text-white',
+                          'relative flex flex-row cursor-pointer select-none py-2 pl-3 pr-9',
+                        ]"
                       >
-                        <div
+                        <span
                           :class="[
-                            selected
-                              ? 'font-medium text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700'
-                              : 'text-gray-500 dark:text-gray-400',
-                            active ? 'bg-gray-100 dark:bg-gray-600' : '',
-                            'block px-4 py-2 text-sm cursor-pointer',
+                            selected ? 'font-semibold' : 'font-normal',
+                            'block truncate',
                           ]"
                         >
-                          {{ t('library.sort.' + option.id) }}
-                        </div>
-                      </ListboxOption>
-                    </div>
+                          {{ t('library.sort.' + option) }}
+                        </span>
+
+                        <IconCheck
+                          v-if="selected"
+                          :class="[
+                            active ? 'text-white' : 'text-indigo-600',
+                            'size-5 absolute right-0 mr-4',
+                          ]"
+                        />
+                      </li>
+                    </ListboxOption>
                   </ListboxOptions>
                 </transition>
               </div>
             </Listbox>
+          </div>
 
+          <!-- Filter Button -->
+          <div class="flex-shrink-0 lg:hidden self-stretch">
             <button
               type="button"
-              class="-m-2 ml-4 p-2 text-gray-400 dark:text-gray-300 hover:text-gray-500 dark:hover:text-gray-200 sm:ml-6 lg:hidden"
+              class="h-full px-5 py-4 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-colors flex items-center gap-2"
               @click="mobileFiltersOpen = true"
             >
+              <FunnelIcon class="size-6 text-gray-200" aria-hidden="true" />
               <span class="sr-only">{{ t('library.filters') }}</span>
-              <FunnelIcon class="size-5" aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -263,113 +195,16 @@
 
           <div class="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-4">
             <!-- Filters -->
-            <form class="hidden lg:block">
-              <h3 class="sr-only">{{ t('library.filters.title') }}</h3>
-              <ul
-                role="list"
-                class="space-y-4 border-b border-gray-200 dark:border-gray-700 pb-6 text-sm font-medium text-gray-900 dark:text-white"
-              >
-                <li v-for="category in subCategories" :key="category.id">
-                  <label
-                    class="flex items-center gap-2 cursor-pointer hover:text-indigo-200 dark:hover:text-indigo-300"
-                    :class="{
-                      'text-indigo-600 dark:text-indigo-400':
-                        selectedTag === category.id,
-                    }"
-                  >
-                    <component
-                      :is="category.icon"
-                      class="h-4 w-4 text-gray-400 dark:text-gray-300"
-                      :class="{
-                        'text-indigo-600 dark:text-indigo-400':
-                          selectedTag === category.id,
-                      }"
-                    />
-                    <span class="flex-1" @click="selectTag(category.id)">
-                      {{ t(`library.filters.${category.id}`) }}
-                    </span>
-                  </label>
-                </li>
-              </ul>
-
-              <Disclosure
-                v-for="section in filters"
-                :key="section.id"
-                v-slot="{ open }"
-                as="div"
-                class="border-b border-gray-200 dark:border-gray-700 py-6"
-              >
-                <h3 class="-my-3 flow-root">
-                  <DisclosureButton
-                    class="flex w-full items-center justify-between bg-white dark:bg-gray-900 py-3 text-sm text-gray-400 dark:text-gray-300 hover:text-gray-500 dark:hover:text-gray-200"
-                  >
-                    <span class="font-medium text-gray-900 dark:text-white">{{
-                      t('library.filters.' + section.id)
-                    }}</span>
-                    <span class="ml-6 flex items-center">
-                      <PlusIcon
-                        v-if="!open"
-                        class="size-5"
-                        aria-hidden="true"
-                      />
-                      <MinusIcon v-else class="size-5" aria-hidden="true" />
-                    </span>
-                  </DisclosureButton>
-                </h3>
-                <DisclosurePanel class="pt-6">
-                  <div class="space-y-4">
-                    <div
-                      v-for="(option, optionIdx) in section.options"
-                      :key="option.value"
-                      class="flex gap-3"
-                    >
-                      <div class="flex h-5 shrink-0 items-center">
-                        <div class="group grid size-4 grid-cols-1">
-                          <input
-                            :id="`filter-${section.id}-${optionIdx}`"
-                            :name="`${section.id}[]`"
-                            :value="option.value"
-                            type="checkbox"
-                            :checked="
-                              isFilterSelected(section.id, option.value)
-                            "
-                            class="col-start-1 row-start-1 appearance-none rounded-sm border border-gray-300 bg-white checked:border-indigo-600 checked:bg-indigo-600 indeterminate:border-indigo-600 indeterminate:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto"
-                            @change="
-                              toggleFilter(section.id, option.value, $event)
-                            "
-                          />
-                          <svg
-                            class="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-disabled:stroke-gray-950/25"
-                            viewBox="0 0 14 14"
-                            fill="none"
-                          >
-                            <path
-                              class="opacity-0 group-has-checked:opacity-100"
-                              d="M3 8L6 11L11 3.5"
-                              stroke-width="2"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                            />
-                            <path
-                              class="opacity-0 group-has-indeterminate:opacity-100"
-                              d="M3 7H11"
-                              stroke-width="2"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                            />
-                          </svg>
-                        </div>
-                      </div>
-                      <label
-                        :for="`filter-${section.id}-${optionIdx}`"
-                        class="text-sm text-gray-600 dark:text-gray-400"
-                        >{{ option.label }}</label
-                      >
-                    </div>
-                  </div>
-                </DisclosurePanel>
-              </Disclosure>
-            </form>
+            <div class="hidden lg:block">
+              <LibraryFilters
+                :selected-tag="selectedTag"
+                :selected-filters="selectedFilters"
+                :sub-categories="subCategories"
+                :filters="filters"
+                @select-tag="selectTag"
+                @toggle-filter="toggleFilter"
+              />
+            </div>
 
             <div class="lg:col-span-3">
               <GameList :filters="currentFilters" />
@@ -389,22 +224,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import {
+  IconArrowsSort,
   IconMoodKidFilled,
   IconPlayCard2Filled,
   IconSearch,
+  IconCheck,
+  IconUsersGroup,
+  IconTrophyFilled,
 } from '@tabler/icons-vue'
 import GameList from '@/views/public/library/GameList.vue'
 import ReservationList from '@/views/public/library/ReservationList.vue'
-import type { FilterOptions } from '@/features/library/service.ts'
+import LibraryFilters from '@/views/public/library/LibraryFilters.vue'
+import { type FilterOptions, SortOption } from '@/features/library/service.ts'
 import {
   Dialog,
   DialogPanel,
-  Disclosure,
-  DisclosureButton,
-  DisclosurePanel,
   Listbox,
   ListboxButton,
   ListboxOption,
@@ -416,11 +253,7 @@ import { XMarkIcon } from '@heroicons/vue/24/outline'
 import {
   ChevronDownIcon,
   FunnelIcon,
-  MinusIcon,
-  PlusIcon,
   SparklesIcon,
-  UserGroupIcon,
-  TrophyIcon,
 } from '@heroicons/vue/20/solid'
 
 const { t } = useI18n()
@@ -428,7 +261,7 @@ const { t } = useI18n()
 const searchQuery = ref('')
 const selectedFilters = ref<Record<string, string[]>>({})
 const selectedTag = ref<string>('')
-const selectedSort = ref('rating')
+const selectedSort = ref<SortOption | undefined>(SortOption.DEFAULT)
 
 // Computed property to create the proper filter structure
 const currentFilters = computed((): FilterOptions => {
@@ -448,19 +281,14 @@ const currentFilters = computed((): FilterOptions => {
     searchQuery: searchQuery.value || undefined,
     selectedFilters:
       Object.keys(cleanedFilters).length > 0 ? cleanedFilters : undefined,
+    selectedSort: selectedSort.value || undefined,
   }
 })
 
-const sortOptions = [
-  { id: 'bestRating', current: false },
-  { id: 'newest', current: false },
-  { id: 'name', current: false },
-]
-
 const subCategories = [
   { id: 'new-arrivals', href: '#', icon: SparklesIcon },
-  { id: 'family', href: '#', icon: UserGroupIcon },
-  { id: 'classics', href: '#', icon: TrophyIcon },
+  { id: 'family', href: '#', icon: IconUsersGroup },
+  { id: 'classics', href: '#', icon: IconTrophyFilled },
   { id: 'children', href: '#', icon: IconMoodKidFilled },
   {
     id: 'two-player-only',
@@ -512,9 +340,6 @@ const selectTag = (tagName: string): void => {
 }
 
 // Filter management functions
-const isFilterSelected = (sectionId: string, value: string): boolean => {
-  return selectedFilters.value[sectionId]?.includes(value) || false
-}
 
 const toggleFilter = (sectionId: string, value: string, event: Event): void => {
   const target = event.target as HTMLInputElement

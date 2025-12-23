@@ -7,9 +7,8 @@ import {
   ListboxOption,
   TransitionRoot,
 } from '@headlessui/vue'
-import { ChevronUpDownIcon } from '@heroicons/vue/20/solid'
-import { IconCheck } from '@tabler/icons-vue'
-import CAvatar from '@/components/CAvatar.vue'
+import { IconCheck, IconLanguage } from '@tabler/icons-vue'
+import CButton from '@/components/CButton.vue'
 
 const { availableLocales, currentLocale, setLocale } = useLocale()
 
@@ -23,32 +22,19 @@ const handleLocaleChange = (localeCode: string): void => {
     :model-value="currentLocale?.code"
     @update:model-value="handleLocaleChange"
   >
-    <div class="relative w-40">
+    <div class="relative">
       <div
-        class="relative w-full cursor-default overflow-hidden rounded-md bg-white dark:bg-white/5 text-left outline-1 -outline-offset-1 outline-gray-300 dark:outline-white/10 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600 dark:focus-within:outline-indigo-500"
+        class="relative w-full cursor-default overflow-hidden rounded-md text-left-outline-offset-1 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600 dark:focus-within:outline-indigo-500"
       >
         <ListboxButton
-          class="relative flex flex-row items-center w-full cursor-default py-1.5 pl-3 pr-10 text-base sm:text-sm/6 text-gray-900 dark:text-white focus:ring-0 bg-transparent outline-none"
+          class="relative flex flex-row items-center w-full cursor-default text-base sm:text-sm/6 text-gray-900 dark:text-white focus:ring-0 bg-transparent outline-none"
         >
-          <CAvatar
-            :src="`https://unpkg.com/language-icons/icons/${currentLocale?.code}.svg`"
-            :alt="`${currentLocale?.code} locale`"
-            :initials="currentLocale?.code?.toUpperCase()"
-            size="xs"
-            shape="circle"
-            class="mr-2"
-          />
-          <span class="block truncate">
-            {{ currentLocale?.nativeName }}
-          </span>
-          <span
-            class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2"
+          <CButton variant="transparent">
+            <IconLanguage class="size-5 mr-1" />
+            <span class="hidden md:block">{{
+              currentLocale?.nativeName
+            }}</span></CButton
           >
-            <ChevronUpDownIcon
-              class="h-5 w-5 text-gray-400"
-              aria-hidden="true"
-            />
-          </span>
         </ListboxButton>
       </div>
 
@@ -58,7 +44,7 @@ const handleLocaleChange = (localeCode: string): void => {
         leave-to="opacity-0"
       >
         <ListboxOptions
-          class="absolute z-20 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white dark:bg-gray-800 py-1 text-base shadow-lg ring-1 ring-gray-200 dark:ring-white/10 focus:outline-none sm:text-sm"
+          class="absolute z-20 mt-1 max-h-60 w-40 overflow-auto rounded-md bg-white dark:bg-gray-800 py-1 text-base shadow-lg ring-1 ring-gray-200 dark:ring-white/10 focus:outline-none sm:text-sm"
         >
           <ListboxOption
             v-for="locale in availableLocales"
@@ -75,15 +61,6 @@ const handleLocaleChange = (localeCode: string): void => {
                   : 'text-gray-900 dark:text-gray-100'
               "
             >
-              <CAvatar
-                :src="`https://unpkg.com/language-icons/icons/${locale.code}.svg`"
-                :alt="`${locale.nativeName} flag`"
-                :initials="locale.code.toUpperCase()"
-                size="xs"
-                shape="circle"
-                class="mr-2"
-              />
-
               <span
                 class="block truncate"
                 :class="selected ? 'font-medium' : 'font-normal'"
