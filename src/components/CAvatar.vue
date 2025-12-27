@@ -28,7 +28,7 @@ interface Props {
   src?: string
   alt?: string
   initials?: string
-  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+  size?: 'xxs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'
   shape?: 'circle' | 'rounded' | 'square'
 }
 
@@ -47,6 +47,7 @@ const showFallback = computed(() => !props.src || hasError.value)
 
 const sizeClasses = computed(() => {
   const sizes = {
+    xxs: 'size-4 text-xxs',
     xs: 'size-6 text-xs',
     sm: 'size-8 text-sm',
     md: 'size-10 text-base',
