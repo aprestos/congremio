@@ -145,7 +145,7 @@ const pt = {
       bestRating: 'Melhor Avaliação',
       newest: 'Mais Recentes',
       name: 'Nome',
-      lastUpdated: 'Popularidade',
+      trending: 'Popularidade',
     },
   },
   reservation: {

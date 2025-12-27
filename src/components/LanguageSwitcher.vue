@@ -23,20 +23,16 @@ const handleLocaleChange = (localeCode: string): void => {
     @update:model-value="handleLocaleChange"
   >
     <div class="relative">
-      <div
-        class="relative w-full cursor-default overflow-hidden rounded-md text-left-outline-offset-1 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600 dark:focus-within:outline-indigo-500"
+      <ListboxButton
+        class="relative flex flex-row items-center w-full cursor-default text-base sm:text-sm/6 text-gray-900 dark:text-white focus:ring-0 bg-transparent outline-none"
       >
-        <ListboxButton
-          class="relative flex flex-row items-center w-full cursor-default text-base sm:text-sm/6 text-gray-900 dark:text-white focus:ring-0 bg-transparent outline-none"
+        <CButton variant="transparent">
+          <IconLanguage class="size-5 mr-1" />
+          <span class="hidden md:block">{{
+            currentLocale?.nativeName
+          }}</span></CButton
         >
-          <CButton variant="transparent">
-            <IconLanguage class="size-5 mr-1" />
-            <span class="hidden md:block">{{
-              currentLocale?.nativeName
-            }}</span></CButton
-          >
-        </ListboxButton>
-      </div>
+      </ListboxButton>
 
       <TransitionRoot
         leave="transition ease-in duration-100"

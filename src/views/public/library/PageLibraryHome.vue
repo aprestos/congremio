@@ -95,7 +95,7 @@
                     class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"
                   >
                     <IconArrowsSort
-                      class="h-6 w-6 text-gray-200"
+                      class="h-6 w-6 text-gray-400 dark:text-gray-300"
                       aria-hidden="true"
                     />
                   </span>
@@ -182,7 +182,7 @@
               class="h-full px-5 py-4 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-colors flex items-center gap-2"
               @click="mobileFiltersOpen = true"
             >
-              <FunnelIcon class="size-6 text-gray-200" aria-hidden="true" />
+              <FunnelIcon class="size-6 text-gray-400" aria-hidden="true" />
               <span class="sr-only">{{ t('library.filters') }}</span>
             </button>
           </div>
@@ -261,7 +261,7 @@ const { t } = useI18n()
 const searchQuery = ref('')
 const selectedFilters = ref<Record<string, string[]>>({})
 const selectedTag = ref<string>('')
-const selectedSort = ref<SortOption | undefined>(SortOption.DEFAULT)
+const selectedSort = ref<SortOption>(SortOption.DEFAULT)
 
 // Computed property to create the proper filter structure
 const currentFilters = computed((): FilterOptions => {

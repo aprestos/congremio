@@ -150,7 +150,7 @@ const en = {
       bestRating: 'Best Rating',
       newest: 'Newest',
       name: 'Name',
-      lastUpdated: 'Last updated',
+      trending: 'Trending',
     },
   },
   reservation: {

@@ -127,12 +127,13 @@
 import { useI18n } from 'vue-i18n'
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue'
 import { MinusIcon, PlusIcon } from '@heroicons/vue/20/solid'
+import type { Component } from 'vue'
 
 interface Props {
   isMobile?: boolean
   selectedTag: string
   selectedFilters: Record<string, string[]>
-  subCategories: Array<{ id: string; href: string; icon: unknown }>
+  subCategories: Array<{ id: string; href: string; icon: Component }>
   filters: Array<{
     id: string
     options: Array<{ value: string; label: string; checked: boolean }>

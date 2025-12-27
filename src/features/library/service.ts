@@ -5,7 +5,7 @@ import { tenantStore } from '@/stores/tenant.ts'
 import logger from '@/lib/logger.ts'
 
 export enum SortOption {
-  DEFAULT = 'lastUpdated',
+  DEFAULT = 'trending',
   BEST_RATING = 'bestRating',
   NEWEST = 'newest',
   NAME = 'name',
@@ -14,7 +14,7 @@ export enum SortOption {
 export interface FilterOptions {
   searchQuery?: string
   selectedFilters?: Record<string, string[]>
-  selectedSort?: SortOption | undefined
+  selectedSort?: SortOption
 }
 
 type GameUpdateCallback = (games: LibraryGame[]) => void
