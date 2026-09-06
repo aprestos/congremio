@@ -1,7 +1,7 @@
 import { supabase } from '@/lib/supabase.ts'
 import logger from '@/lib/logger.ts'
 import { toCamelCaseAs } from '@/utils/caseConverter.ts'
-import type { TenantDomain } from './domain.model.ts'
+import type { DomainStatus, TenantDomain } from './domain.model.ts'
 
 /**
  * The edge function answers a failure with `{ error, message }` and a real
@@ -57,6 +57,28 @@ export const domainsService = {
     }
 
     return toCamelCaseAs<TenantDomain>(data ?? [])
+  },
+
+  /**
+   * The status of a hostname whether or not it resolves yet.
+   *
+   * Tenant resolution only matches active hostnames, so a host that fails to
+   * resolve could be one we have never heard of or one that is still being
+   * verified. Those need different things said to the visitor.
+   */
+  async getStatusByHostname(hostname: string): Promise<DomainStatus | null> {
+    const { data, error } = await supabase
+      .from('tenant_domains')
+      .select('status')
+      .eq('hostname', hostname.trim().toLowerCase())
+      .maybeSingle<{ status: DomainStatus }>()
+
+    if (error) {
+      logger.error('Unable to read the domain status', { hostname, error })
+      return null
+    }
+
+    return data?.status ?? null
   },
 
   async add(tenantId: string, hostname: string): Promise<TenantDomain> {

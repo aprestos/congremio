@@ -11,7 +11,6 @@ export enum LogoType {
 export interface Tenant {
   id: string
   name: string
-  domain: string
   logo?: string
   logos?: Partial<Record<LogoType, string | undefined>>
   currentEvent: string

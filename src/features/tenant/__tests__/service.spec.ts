@@ -13,7 +13,6 @@ vi.mock('@/lib/supabase', () => ({
 const tenantRow = {
   id: '1',
   name: 'Test Tenant',
-  domain: 'example.com',
   current_event: '',
   email: '',
 }
@@ -21,7 +20,6 @@ const tenantRow = {
 const tenant = {
   id: '1',
   name: 'Test Tenant',
-  domain: 'example.com',
   currentEvent: '',
   email: '',
 }
