@@ -31,33 +31,6 @@ export const stripeService = {
     }
   },
 
-  async callback(
-    tenantId: string,
-    code: string,
-    state: string,
-  ): Promise<string | undefined> {
-    try {
-      const result = await supabase.functions.invoke<{ url: string }>(
-        'admin/payments/stripe/callback',
-        {
-          method: 'POST',
-          body: {
-            tenant_id: tenantId,
-            code,
-            state,
-          },
-        },
-      )
-      return result.data?.url
-    } catch (error) {
-      logger.error('unable to update settings', {
-        error,
-        tenantId,
-      })
-      throw error
-    }
-  },
-
   async getConfiguration(
     tenantId: string,
   ): Promise<StripeConfiguration | null> {

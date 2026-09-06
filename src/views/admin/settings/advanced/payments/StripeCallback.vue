@@ -9,8 +9,6 @@ import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type { LocationQueryValue } from 'vue-router'
 import { RouteNames } from '@/router/routeNames.ts'
-import { stripeService } from '@/features/settings/stripe.service.ts'
-import { tenantStore } from '@/features/tenant/tenant.store'
 
 const router = useRouter()
 const route = useRoute()
@@ -52,13 +50,11 @@ async function redirectToAdvancedSettings(): Promise<void> {
   await router.push({ name: RouteNames.admin.settingsAdvanced })
 }
 
-onMounted(async () => {
+onMounted(() => {
   const queryError = normalizeQueryValue(route.query.error)
   const queryErrorDescription = normalizeQueryValue(
     route.query.error_description,
   )
-  const queryCode = normalizeQueryValue(route.query.code)
-
   const stripeResult = normalizeQueryValue(route.query.stripe)
 
   if (queryError) {
@@ -72,29 +68,6 @@ onMounted(async () => {
     title.value = 'Stripe connected successfully'
     message.value =
       'Your Stripe account has been connected. You will be redirected to settings.'
-  } else if (queryCode) {
-    // Retired flow: Stripe used to redirect straight to the tenant's origin
-    // with the code, and this page posted it back. Kept so this page still
-    // works against a function that has not been redeployed yet; remove it,
-    // and stripeService.callback(), once the new callback is live.
-
-    isLoading.value = true
-    try {
-      await stripeService.callback(
-        tenantStore.value?.id as string,
-        route.query.code as string,
-        route.query.state as string,
-      )
-      isSuccess.value = true
-      title.value = 'Stripe connected successfully'
-      message.value =
-        'Your Stripe account has been connected. You will be redirected to settings.'
-    } catch {
-      isSuccess.value = false
-      title.value = 'Unable to connect your account'
-      message.value =
-        'Something went wrong while linking to stripe. Please try connecting your account again.'
-    }
   } else {
     isSuccess.value = false
     title.value = 'Invalid callback'

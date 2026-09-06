@@ -214,10 +214,12 @@ const recordNoun = (domain: TenantDomain): string =>
 const dnsRecords = (domain: TenantDomain): DnsRecord[] =>
   domain.status === 'active' ? [] : (domain.dnsRecords ?? [])
 
-// Only a domain provisioned through us has provider state worth polling. A
-// congrem.io subdomain is served by the wildcard and is live from the start.
+// Only an individual custom domain has provider state worth polling; a
+// wildcard or platform hostname is live from the start. A missing provider id
+// is not a reason to hide this -- refreshing is what looks the id up and
+// stores it, so the rows that lack one are the ones that most need it.
 const canRefresh = (domain: TenantDomain): boolean =>
-  domain.provider === 'railway' && domain.providerId !== null
+  domain.provider === 'railway'
 
 const describe = (domain: TenantDomain): string => {
   if (domain.provider !== 'railway') {
