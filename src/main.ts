@@ -22,6 +22,9 @@ import { settingsStore } from '@/features/settings/useSettings.store.ts'
 import { settingsService } from '@/features/settings/service.ts'
 import type { Edition } from '@/features/events/edition.model.ts'
 import i18n from '@/i18n'
+import domainsService from '@/features/domains/service'
+import DomainNotConfigured from '@/views/DomainNotConfigured.vue'
+import logger from '@/lib/logger.ts'
 
 // Always resolve from the hostname. The tenant a host maps to is server-side
 // state that can change, so it is never read from a client-side cache.
@@ -29,6 +32,22 @@ async function loadTenant(): Promise<Tenant> {
   const tenant = await tenantService.getByDomain(window.location.hostname)
   tenantStore.value = tenant
   return tenant
+}
+
+/**
+ * Shown instead of the app when the hostname resolves to no tenant.
+ *
+ * Nothing here depends on a tenant, because there is not one: no router, no
+ * settings, no branding. The status lookup only decides which of two things
+ * to say, so a failure to read it still leaves a page rather than a blank
+ * screen.
+ */
+async function mountUnconfiguredDomain(hostname: string): Promise<void> {
+  const status = await domainsService
+    .getStatusByHostname(hostname)
+    .catch(() => null)
+
+  createApp(DomainNotConfigured, { hostname, status }).mount('#app')
 }
 
 async function loadEdition(tenantId: string): Promise<Edition | null> {
@@ -53,7 +72,21 @@ async function initializeApp(): Promise<void> {
   const app = createApp(App)
 
   // Load tenant first before setting up router
-  const tenant = await loadTenant()
+  let tenant: Tenant
+  try {
+    tenant = await loadTenant()
+  } catch (error) {
+    // Only the tenant lookup is caught here. Letting the whole startup fall
+    // back would report a network blip or a broken build as a domain that is
+    // not configured, which sends the reader after the wrong problem.
+    logger.error('No tenant serves this hostname', {
+      hostname: window.location.hostname,
+      error,
+    })
+    await mountUnconfiguredDomain(window.location.hostname)
+    return
+  }
+
   const edition = await loadEdition(tenant.id)
   if (edition) {
     await loadSettings(tenant.id, edition.id)

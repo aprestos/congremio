@@ -12,15 +12,6 @@ const HOSTNAME =
 type ResolvedDomain = { tenants: Record<string, unknown> | null }
 
 export const tenantService = {
-  async get(): Promise<Array<Tenant>> {
-    try {
-      const result = await supabase.from('tenants').select('id,name,domain')
-      return result.data as Tenant[]
-    } catch (error) {
-      logger.error('Error on tenantService.get()', { error })
-      return []
-    }
-  },
   async getByDomain(domain: string): Promise<Tenant> {
     const hostname = domain.trim().toLowerCase()
 
